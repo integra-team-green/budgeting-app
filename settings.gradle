@@ -1,0 +1,3 @@
+rootProject.name = "MoneyMind"
+
+include("backend", "frontend")
