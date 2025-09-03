@@ -112,7 +112,7 @@ public class RestSavingController {
             Saving saving = savingMapper.toEntity(savingDTO);
             savingService.updateSaving(saving);
             System.out.println("Saving updated successfully: " + saving);
-            return ResponseEntity.ok(saving);
+            return ResponseEntity.ok(savingDTO);
         } catch (ValidationException e) {
             return ResponseEntity.status(400).body("Error: " + e.getMessage());
         } catch (Exception e) {
@@ -139,7 +139,7 @@ public class RestSavingController {
         try {
             savingService.deleteSaving(savingId);
             System.out.println("Saving deleted successfully with ID: " + savingId);
-            return ResponseEntity.ok(saving);
+            return ResponseEntity.ok(savingDTO);
         } catch (Exception e) {
             System.err.println("Error deleting saving with ID " + savingId + ": " + e.getMessage());
             return ResponseEntity.status(500).body("Error: " + e.getMessage());
