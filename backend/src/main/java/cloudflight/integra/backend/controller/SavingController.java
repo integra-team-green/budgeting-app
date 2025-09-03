@@ -5,6 +5,7 @@ import cloudflight.integra.backend.dto.SavingDTO;
 import cloudflight.integra.backend.entity.Saving;
 import cloudflight.integra.backend.entity.validation.ValidationException;
 import cloudflight.integra.backend.exception.MoneyMindRuntimeException;
+import cloudflight.integra.backend.exception.NotFoundException;
 import cloudflight.integra.backend.mapper.SavingMapper;
 import cloudflight.integra.backend.service.ISavingService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,13 +46,13 @@ public class SavingController {
     @GetMapping(value = "/{savingId}")
     public ResponseEntity<?> getSavingById(
             @Parameter(description = "ID of saving to return") @PathVariable Long savingId) {
-        log.info("GET /savings/" + savingId + " called, searching for saving with ID: " + savingId);
+        log.info("GET /savings/{} called, searching for saving with ID: {}", savingId, savingId);
 
         try {
             Saving saving = savingService.getSavingById(savingId);
             SavingDTO savingDTO = SavingMapper.toDTO(saving);
             return ResponseEntity.ok(savingDTO);
-        } catch (IllegalArgumentException e) {
+        } catch (NotFoundException e) {
             return ResponseEntity.status(404).body("Saving with ID " + savingId + " not found.");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error: " + e.getMessage());
@@ -100,18 +101,18 @@ public class SavingController {
                     )
 
             ) @org.springframework.web.bind.annotation.RequestBody SavingDTO savingDTO) {
-        log.info("POST /savings called, adding new saving: " + savingDTO);
+        log.info("POST /savings called, adding new saving: {}", savingDTO);
 
         try {
             Saving saving = SavingMapper.toEntity(savingDTO);
             savingService.addSaving(saving);
-            log.info("Saving added successfully: " + saving);
+            log.info("Saving added successfully: {}", saving);
             return ResponseEntity.ok(savingDTO);
         } catch (IllegalArgumentException | ValidationException | MoneyMindRuntimeException e) {
-            log.error("Error adding saving: " + e.getMessage());
+            log.error("Error adding saving: {}", e.getMessage());
             return ResponseEntity.status(400).body("Error: " + e.getMessage());
         } catch (Exception e) {
-            log.error("Error adding saving: " + e.getMessage());
+            log.error("InternalError adding saving: {}", e.getMessage());
             return ResponseEntity.status(500).body("Error: " + e.getMessage());
         }
     }
@@ -128,7 +129,7 @@ public class SavingController {
             @Parameter(description = "ID of saving to update")
             @PathVariable Long savingId,
             @RequestBody(description = "Updated saving") @org.springframework.web.bind.annotation.RequestBody SavingDTO savingDTO) {
-        log.info("PUT /savings/" + savingId + " called, updating saving with ID: " + savingId);
+        log.info("PUT /savings/{} called, updating saving with ID: {}", savingId, savingId);
 
         try {
             if (!savingId.equals(savingDTO.getId())) {
@@ -137,13 +138,16 @@ public class SavingController {
 
             Saving saving = SavingMapper.toEntity(savingDTO);
             savingService.updateSaving(saving);
-            log.info("Saving updated successfully: " + saving);
+            log.info("Saving updated successfully: {}", saving);
             return ResponseEntity.ok(savingDTO);
         } catch (ValidationException e) {
-            log.error("Validation error updating saving with ID " + savingId + ": " + e.getMessage());
+            log.error("Validation error updating saving with ID {}: {}", savingId, e.getMessage());
             return ResponseEntity.status(400).body("Error: " + e.getMessage());
+        } catch (NotFoundException e) {
+            log.error("Saving not found with ID {}: {}", savingId, e.getMessage());
+            return ResponseEntity.status(404).body("Error: " + e.getMessage());
         } catch (Exception e) {
-            log.error("Error updating saving with ID " + savingId + ": " + e.getMessage());
+            log.error("Error updating saving with ID {}: {}", savingId, e.getMessage());
             return ResponseEntity.status(500).body("Error: " + e.getMessage());
         }
     }
@@ -157,17 +161,19 @@ public class SavingController {
     @DeleteMapping("/{savingId}")
     public ResponseEntity<?> deleteSaving(
             @Parameter(description = "ID of saving to delete")@PathVariable Long savingId) {
-        log.info("DELETE /savings/" + savingId + " called, deleting saving with ID: " + savingId);
+        log.info("DELETE /savings/{} called, deleting saving with ID: {}", savingId, savingId);
 
         try {
             savingService.deleteSaving(savingId);
-            log.info("Saving deleted successfully with ID: " + savingId);
+            log.info("Saving deleted successfully with ID: {}", savingId);
             return ResponseEntity.noContent().build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
-
+        } catch (NotFoundException e) {
+            log.error("NotFound saving with ID {}: {}", savingId, e.getMessage());
+            return ResponseEntity.status(404).body("Error: " + e.getMessage());
         } catch (Exception e) {
-            log.error("Error deleting saving with ID " + savingId + ": " + e.getMessage());
+            log.error("Error deleting saving with ID {}: {}", savingId, e.getMessage());
             return ResponseEntity.status(500).body("Error: " + e.getMessage());
         }
     }

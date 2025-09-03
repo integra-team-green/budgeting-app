@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 @SpringBootTest
-class BackendApplicationTests {
+class InMemoryRepositoryTests {
 	private ISavingRepository<Long, Saving> TESTsavingRepository;
 	private ISavingService TESTsavingService;
 
