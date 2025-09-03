@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.5.5'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'org.openapi.generator' version '7.5.0'
 }
 
 group = 'cloudflight.integra'
@@ -21,7 +22,19 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.projectlombok:lombok'
+
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
+	implementation 'org.openapitools:jackson-databind-nullable:0.2.6'
+
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.1'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'
+
+	implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
+	implementation 'com.google.code.findbugs:jsr305:3.0.2'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
@@ -29,3 +42,28 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+//openApiGenerate {
+//	generatorName = "spring"
+//	inputSpec = "$rootDir/backend/src/main/resources/api.yaml"
+//	outputDir = "$buildDir/generated"
+//	apiPackage = "cloudflight.integra.backend.controller.generated"
+//	modelPackage = "cloudflight.integra.backend.model.generated"
+//	configOptions = [
+//			interfaceOnly: "true",
+//			dateLibrary: "java8",
+//			useTags: "true"
+//	]
+//}
+
+//sourceSets {
+//	main {
+//		java {
+//			srcDir "$buildDir/generated/src/main/java"
+//		}
+//	}
+//}
+//
+//tasks.compileJava {
+//	dependsOn tasks.openApiGenerate
+//}
