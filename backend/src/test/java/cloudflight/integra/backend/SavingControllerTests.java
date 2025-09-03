@@ -1,11 +1,10 @@
 package cloudflight.integra.backend;
 
-import cloudflight.integra.backend.controller.RestSavingController;
+import cloudflight.integra.backend.controller.SavingController;
 import cloudflight.integra.backend.dto.SavingDTO;
 import cloudflight.integra.backend.entity.Saving;
 import cloudflight.integra.backend.entity.validation.SavingValidation;
-import cloudflight.integra.backend.mapper.ISavingMapper;
-import cloudflight.integra.backend.mapper.implementation.SavingMapper;
+import cloudflight.integra.backend.mapper.SavingMapper;
 import cloudflight.integra.backend.repository.ISavingRepository;
 import cloudflight.integra.backend.repository.implementation.InMemorySavingRepository;
 import cloudflight.integra.backend.service.ISavingService;
@@ -32,9 +31,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class RestSavingControllerTests {
+class SavingControllerTests {
     private ISavingService TESTsavingService;
-    private ISavingMapper savingMapper;
 
     private MockMvc TESTmockMvc;
 
@@ -43,34 +41,38 @@ class RestSavingControllerTests {
 
     @BeforeEach
     void setUp() {
-        Saving saving = new Saving(1L, new BigDecimal("10000.00"), new Date(), "Apartament", "I wish to have my owm apartament");
-        Saving saving2 = new Saving(2L, new BigDecimal("2500.00"), new Date(), "Golf 5", "dream car");
-        Saving saving3 = new Saving(4L, new BigDecimal("5000.00"), new Date(), "Sicily trip");
-
-        ISavingRepository<Long, Saving> TESTsavingRepository = new InMemorySavingRepository();
-
-        TESTsavingRepository.save(saving);
-        TESTsavingRepository.save(saving2);
-        TESTsavingRepository.save(saving3);
+        ISavingRepository<Long, Saving> TESTsavingRepository = getLongSavingISavingRepository();
 
         SavingValidation TESTsavingValidator = new SavingValidation();
         TESTsavingService = new SavingService(TESTsavingRepository, TESTsavingValidator);
-        savingMapper = new SavingMapper();
 
-        RestSavingController TESTrestSavingController = new RestSavingController(TESTsavingService, savingMapper);
+        SavingController TESTrestSavingController = new SavingController(TESTsavingService);
 
         TESTmockMvc = MockMvcBuilders.standaloneSetup(TESTrestSavingController)
                 .build();
 
     }
 
+    private static ISavingRepository<Long, Saving> getLongSavingISavingRepository() {
+        Saving saving = new Saving(null, new BigDecimal("10000.00"), new Date(), "Apartament", "I wish to have my owm apartament");
+        Saving saving2 = new Saving(null, new BigDecimal("2500.00"), new Date(), "Golf 5", "dream car");
+        Saving saving3 = new Saving(null, new BigDecimal("5000.00"), new Date(), "Sicily trip");
+
+        ISavingRepository<Long, Saving> TESTsavingRepository = new InMemorySavingRepository();
+
+        TESTsavingRepository.save(saving);
+        TESTsavingRepository.save(saving2);
+        TESTsavingRepository.save(saving3);
+        return TESTsavingRepository;
+    }
+
 
     @Test
     void testGetById() throws Exception {
-        TESTmockMvc.perform(get("/savings/4"))
+        TESTmockMvc.perform(get("/api/v1/savings/3"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(4L))
+                .andExpect(jsonPath("$.id").value(3L))
                 .andExpect(jsonPath("$.date").exists())
                 .andExpect(jsonPath("$.amount").value(5000.0))
                 .andExpect(jsonPath("$.goal").value("Sicily trip"));
@@ -79,7 +81,7 @@ class RestSavingControllerTests {
     @Test
     void testGetById_NotFound() {
         try {
-            TESTmockMvc.perform(get("/savings/999"))
+            TESTmockMvc.perform(get("/api/v1/savings/999"))
                     .andDo(print())
                     .andExpect(status().isNotFound());
 
@@ -91,7 +93,7 @@ class RestSavingControllerTests {
 
     @Test
     void testGetAll() throws Exception {
-        TESTmockMvc.perform(get("/savings"))
+        TESTmockMvc.perform(get("/api/v1/savings"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(3)))
@@ -114,16 +116,15 @@ class RestSavingControllerTests {
     void testAdd() throws Exception {
         Date date = new Date();
 
-        Saving saving = new Saving(5L, new BigDecimal("3000.00"), new Date(), "New Laptop");
-        SavingDTO savingDTO = savingMapper.toDTO(saving);
+        Saving saving = new Saving(null, new BigDecimal("3000.00"), new Date(), "New Laptop");
+        SavingDTO savingDTO = SavingMapper.toDTO(saving);
 
 
-        TESTmockMvc.perform(post("/savings")
+        TESTmockMvc.perform(post("/api/v1/savings")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(savingDTO)))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(5L))
                 .andExpect(jsonPath("$.amount").value(3000.00))
                 .andExpect(jsonPath("$.date").value(date))
                 .andExpect(jsonPath("$.goal").value("New Laptop"));
@@ -133,11 +134,11 @@ class RestSavingControllerTests {
 
     @Test
     void testAdd_Bad() {
-        Saving badSaving = new Saving(10L, new BigDecimal("-1500.00"), new Date(), "", "Wrong description");
-        SavingDTO savingDTO = savingMapper.toDTO(badSaving);
+        Saving badSaving = new Saving(null, new BigDecimal("-1500.00"), new Date(), "", "Wrong description");
+        SavingDTO savingDTO = SavingMapper.toDTO(badSaving);
 
         try {
-            TESTmockMvc.perform(post("/savings")
+            TESTmockMvc.perform(post("api/v1/savings")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(savingDTO)))
                     .andDo(print())
@@ -150,13 +151,13 @@ class RestSavingControllerTests {
     @Test
     void testDelete() throws Exception {
         Iterable<Saving> all = TESTsavingService.getAllSavings();
-        Iterable<SavingDTO> savingDTOS = savingMapper.toDtoList(all);
+        Iterable<SavingDTO> savingDTOS = SavingMapper.toDtoList(all);
 
         for (SavingDTO s : savingDTOS) {
             System.out.println(s.toString());
         }
 
-        TESTmockMvc.perform(get("/savings"))
+        TESTmockMvc.perform(get("/api/v1/savings"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(3)))
@@ -173,14 +174,14 @@ class RestSavingControllerTests {
                 .andExpect(jsonPath("$[2].amount").exists())
                 .andExpect(jsonPath("$[2].goal").exists());
 
-        TESTmockMvc.perform(delete("/savings/2"))
+        TESTmockMvc.perform(delete("/api/v1/savings/2"))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
         System.out.println("after delete: ");
 
         Iterable<Saving> updatedAll = TESTsavingService.getAllSavings();
-        Iterable<SavingDTO> updatedSavingDTOS = savingMapper.toDtoList(updatedAll);
+        Iterable<SavingDTO> updatedSavingDTOS = SavingMapper.toDtoList(updatedAll);
 
         int count = 0;
         for (SavingDTO s : updatedSavingDTOS) {
@@ -190,7 +191,7 @@ class RestSavingControllerTests {
 
         assertEquals(2, count, "Should be 2 savings after delete");
 
-        TESTmockMvc.perform(get("/savings"))
+        TESTmockMvc.perform(get("/api/v1/savings"))
                 .andDo(print())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].id").exists())
@@ -207,13 +208,13 @@ class RestSavingControllerTests {
     @Test
     void testUpdate() throws Exception {
         Iterable<Saving> all = TESTsavingService.getAllSavings();
-        Iterable<SavingDTO> savingDTOS = savingMapper.toDtoList(all);
+        Iterable<SavingDTO> savingDTOS = SavingMapper.toDtoList(all);
 
         for (SavingDTO s : savingDTOS) {
             System.out.println(s.toString());
         }
 
-        TESTmockMvc.perform(get("/savings"))
+        TESTmockMvc.perform(get("/api/v1/savings"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(3)))
@@ -231,15 +232,15 @@ class RestSavingControllerTests {
                 .andExpect(jsonPath("$[2].goal").exists());
 
 
-        Saving saving = new Saving(4L, new BigDecimal("6000.00"), new Date(), "Sicily trip - updated", "Mafia description");
-        SavingDTO savingDTO = savingMapper.toDTO(saving);
+        Saving saving = new Saving(3L, new BigDecimal("6000.00"), new Date(), "Sicily trip - updated", "Mafia description");
+        SavingDTO savingDTO = SavingMapper.toDTO(saving);
 
-        TESTmockMvc.perform(put("/savings/4")
+        TESTmockMvc.perform(put("/api/v1/savings/3")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(savingDTO)))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(4L))
+                .andExpect(jsonPath("$.id").value(3L))
                 .andExpect(jsonPath("$.amount").value(6000.00))
                 .andExpect(jsonPath("$.goal").value("Sicily trip - updated"))
                 .andExpect(jsonPath("$.description").value("Mafia description"));
@@ -250,7 +251,7 @@ class RestSavingControllerTests {
             System.out.println(s.toString());
         }
 
-        TESTmockMvc.perform(get("/savings"))
+        TESTmockMvc.perform(get("/api/v1/savings"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(3)))
@@ -270,11 +271,11 @@ class RestSavingControllerTests {
 
     @Test
     void testUpdate_Bad() {
-        Saving saving = new Saving(4L, new BigDecimal("-6000.00"), new Date(), "", "Mafia description");
-        SavingDTO savingDTO = savingMapper.toDTO(saving);
+        Saving saving = new Saving(null, new BigDecimal("-6000.00"), new Date(), "", "Mafia description");
+        SavingDTO savingDTO = SavingMapper.toDTO(saving);
 
         try {
-            TESTmockMvc.perform(put("/savings/4")
+            TESTmockMvc.perform(put("/api/v1/savings/4")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(savingDTO)))
                     .andDo(print())

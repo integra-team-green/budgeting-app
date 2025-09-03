@@ -20,6 +20,13 @@ public class SavingDTO {
         this.description = description;
     }
 
+    public SavingDTO(BigDecimal amount, Date date, String goal, String description) {
+        this.amount = amount;
+        this.date = date;
+        this.goal = goal;
+        this.description = description;
+    }
+
     public SavingDTO(){
 
     }

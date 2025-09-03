@@ -21,8 +21,11 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	'org.springframework.boot:spring-boot-starter-data-jpa'
+
 	implementation 'org.projectlombok:lombok'
 
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
@@ -38,6 +41,8 @@ dependencies {
 	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 
+	implementation 'org.postgresql:postgresql:42.7.4'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
@@ -46,27 +51,28 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-//openApiGenerate {
-//	generatorName = "spring"
-//	inputSpec = "$rootDir/backend/src/main/resources/api.yaml"
-//	outputDir = "$buildDir/generated"
-//	apiPackage = "cloudflight.integra.backend.controller.generated"
-//	modelPackage = "cloudflight.integra.backend.model.generated"
-//	configOptions = [
-//			interfaceOnly: "true",
-//			dateLibrary: "java8",
-//			useTags: "true"
-//	]
-//}
+openApiGenerate {
+	generatorName = "spring"
+	inputSpec = "$rootDir/backend/src/main/resources/openapi-spec.json"
+	outputDir = "$buildDir/generated"
+	apiPackage = "cloudflight.integra.backend.controller.generated"
+	modelPackage = "cloudflight.integra.backend.model.generated"
+	configOptions = [
+			interfaceOnly: "true",
+			dateLibrary: "java8",
+			useTags: "true",
+			useJakartaEe: "true"
+	]
+}
 
-//sourceSets {
-//	main {
-//		java {
-//			srcDir "$buildDir/generated/src/main/java"
-//		}
-//	}
-//}
-//
-//tasks.compileJava {
-//	dependsOn tasks.openApiGenerate
-//}
+sourceSets {
+	main {
+		java {
+			srcDir "$buildDir/generated/src/main/java"
+		}
+	}
+}
+
+tasks.compileJava {
+	dependsOn tasks.openApiGenerate
+}

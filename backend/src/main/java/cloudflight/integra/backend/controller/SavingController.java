@@ -1,36 +1,43 @@
 package cloudflight.integra.backend.controller;
 
+import cloudflight.integra.backend.controller.problem.SavingApiErrorResponses;
 import cloudflight.integra.backend.dto.SavingDTO;
 import cloudflight.integra.backend.entity.Saving;
 import cloudflight.integra.backend.entity.validation.ValidationException;
-import cloudflight.integra.backend.mapper.ISavingMapper;
+import cloudflight.integra.backend.exception.MoneyMindRuntimeException;
+import cloudflight.integra.backend.mapper.SavingMapper;
 import cloudflight.integra.backend.service.ISavingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/savings")
+@RequestMapping("/api/v1/savings")
+@SavingApiErrorResponses
 @Tag(name = "saving", description = "All about your savings")
-public class RestSavingController {
+public class SavingController {
 
+    private static final Logger log = LoggerFactory.getLogger(SavingController.class);
     private final ISavingService savingService;
-    private final ISavingMapper savingMapper;
 
     @Autowired
-    public RestSavingController(ISavingService savingService, ISavingMapper savingMapper) {
+    public SavingController(ISavingService savingService) {
         this.savingService = savingService;
-        this.savingMapper = savingMapper;
     }
 
 
-    @Operation(summary = "Get saving by ID", description = "Returns a single saving ID")
+    @Operation(summary = "Get saving by ID", description = "Returns a single saving")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Saving found"),
             @ApiResponse(responseCode = "404", description = "Saving not found")
@@ -38,11 +45,11 @@ public class RestSavingController {
     @GetMapping(value = "/{savingId}")
     public ResponseEntity<?> getSavingById(
             @Parameter(description = "ID of saving to return") @PathVariable Long savingId) {
-        System.out.println("GET /savings/" + savingId + " called, searching for saving with ID: " + savingId);
+        log.info("GET /savings/" + savingId + " called, searching for saving with ID: " + savingId);
 
         try {
             Saving saving = savingService.getSavingById(savingId);
-            SavingDTO savingDTO = savingMapper.toDTO(saving);
+            SavingDTO savingDTO = SavingMapper.toDTO(saving);
             return ResponseEntity.ok(savingDTO);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(404).body("Saving with ID " + savingId + " not found.");
@@ -56,11 +63,11 @@ public class RestSavingController {
     @GetMapping()
     public ResponseEntity<?> getAllSavings() {
 
-        System.out.println("GET /savings called, returning all savings.");
+        log.info("GET /savings called, returning all savings.");
 
         try {
             Iterable<Saving> savings = savingService.getAllSavings();
-            Iterable<SavingDTO> savingDTOS = savingMapper.toDtoList(savings);
+            Iterable<SavingDTO> savingDTOS = SavingMapper.toDtoList(savings);
             return ResponseEntity.ok(savingDTOS);
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error: " + e.getMessage());
@@ -75,17 +82,36 @@ public class RestSavingController {
     })
     @PostMapping()
     public ResponseEntity<?> addSaving(
-            @RequestBody(description = "Saving to add") @org.springframework.web.bind.annotation.RequestBody SavingDTO savingDTO) {
-        System.out.println("POST /savings called, adding new saving: " + savingDTO);
+            @RequestBody(
+                    description = "Saving to add",
+                    required = true,
+                    content = @Content(
+                            schema = @Schema(implementation = SavingDTO.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "SavingExample",
+                                            value = "{ \"amount\": 10000.00, \"date\": \"2025-09-04T10:47:00+00:00\", \"goal\": \"Apartament\", \"description\": \"My dream apartament\" }"
+                                    ),
+                                    @ExampleObject(
+                                            name = "BadExample",
+                                            value = "{ \"amount\": -2000.00, \"date\": \"2222-09-04T10:47:00+00:00\", \"goal\": \"\", \"description\": \"bad description\" }"
+                                    )
+                            }
+                    )
+
+            ) @org.springframework.web.bind.annotation.RequestBody SavingDTO savingDTO) {
+        log.info("POST /savings called, adding new saving: " + savingDTO);
 
         try {
-            Saving saving = savingMapper.toEntity(savingDTO);
+            Saving saving = SavingMapper.toEntity(savingDTO);
             savingService.addSaving(saving);
-            System.out.println("Saving added successfully: " + saving);
+            log.info("Saving added successfully: " + saving);
             return ResponseEntity.ok(savingDTO);
-        } catch (IllegalArgumentException | ValidationException e) {
+        } catch (IllegalArgumentException | ValidationException | MoneyMindRuntimeException e) {
+            log.error("Error adding saving: " + e.getMessage());
             return ResponseEntity.status(400).body("Error: " + e.getMessage());
         } catch (Exception e) {
+            log.error("Error adding saving: " + e.getMessage());
             return ResponseEntity.status(500).body("Error: " + e.getMessage());
         }
     }
@@ -102,20 +128,22 @@ public class RestSavingController {
             @Parameter(description = "ID of saving to update")
             @PathVariable Long savingId,
             @RequestBody(description = "Updated saving") @org.springframework.web.bind.annotation.RequestBody SavingDTO savingDTO) {
-        System.out.println("PUT /savings/" + savingId + " called, updating saving with ID: " + savingId);
+        log.info("PUT /savings/" + savingId + " called, updating saving with ID: " + savingId);
 
         try {
             if (!savingId.equals(savingDTO.getId())) {
                 return ResponseEntity.status(400).body("ID in path and request body do not match.");
             }
 
-            Saving saving = savingMapper.toEntity(savingDTO);
+            Saving saving = SavingMapper.toEntity(savingDTO);
             savingService.updateSaving(saving);
-            System.out.println("Saving updated successfully: " + saving);
+            log.info("Saving updated successfully: " + saving);
             return ResponseEntity.ok(savingDTO);
         } catch (ValidationException e) {
+            log.error("Validation error updating saving with ID " + savingId + ": " + e.getMessage());
             return ResponseEntity.status(400).body("Error: " + e.getMessage());
         } catch (Exception e) {
+            log.error("Error updating saving with ID " + savingId + ": " + e.getMessage());
             return ResponseEntity.status(500).body("Error: " + e.getMessage());
         }
     }
@@ -123,25 +151,23 @@ public class RestSavingController {
 
     @Operation(summary = "Delete a saving by ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Saving updated"),
+            @ApiResponse(responseCode = "204", description = "Saving deleted"),
             @ApiResponse(responseCode = "404", description = "Saving not found")
     })
     @DeleteMapping("/{savingId}")
     public ResponseEntity<?> deleteSaving(
             @Parameter(description = "ID of saving to delete")@PathVariable Long savingId) {
-        System.out.println("DELETE /savings/" + savingId + " called, deleting saving with ID: " + savingId);
+        log.info("DELETE /savings/" + savingId + " called, deleting saving with ID: " + savingId);
 
-        Saving saving = savingService.getSavingById(savingId);
-        SavingDTO savingDTO = savingMapper.toDTO(saving);
-        if (savingDTO == null) {
-            return ResponseEntity.status(404).body("Saving with ID " + savingId + " not found.");
-        }
         try {
             savingService.deleteSaving(savingId);
-            System.out.println("Saving deleted successfully with ID: " + savingId);
-            return ResponseEntity.ok(savingDTO);
+            log.info("Saving deleted successfully with ID: " + savingId);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+
         } catch (Exception e) {
-            System.err.println("Error deleting saving with ID " + savingId + ": " + e.getMessage());
+            log.error("Error deleting saving with ID " + savingId + ": " + e.getMessage());
             return ResponseEntity.status(500).body("Error: " + e.getMessage());
         }
     }

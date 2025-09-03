@@ -2,6 +2,7 @@ package cloudflight.integra.backend.service.impl;
 
 import cloudflight.integra.backend.entity.Saving;
 import cloudflight.integra.backend.entity.validation.SavingValidation;
+import cloudflight.integra.backend.exception.MoneyMindRuntimeException;
 import cloudflight.integra.backend.repository.ISavingRepository;
 import cloudflight.integra.backend.service.ISavingService;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,8 @@ public class SavingService implements ISavingService {
 
     @Override
     public void addSaving(Saving saving) {
+        if (saving.getId() != null)
+            throw new MoneyMindRuntimeException("Id must be null for new entity");
         savingValidator.validate(saving);
         savingRepository.save(saving);
     }

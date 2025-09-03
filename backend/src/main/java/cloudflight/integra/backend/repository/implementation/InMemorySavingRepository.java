@@ -4,15 +4,17 @@ import cloudflight.integra.backend.entity.Saving;
 import cloudflight.integra.backend.repository.ISavingRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
 public class InMemorySavingRepository implements ISavingRepository<Long, Saving> {
     private final Map<Long, Saving> savings;
+    private final AtomicLong idSequence = new AtomicLong(0L);
 
     public InMemorySavingRepository() {
-        this.savings = new HashMap<>();
+        this.savings = new ConcurrentHashMap<>();
     }
 
 
@@ -37,8 +39,9 @@ public class InMemorySavingRepository implements ISavingRepository<Long, Saving>
 
     @Override
     public void save(Saving entity) {
-        if (entity == null) {
-            throw new IllegalArgumentException("entity must not be null");
+        if (entity.getId() == null) {
+            long id = idSequence.incrementAndGet();
+            entity.setId(id);
         }
         savings.put(entity.getId(), entity);
     }

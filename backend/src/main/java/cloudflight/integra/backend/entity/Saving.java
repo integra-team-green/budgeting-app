@@ -1,14 +1,29 @@
 package cloudflight.integra.backend.entity;
 
+import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Objects;
 
+@Entity
+@Table(name = "savings")
 public class Saving {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "amount", nullable = false, precision = 19, scale = 4)
     private BigDecimal amount;
+
+    @Column(name = "date", nullable = false)
     private Date date;
+
+    @Column(name = "goal", nullable = false)
     private String goal;
+
+    @Column(name = "description")
     private String description;
 
     public Saving(Long id, BigDecimal amount, Date date, String goal, String description) {
@@ -73,6 +88,35 @@ public class Saving {
     public void setDescription(String description) {
         this.description = description;
     }
+
+
+    // builder-style methods / fluent API
+    public Saving withId(Long id) {
+        this.id = id;
+        return this;
+    }
+
+    public Saving withAmount(BigDecimal amount) {
+        this.amount = amount;
+        return this;
+    }
+
+    public Saving withDate(Date date) {
+        this.date = date;
+        return this;
+    }
+
+    public Saving withGoal(String goal) {
+        this.goal = goal;
+        return this;
+    }
+
+    public Saving withDescription(String description) {
+        this.description = description;
+        return this;
+    }
+
+
 
     @Override
     public boolean equals(Object o) {

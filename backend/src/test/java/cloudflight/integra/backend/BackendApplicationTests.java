@@ -25,9 +25,9 @@ class BackendApplicationTests {
 
     @BeforeEach
 	void setUp() {
-		Saving saving = new Saving(1L, new BigDecimal("10000.00"), new Date(), "Apartament", "I wish to have my owm apartament");
-		Saving saving2 = new Saving(2L, new BigDecimal("2500.00"), new Date(), "Golf 5", "dream car");
-		Saving saving3 = new Saving(4L, new BigDecimal("5000.00"), new Date(), "Sicily trip");
+		Saving saving = new Saving(null, new BigDecimal("10000.00"), new Date(), "Apartament", "I wish to have my owm apartament");
+		Saving saving2 = new Saving(null, new BigDecimal("2500.00"), new Date(), "Golf 5", "dream car");
+		Saving saving3 = new Saving(null, new BigDecimal("5000.00"), new Date(), "Sicily trip");
 
 		TESTsavingRepository = new InMemorySavingRepository();
 
@@ -69,13 +69,13 @@ class BackendApplicationTests {
 
 	@Test
 	void testSavingRepoSave() {
-		Saving newSaving = new Saving(5L, new BigDecimal("3000.00"), new Date(), "New Laptop", "I need a new laptop for work");
+		Saving newSaving = new Saving(null, new BigDecimal("3000.00"), new Date(), "New Laptop", "I need a new laptop for work");
 
 		TESTsavingRepository.save(newSaving);
 
-		Saving found = TESTsavingRepository.findOne(5L);
+		Saving found = TESTsavingRepository.findOne(4L);
 
-		assert (found.getId().equals(5L));
+		assert (found.getId().equals(4L));
 		assert (found.getGoal().equals("New Laptop"));
 
 		System.out.println(found);
@@ -108,7 +108,7 @@ class BackendApplicationTests {
 
 	@Test
 	void testSavingRepoUpdate() {
-		Saving toUpdate = TESTsavingRepository.findOne(4L);
+		Saving toUpdate = TESTsavingRepository.findOne(3L);
 
 		System.out.println(toUpdate.toString());
 
@@ -119,7 +119,7 @@ class BackendApplicationTests {
 		TESTsavingRepository.update(toUpdate);
 
 
-		Saving found = TESTsavingRepository.findOne(4L);
+		Saving found = TESTsavingRepository.findOne(3L);
 
 		System.out.println("after update:");
 		System.out.println(found.toString());
@@ -162,13 +162,13 @@ class BackendApplicationTests {
 
 	@Test
 	void testSavingServiceSave() {
-		Saving newSaving = new Saving(5L, new BigDecimal("3000.00"), new Date(), "New Laptop", "I need a new laptop for work");
+		Saving newSaving = new Saving(null, new BigDecimal("3000.00"), new Date(), "New Laptop", "I need a new laptop for work");
 
 		TESTsavingService.addSaving(newSaving);
 
-		Saving found = TESTsavingService.getSavingById(5L);
+		Saving found = TESTsavingService.getSavingById(4L);
 
-		assert (found.getId().equals(5L));
+		assert (found.getId().equals(4L));
 //		assert (found.getGoal().equals("New Laptop"));
 
 		assertEquals("New Laptop", found.getGoal(), "Goal should be New Laptop");
@@ -190,10 +190,9 @@ class BackendApplicationTests {
 
 		Date futureDate = calendar.getTime();
 
-		Saving badSaving = new Saving(10L, new BigDecimal("-1500.00"), futureDate, "", "Wrong description");
-//		Saving badSaving = new Saving(10L, new BigDecimal("-1500.00"), new Date(), "", "Wrong description");
-//		Saving badSaving = new Saving(10L, new BigDecimal("-1500.00"), new Date(), "TestGoal", "Wrong description");
-		Saving goodSaving = new Saving(10L, new BigDecimal("1500.00"), new Date(), "TestGoal", "Wrong description");
+		Saving badSaving = new Saving(null, new BigDecimal("-1500.00"), futureDate, "", "Wrong description");
+//		Saving badSaving = new Saving(null, new BigDecimal("-1500.00"), new Date(), "TestGoal", "Wrong description");
+		Saving goodSaving = new Saving(null, new BigDecimal("1500.00"), new Date(), "TestGoal", "Wrong description");
 
 		try {
 			try {
@@ -240,7 +239,7 @@ class BackendApplicationTests {
 
 	@Test
 	void testSavingServiceUpdate() {
-		Saving toUpdate = TESTsavingService.getSavingById(4L);
+		Saving toUpdate = TESTsavingService.getSavingById(3L);
 
 		System.out.println(toUpdate.toString());
 
@@ -260,7 +259,7 @@ class BackendApplicationTests {
 
 	@Test
 	void testSavingService_BAD_Update() {
-		Saving toUpdate = TESTsavingService.getSavingById(4L);
+		Saving toUpdate = TESTsavingService.getSavingById(3L);
 
 		System.out.println(toUpdate.toString());
 
