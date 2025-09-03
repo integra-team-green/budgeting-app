@@ -7,7 +7,7 @@ public interface ISavingService {
     /**
      * First validates the saving and then adds it to the repository
      *
-     * @param saving
+     * @param saving -
      */
     void addSaving(Saving saving);
 
@@ -21,7 +21,7 @@ public interface ISavingService {
     /**
      * Returns a saving by its id from the repository
      *
-     * @param id
+     * @param id -
      * @return Saving with the given id
      */
     Saving getSavingById(Long id);
@@ -29,14 +29,14 @@ public interface ISavingService {
     /**
      * Deletes a saving by its id from the repository
      *
-     * @param id
+     * @param id -
      */
     void deleteSaving(Long id);
 
     /**
      * First validates the saving and then updates it in the repository
      *
-     * @param saving
+     * @param saving -
      */
     void updateSaving(Saving saving);
 }

@@ -1,11 +1,10 @@
 package cloudflight.integra.backend;
 
-import cloudflight.integra.backend.controller.RestSavingController;
 import cloudflight.integra.backend.entity.Saving;
 import cloudflight.integra.backend.entity.validation.SavingValidation;
 import cloudflight.integra.backend.entity.validation.ValidationException;
 import cloudflight.integra.backend.repository.ISavingRepository;
-import cloudflight.integra.backend.repository.implementation.SavingRepository;
+import cloudflight.integra.backend.repository.implementation.InMemorySavingRepository;
 import cloudflight.integra.backend.service.ISavingService;
 import cloudflight.integra.backend.service.impl.SavingService;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,7 +29,7 @@ class BackendApplicationTests {
 		Saving saving2 = new Saving(2L, new BigDecimal("2500.00"), new Date(), "Golf 5", "dream car");
 		Saving saving3 = new Saving(4L, new BigDecimal("5000.00"), new Date(), "Sicily trip");
 
-		TESTsavingRepository = new SavingRepository();
+		TESTsavingRepository = new InMemorySavingRepository();
 
 		TESTsavingRepository.save(saving);
 		TESTsavingRepository.save(saving2);
