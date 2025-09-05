@@ -1,0 +1,237 @@
+openapi: 3.0.4
+info:
+  title: MoneyMind API
+  description: This is a simple API for MoneyMind app
+  version: 1.0.12
+
+tags:
+  - name: saving
+    description: All about your savings
+
+paths:
+  /savings:
+    get:
+      tags:
+        - saving
+      summary: Vizualize all of your savings
+      description: Returns an iterable with all available savings
+      operationId: getAllSavings
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Saving'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      tags:
+        - saving
+      summary: Add a new saving into Savings list
+      description: Add a new saving into Savings list
+      operationId: addSaving
+      requestBody:
+        required: true
+        description: Create a new saving
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Saving'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Saving'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/Saving"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Saving'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Saving'
+        '400':
+          description: Invalid input
+        '422':
+          description: Validation exception
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /savings/{savingId}:
+    get:
+      tags:
+        - saving
+      summary: Find saving by ID
+      description: Returns a single saving
+      operationId: getSavingById
+      parameters:
+        - name: savingId
+          in: path
+          description: ID of saving to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Saving'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Saving'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Saving not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      tags:
+        - saving
+      summary: Update an existing saving
+      description: Update an existing saving by Id
+      operationId: updateSaving
+      parameters:
+        - name: savingId
+          in: path
+          description: ID of saving to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Update an existing saving in the savings list
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Saving'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Saving'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Saving'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Saving'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Saving'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Saving not found
+        '422':
+          description: Validation exception
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      tags:
+        - saving
+      summary: Deletes a saving
+      description: Deletes a saving
+      operationId: deleteSaving
+      parameters:
+        - name: savingId
+          in: path
+          description: ID of saving to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Saving deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Saving'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Saving'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Saving not found
+        '422':
+          description: Validation exception
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+
+
+components:
+  schemas:
+    Saving:
+      required:
+        - id
+        - amount
+        - date
+        - goal
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        amount:
+          type: number
+          format: double
+          minimum: 0
+          example: 10000.00
+        date:
+          type: string
+          format: date-time
+          example: "2025-09-04T10:47:00+00:00"
+          description: (format= ISO 8601)
+        goal:
+          type: string
+          example: Apartament
+        description:
+          type: string
+          nullable: true
+          example: My dream apartament
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
