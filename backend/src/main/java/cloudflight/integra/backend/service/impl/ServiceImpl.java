@@ -1,6 +1,7 @@
 package cloudflight.integra.backend.service.impl;
 
 import cloudflight.integra.backend.model.Payment;
+import cloudflight.integra.backend.model.validator.PaymentNotFoundException;
 import cloudflight.integra.backend.model.validator.PaymentValidator;
 import cloudflight.integra.backend.model.validator.ValidationException;
 import cloudflight.integra.backend.repository.IPaymentRepository;
@@ -30,7 +31,7 @@ public class ServiceImpl implements IService {
 
     @Override
     public Payment getPayment(Long id) {
-        return IPaymentRepository.findById(id).orElseThrow(() -> new RuntimeException("Payment not found with id: " + id));
+        return IPaymentRepository.findById(id).orElseThrow(() -> new PaymentNotFoundException("Payment not found with id: " + id));
     }
 
     @Override
@@ -40,13 +41,13 @@ public class ServiceImpl implements IService {
         } catch (ValidationException e) {
             throw new RuntimeException(e.getMessage());
         }
-        return IPaymentRepository.update(payment).orElseThrow(() -> new RuntimeException("Payment not found with id: " + payment.getId()));
+        return IPaymentRepository.update(payment).orElseThrow(() -> new PaymentNotFoundException("Payment not found with id: " + payment.getId()));
 
     }
 
     @Override
     public Payment deletePayment(Long id) {
-       return IPaymentRepository.delete(id).orElseThrow(() -> new RuntimeException("Payment not found with id: " + id));
+       return IPaymentRepository.delete(id).orElseThrow(() -> new PaymentNotFoundException("Payment not found with id: " + id));
     }
 
     @Override
