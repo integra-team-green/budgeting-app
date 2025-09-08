@@ -1,12 +1,12 @@
-package cloudflight.integra.backend.controller;
+package cloudflight.integra.backend.controller.problem;
 
 import cloudflight.integra.backend.entity.validator.ValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RestControllerAdvice
-public class GlobalExceptionHandler {
+@ControllerAdvice(annotations = UserApiErrorResponses.class)
+public class UserRestExceptionHandler {
 
     /**
      * Handles validation exceptions and returns a 400 Bad Request response with the exception message.

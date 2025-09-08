@@ -1,5 +1,6 @@
 package cloudflight.integra.backend.controller;
 
+import cloudflight.integra.backend.controller.problem.UserApiErrorResponses;
 import cloudflight.integra.backend.dto.UserDto;
 import cloudflight.integra.backend.entity.User;
 import cloudflight.integra.backend.mapper.UserMapper;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/users")
+@UserApiErrorResponses
 public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
@@ -56,6 +58,6 @@ public class UserController {
         logger.info("Received DELETE request for user with id: {}", id);
         userService.deleteUser(id);
         logger.info("User with id {} deleted.", id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }
