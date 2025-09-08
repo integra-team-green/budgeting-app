@@ -13,6 +13,8 @@ import java.util.Objects;
 
 /**
  * Credit entity - plain JPA entity (no foreign keys).
+ *
+ * @author Oana Nourescu
  */
 //@Entity
 //@Table(name = "credits")
@@ -45,6 +47,16 @@ public class Credit {
     public Credit() {
     }
 
+    /**
+     * All-args constructor
+     * @param id
+     * @param amount
+     * @param lender
+     * @param startDate
+     * @param dueDate
+     * @param interestRate
+     * @param description
+     */
     // Full constructor
     public Credit(Long id, BigDecimal amount, String lender, LocalDate startDate, LocalDate dueDate,
                   Double interestRate, String description) {

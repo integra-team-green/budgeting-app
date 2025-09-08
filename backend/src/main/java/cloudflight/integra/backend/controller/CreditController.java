@@ -1,5 +1,6 @@
 package cloudflight.integra.backend.controller;
 
+import cloudflight.integra.backend.controller.problem.CreditApiErrorResponses;
 import cloudflight.integra.backend.dto.CreditDTO;
 import cloudflight.integra.backend.entity.Credit;
 import cloudflight.integra.backend.mapper.CreditMapper;
@@ -21,7 +22,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/credits")
+@CreditApiErrorResponses
+@RequestMapping("/api/v1/credits")
 public class CreditController {
 
     private static final Logger log = LoggerFactory.getLogger(CreditController.class);

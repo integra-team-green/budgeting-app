@@ -35,7 +35,7 @@ public class CreditServiceImpl implements CreditService {
     @Override
     public Credit findById(Long id) {
         if (id == null) {
-            throw new NotFoundException("Credit not found");
+            throw new IllegalArgumentException("Credit not found");
         }
 
         return repository.findById(id).orElseThrow(() -> new NotFoundException("Credit not found " + id));
@@ -49,11 +49,11 @@ public class CreditServiceImpl implements CreditService {
     @Override
     public Credit update(Long id, Credit credit) {
         if (id == null) {
-            throw new MoneyMindRuntimeException("Id cannot be null");
+            throw new IllegalArgumentException("Id cannot be null");
         }
         // ensure the id in path and the payload (if present) match
         if (credit.getId() != null && !credit.getId().equals(id)) {
-            throw new MoneyMindRuntimeException("Id in path and payload must match");
+            throw new IllegalArgumentException("Id in path and payload must match");
         }
         // set id into payload to run common validation
         credit.setId(id);
@@ -68,7 +68,7 @@ public class CreditServiceImpl implements CreditService {
     @Override
     public void delete(Long id) {
         if (id == null) {
-            throw new MoneyMindRuntimeException("Id cannot be null");
+            throw new IllegalArgumentException("Id cannot be null");
         }
         if (repository.existsById(id)) {
             throw new NotFoundException("credit", id);

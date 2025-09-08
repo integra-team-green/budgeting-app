@@ -8,16 +8,16 @@ import cloudflight.integra.backend.validation.ValidationException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-@RestControllerAdvice
-public class RestExceptionHandler {
+@ControllerAdvice(annotations = CreditApiErrorResponses.class)
+public class CreditRestExceptionHandler {
 
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<Object> handleCustomValidation(ValidationException ex, HttpServletRequest req) {
@@ -26,6 +26,11 @@ public class RestExceptionHandler {
 
     @ExceptionHandler(MoneyMindRuntimeException.class)
     public ResponseEntity<Object> handleCustomRuntimeException(MoneyMindRuntimeException ex, HttpServletRequest req) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), req, List.of());
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex, HttpServletRequest req) {
         return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), req, List.of());
     }
 
