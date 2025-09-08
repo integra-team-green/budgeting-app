@@ -1,8 +1,8 @@
 package cloudflight.integra.backend.service.impl;
 
-import cloudflight.integra.backend.entity.Expense;
+import cloudflight.integra.backend.dto.ExpenseDto;
+import cloudflight.integra.backend.exceptions.ResourceNotFoundException;
 import cloudflight.integra.backend.service.ExpenseService;
-import cloudflight.integra.backend.entity.validation.ValidationExceptionExpense;
 import org.springframework.stereotype.Service;
 import cloudflight.integra.backend.repository.ExpenseRepository;
 
@@ -11,6 +11,7 @@ import java.util.List;
 import cloudflight.integra.backend.entity.validation.ExpenseValidation;
 
 /**
+ *
  * Implementation of ExpenseService using in-memory repository.
  */
 @Service
@@ -25,49 +26,43 @@ public class ExpenseServiceImplementation implements ExpenseService {
 
 
     @Override
-    public Expense createExpense(Expense expense) {
-        try {
-            expenseValidation.validateException(expense);
-        } catch (IllegalArgumentException e) {
-            throw new ValidationExceptionExpense(e.getMessage());
+    public ExpenseDto createExpense(ExpenseDto expenseDto) {
+        expenseValidation.validateException(expenseDto);
+        return expenseRepository.addExpense(expenseDto);
+    }
+
+
+    @Override
+    public ExpenseDto updateExpense(Long id, ExpenseDto updatedExpense) {
+        expenseValidation.validateException(updatedExpense);
+
+        if (updatedExpense.getId() == null || !id.equals(updatedExpense.getId())) {
+            throw new IllegalArgumentException("ID in path and DTO do not match");
         }
-        return expenseRepository.saveExpense(expense);
+        ExpenseDto existingExpense = expenseRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Expense with id " + id + " not found"));
+        return expenseRepository.updateExpense(updatedExpense);
     }
 
 
 
     @Override
-    public List<Expense> findAllByUserId(Long userId) {
+    public List<ExpenseDto> findAllByUserId(Long userId) {
 
         return expenseRepository.findAllByUserId(userId);
     }
 
     @Override
-    public Expense findById(Long id) {
+    public ExpenseDto findById(Long id) {
         return expenseRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Expense with id: " + id + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Expense with id: " + id + " not found"));
     }
 
 
-    @Override
-    public Expense updateExpense(Long id, Expense updatedExpense) {
-        Expense existingExpense = expenseRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Expense with id: " + id + " not found"));
-        expenseValidation.validateException(updatedExpense);
-        existingExpense.setAmount(updatedExpense.getAmount());
-        existingExpense.setCategory(updatedExpense.getCategory());
-        existingExpense.setDate(updatedExpense.getDate());
-        existingExpense.setDescription(updatedExpense.getDescription());
-        return expenseRepository.saveExpense(existingExpense);
-    }
-
-    @Override
     public void deleteExpense(Long id) {
-        if (expenseRepository.findById(id).isPresent()) {
-            expenseRepository.deleteById(id);
-        } else {
-            throw new RuntimeException("Expense not found");
-        }
+        ExpenseDto existing = expenseRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Expense with id " + id + " not found"));
+        expenseRepository.deleteById(id);
     }
 
 }

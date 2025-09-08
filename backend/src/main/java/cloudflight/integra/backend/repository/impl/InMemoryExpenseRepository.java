@@ -1,6 +1,6 @@
 package cloudflight.integra.backend.repository.impl;
 
-import cloudflight.integra.backend.entity.Expense;
+import cloudflight.integra.backend.dto.ExpenseDto;
 import cloudflight.integra.backend.repository.ExpenseRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,29 +14,29 @@ import java.util.stream.Collectors;
 
 @Repository
 public class InMemoryExpenseRepository implements ExpenseRepository {
-    private final Map<Long, Expense> expenses = new HashMap<>();
+    private final Map<Long, ExpenseDto> expenses = new HashMap<>();
     private final AtomicLong nextId = new AtomicLong(1);
 
 
     @Override
-    public Expense saveExpense(Expense expense) {
-        if(expense.getId() == null) {
-            expense.setId(nextId.getAndIncrement());
+    public ExpenseDto addExpense(ExpenseDto expenseDto) {
+        if(expenseDto.getId() == null) {
+            expenseDto.setId(nextId.getAndIncrement());
         }
-        expenses.put(expense.getId(), expense);
-        return expense;
+        expenses.put(expenseDto.getId(), expenseDto);
+        return expenseDto;
     }
 
 
     @Override
-    public List<Expense> findAllByUserId(Long userId) {
+    public List<ExpenseDto> findAllByUserId(Long userId) {
         return expenses.values().stream()
                 .filter(e -> e.getUserId().equals(userId))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public Optional<Expense> findById(Long id) {
+    public Optional<ExpenseDto> findById(Long id) {
 
         return Optional.ofNullable(expenses.get(id));
     }
@@ -54,12 +54,16 @@ public class InMemoryExpenseRepository implements ExpenseRepository {
     }
 
     @Override
-    public Expense updateExpense(Expense expense) {
+    public ExpenseDto updateExpense(ExpenseDto expense) {
         if (expense.getId() == null || !expenses.containsKey(expense.getId())) {
-            throw new IllegalArgumentException("Expense with id " + expense.getId() + " does not exist.");
+            throw new IllegalArgumentException(
+                    "Expense with id " + expense.getId() + " does not exist"
+            );
         }
         expenses.put(expense.getId(), expense);
         return expense;
     }
+
+
 
 }
