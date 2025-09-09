@@ -84,12 +84,12 @@ public class RestExpenseController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<ExpenseDto> updateExpense(@PathVariable Long id,
-                                                    @RequestBody ExpenseDto expenseDto) {
+                                                    @Valid @RequestBody ExpenseDto expenseDto) {
         log.info("Updating expense with id={}", id);
         if (!id.equals(expenseDto.getId())) {
             log.warn("ID in path {} does not match ID in body {}", id, expenseDto.getId());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(null); // Excepția va fi prinsă mai bine în Advice
+                    .body(null);
         }
         ExpenseDto updated = expenseService.updateExpense(id, expenseDto);
         log.debug("Updated expense: {}", updated);
