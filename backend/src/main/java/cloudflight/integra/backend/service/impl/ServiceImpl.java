@@ -6,10 +6,11 @@ import cloudflight.integra.backend.model.validator.PaymentValidator;
 import cloudflight.integra.backend.model.validator.ValidationException;
 import cloudflight.integra.backend.repository.IPaymentRepository;
 import cloudflight.integra.backend.service.IService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@org.springframework.stereotype.Service
+@Service
 public class ServiceImpl implements IService {
     private final IPaymentRepository IPaymentRepository;
     private final PaymentValidator paymentValidator;

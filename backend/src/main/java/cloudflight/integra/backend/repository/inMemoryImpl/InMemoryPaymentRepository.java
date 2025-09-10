@@ -7,21 +7,22 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
 public class InMemoryPaymentRepository implements IPaymentRepository {
     private final List<Payment> payments;
-    private Long currentId;
+    private final AtomicLong currentId;
 
     public InMemoryPaymentRepository() {
         this.payments = new ArrayList<>();
-        this.currentId = 0L;
+        this.currentId = new AtomicLong(0);
     }
 
     @Override
     public Payment save(Payment payment) {
         if (payment.getId() == null) {
-            payment.setId(++this.currentId);
+            payment.setId(currentId.incrementAndGet());
         }
         payments.add(payment);
         return payment;

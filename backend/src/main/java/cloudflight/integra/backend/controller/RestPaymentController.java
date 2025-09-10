@@ -19,9 +19,9 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @RestController
-@RequestMapping("/payments")
+@RequestMapping("/api/v1/payments")
 public class RestPaymentController {
-    private cloudflight.integra.backend.service.IService IService;
+    private IService IService;
     private static final Logger log = LoggerFactory.getLogger(RestPaymentController.class);
 
     @Autowired
