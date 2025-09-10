@@ -6,24 +6,26 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class ExpenseValidation implements Validator<ExpenseDto> {
     @Override
     public void validateException(ExpenseDto expenseDto) throws ValidationExceptionExpense {
-        String errors = "";
+        List<String> errors = new ArrayList<>();
 
         if (expenseDto.getAmount() == null || expenseDto.getAmount().compareTo(BigDecimal.ZERO)<=0) {
-            errors+="Amount must be greater than or equal to 0 \n";
+            errors.add("Amount must be greater than or equal to 0");
         }
         if (expenseDto.getCategory() == null || expenseDto.getCategory().isEmpty()) {
-            errors+="Category cannot be empty \n";
+            errors.add("Category cannot be empty");
         }
         if (expenseDto.getDate() == null){
-            errors+="Date cannot be null \n";
+            errors.add("Date cannot be null");
         }
         if  (expenseDto.getDate().isAfter(LocalDate.now())) {
-            errors+="Expense date cannot be in the future";
+            errors.add("Expense date cannot be in the future");
         }
         if (!errors.isEmpty())
             throw new ValidationExceptionExpense(errors);
