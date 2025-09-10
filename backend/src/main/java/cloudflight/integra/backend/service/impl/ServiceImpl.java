@@ -24,7 +24,7 @@ public class ServiceImpl implements IService {
         try {
             paymentValidator.validate(payment);
         } catch (ValidationException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new ValidationException(List.of(e.getMessage()));
         }
         return IPaymentRepository.save(payment);
     }
@@ -39,7 +39,7 @@ public class ServiceImpl implements IService {
         try {
             paymentValidator.validate(payment);
         } catch (ValidationException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new ValidationException(List.of(e.getMessage()));
         }
         return IPaymentRepository.update(payment).orElseThrow(() -> new PaymentNotFoundException("Payment not found with id: " + payment.getId()));
 

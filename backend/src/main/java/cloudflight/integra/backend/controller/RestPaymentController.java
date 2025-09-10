@@ -32,7 +32,6 @@ public class RestPaymentController {
     @PostMapping
     public ResponseEntity<?> create(@RequestBody PaymentDTO payment){
         log.debug("Creating payment {}", payment);
-
         Payment entity= PaymentDTOMapper.getFromDTO(payment);
         Payment saved = IService.addPayment(entity);
         PaymentDTO response = PaymentDTOMapper.getDTO(saved);

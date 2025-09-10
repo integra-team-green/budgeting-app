@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public class InMemoryPaymentRepository implements IPaymentRepository {
-    private List<Payment> payments;
+    private final List<Payment> payments;
     private Long currentId;
 
     public InMemoryPaymentRepository() {
