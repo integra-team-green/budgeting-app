@@ -4,7 +4,6 @@ import cloudflight.integra.backend.dto.IncomeDTO;
 import cloudflight.integra.backend.entity.Income;
 import cloudflight.integra.backend.mapper.IncomeMapper;
 import cloudflight.integra.backend.service.IncomeService;
-import cloudflight.integra.backend.exception.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -19,7 +18,7 @@ import java.util.stream.StreamSupport;
 @RequestMapping("/api/incomes")
 public class IncomeRestController {
 
-    private static final Logger logger = LoggerFactory.getLogger(IncomeRestController.class);
+    private static final Logger log = LoggerFactory.getLogger(IncomeRestController.class);
 
     private final IncomeService incomeService;
 
@@ -29,7 +28,7 @@ public class IncomeRestController {
 
     @PostMapping
     public ResponseEntity<IncomeDTO> createIncome(@RequestBody IncomeDTO dto) {
-        logger.info("Creating income: {}", dto);
+        log.info("Creating income: {}", dto);
         Income income = IncomeMapper.toEntity(dto);
         incomeService.createIncome(income);
         return new ResponseEntity<>(IncomeMapper.toDTO(income), HttpStatus.CREATED);
@@ -37,18 +36,14 @@ public class IncomeRestController {
 
     @GetMapping("/{id}")
     public ResponseEntity<IncomeDTO> getIncomeById(@PathVariable Long id) {
-        logger.info("Fetching income with id {}", id);
+        log.debug("Fetching income with id {}", id);
         Income income = incomeService.getIncomeById(id);
-        if (income == null) {
-            logger.warn("Income with id {} not found", id);
-            throw new NotFoundException("Income with id " + id + " not found");
-        }
         return new ResponseEntity<>(IncomeMapper.toDTO(income), HttpStatus.OK);
     }
 
     @GetMapping
     public ResponseEntity<List<IncomeDTO>> getAllIncomes() {
-        logger.info("Fetching all incomes");
+        log.debug("Fetching all incomes");
         List<IncomeDTO> dtos = StreamSupport
                 .stream(incomeService.getAllIncomes().spliterator(), false)
                 .map(IncomeMapper::toDTO)
@@ -58,7 +53,7 @@ public class IncomeRestController {
 
     @PutMapping("/{id}")
     public ResponseEntity<IncomeDTO> updateIncome(@PathVariable Long id, @RequestBody IncomeDTO dto) {
-        logger.info("Updating income with id {}", id);
+        log.info("Updating income with id {}", id);
         Income income = IncomeMapper.toEntity(dto);
         income.setId(id);
         incomeService.updateIncome(income);
@@ -67,12 +62,7 @@ public class IncomeRestController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteIncome(@PathVariable Long id) {
-        logger.info("Deleting income with id {}", id);
-        Income income = incomeService.getIncomeById(id);
-        if (income == null) {
-            logger.warn("Income with id {} not found for delete", id);
-            throw new NotFoundException("Income with id " + id + " not found");
-        }
+        log.warn("Deleting income with id {}", id);
         incomeService.deleteIncome(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

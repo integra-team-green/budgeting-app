@@ -1,39 +1,43 @@
 package cloudflight.integra.backend.repository;
 
 import cloudflight.integra.backend.entity.Income;
-import org.springframework.stereotype.Repository;
 
-
+/**
+ * Repository interface provides CRUD operations for Income entity.
+ */
 public interface IncomeRepository {
     /**
-     * Saves an income
+     * Saves the Income entity
      *
-     * @param income
+     * @param income the Income entity that was added
      */
     void create(Income income);
 
     /**
+     * Retrieves all Income entities.
      *
-     * @return all incomes
+     * @return An Iterable of all Income entities.
      */
     Iterable<Income> getAll();
 
     /**
      * Finds an income by ID.
-     * @param id
+     * @param id the identifier of the entity
      * @return the income with the searched ID, or an exception
      */
     Income findById(Long id);
 
     /**
-     * Updates an income
-     * @param income
+     * Updates an Income by its ID
+     *
+     * @param income the Income entity that was updated
      */
     void update(Income income);
 
     /**
-     * Deletes an income
-     * @param id
+     * Deletes an Income by its ID.
+     *
+     * @param id the identifier of the Income
      */
     void delete(Long id);
 }

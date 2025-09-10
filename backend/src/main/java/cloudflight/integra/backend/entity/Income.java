@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Objects;
 
+
 public class Income {
     private Long id;
     private BigDecimal amount;
@@ -11,6 +12,14 @@ public class Income {
     private Date date;
     private String description;
 
+    /**
+     *
+     * @param id generated automatically
+     * @param amount the amount of the income
+     * @param source the source of the income
+     * @param date the date of the income
+     * @param description the description of the income(can be optional)
+     */
     public Income(Long id, BigDecimal amount, String source, Date date, String description) {
         this.id = id;
         this.amount = amount;

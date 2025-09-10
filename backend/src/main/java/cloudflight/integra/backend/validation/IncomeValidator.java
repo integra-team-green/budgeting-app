@@ -10,6 +10,12 @@ import java.util.List;
 
 @Component
 public class IncomeValidator {
+
+    /**
+     * Validates the given Income
+     * @param income the Income entity that will be validated
+     * @throws ValidationException with the attribute where was invalid data and a description of the error
+     */
     public void validate(Income income) {
         List<ValidationError> errors = new ArrayList<>();
 

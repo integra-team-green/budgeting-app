@@ -7,59 +7,75 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.stream.StreamSupport;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryIncomeRepositoryTest {
-    private InMemoryIncomeRepository repo;
+
+    private InMemoryIncomeRepository repository;
 
     @BeforeEach
     void setUp() {
-        repo = new InMemoryIncomeRepository();
+        repository = new InMemoryIncomeRepository();
     }
 
     @Test
-    void testCreateAndFindById() {
-        Income income = new Income(1L, new BigDecimal("1000"), "Job", new Date(), "Salary");
-        repo.create(income);
+    void create_generatesAutoIncrementId() {
+        Income income1 = new Income(null, BigDecimal.valueOf(100), "Job", new Date(), "Salary");
+        Income income2 = new Income(null, BigDecimal.valueOf(200), "Gift", new Date(), "Birthday");
 
-        Income found = repo.findById(1L);
+        repository.create(income1);
+        repository.create(income2);
+
+        assertNotNull(income1.getId());
+        assertNotNull(income2.getId());
+        assertEquals(1L, income1.getId());
+        assertEquals(2L, income2.getId());
+    }
+
+    @Test
+    void findById_returnsCorrectIncome() {
+        Income income = new Income(null, BigDecimal.valueOf(150), "Freelance", new Date(), "Project");
+        repository.create(income);
+
+        Income found = repository.findById(income.getId());
+
         assertNotNull(found);
-        assertEquals(income, found);
+        assertEquals(income.getAmount(), found.getAmount());
     }
 
     @Test
-    void testGetAll() {
-        Income i1 = new Income(1L, new BigDecimal("1000"), "Job", new Date(), "Salary");
-        Income i2 = new Income(2L, new BigDecimal("500"), "Freelance", new Date(), "Bonus");
-        repo.create(i1);
-        repo.create(i2);
+    void update_changesExistingIncome() {
+        Income income = new Income(null, BigDecimal.valueOf(300), "Bonus", new Date(), "Year end");
+        repository.create(income);
 
-        Iterable<Income> all = repo.getAll();
-        int count = 0;
-        for (Income i : all) count++;
+        income.setAmount(BigDecimal.valueOf(500));
+        repository.update(income);
+
+        Income updated = repository.findById(income.getId());
+        assertEquals(BigDecimal.valueOf(500), updated.getAmount());
+    }
+
+    @Test
+    void delete_removesIncome() {
+        Income income = new Income(null, BigDecimal.valueOf(400), "Lottery", new Date(), "Win");
+        repository.create(income);
+
+        repository.delete(income.getId());
+
+        assertNull(repository.findById(income.getId()));
+    }
+
+    @Test
+    void getAll_returnsAllIncomes() {
+        repository.create(new Income(null, BigDecimal.valueOf(100), "Job", new Date(), "Salary"));
+        repository.create(new Income(null, BigDecimal.valueOf(200), "Gift", new Date(), "Birthday"));
+
+        Iterable<Income> allIncomes = repository.getAll();
+        long count = StreamSupport.stream(allIncomes.spliterator(), false).count();
 
         assertEquals(2, count);
     }
 
-    @Test
-    void testUpdate() {
-        Income income = new Income(1L, new BigDecimal("1000"), "Job", new Date(), "Salary");
-        repo.create(income);
-
-        income.setAmount(new BigDecimal("1200"));
-        repo.update(income);
-
-        Income updated = repo.findById(1L);
-        assertEquals(new BigDecimal("1200"), updated.getAmount());
-    }
-
-    @Test
-    void testDelete() {
-        Income income = new Income(1L, new BigDecimal("1000"), "Job", new Date(), "Salary");
-        repo.create(income);
-
-        repo.delete(1L);
-        assertNull(repo.findById(1L));
-    }
 }

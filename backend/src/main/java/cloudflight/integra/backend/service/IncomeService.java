@@ -1,37 +1,45 @@
 package cloudflight.integra.backend.service;
 
 import cloudflight.integra.backend.entity.Income;
-import org.springframework.stereotype.Service;
 
+
+/**
+ * Service interface for managing Income entities
+ */
 public interface IncomeService {
     /**
-     * Validates the income then adds it
-     * @param income
+     * Adds an Income
+     *
+     * @param income the income to add
      */
     void createIncome(Income income);
 
     /**
-     * Returns all incomes
-     * @return
+     * Returns all Incomes
+     *
+     * @return an Iterable of all Incomes
      */
     Iterable<Income> getAllIncomes();
 
     /**
+     * Returns an Income by its ID
      *
-     * @param id
+     * @param id the identifier of the Income
      * @return Income with the given id
      */
     Income getIncomeById(Long id);
 
     /**
-     * Validates the new values then updates the income
-     * @param income
+     * Updates an Income
+     *
+     * @param income the income to be updated
      */
     void updateIncome(Income income);
 
     /**
-     * Deletes an income by its ID
-     * @param id
+     * Deletes an Income by its ID
+     *
+     * @param id the identifier of the Income
      */
     void deleteIncome(Long id);
 }
