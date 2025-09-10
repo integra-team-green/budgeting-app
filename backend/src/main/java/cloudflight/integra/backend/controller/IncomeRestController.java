@@ -1,5 +1,6 @@
 package cloudflight.integra.backend.controller;
 
+import cloudflight.integra.backend.controller.problem.IncomeApiErrorResponses;
 import cloudflight.integra.backend.dto.IncomeDTO;
 import cloudflight.integra.backend.entity.Income;
 import cloudflight.integra.backend.mapper.IncomeMapper;
@@ -16,6 +17,7 @@ import java.util.stream.StreamSupport;
 
 @RestController
 @RequestMapping("/api/incomes")
+@IncomeApiErrorResponses
 public class IncomeRestController {
 
     private static final Logger log = LoggerFactory.getLogger(IncomeRestController.class);
