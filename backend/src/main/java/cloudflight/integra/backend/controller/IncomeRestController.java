@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @RestController
-@RequestMapping("/api/incomes")
+@RequestMapping("/api/v1/incomes")
 @IncomeApiErrorResponses
 public class IncomeRestController {
 
