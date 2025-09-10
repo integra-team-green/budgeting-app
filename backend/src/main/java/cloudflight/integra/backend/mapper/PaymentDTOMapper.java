@@ -47,11 +47,7 @@ public class PaymentDTOMapper {
      */
 
     public static List<Payment> getPaymentsFromDto(List<PaymentDTO> paymentDTOList) {
-        List<Payment> payments= new ArrayList<>();
-        for (PaymentDTO paymentDTO: paymentDTOList) {
-            payments.add(getFromDTO(paymentDTO));
-        }
-        return payments;
+        return paymentDTOList.stream().map(PaymentDTOMapper::getFromDTO).toList();
     }
 
     /**
@@ -60,10 +56,7 @@ public class PaymentDTOMapper {
      * @return list of dtos
      */
     public static List<PaymentDTO> getPaymentDTOsFromPayments(List<Payment> payments) {
-        List<PaymentDTO> paymentDTOs= new ArrayList<>();
-        for (Payment payment: payments) {
-            paymentDTOs.add(getDTO(payment));
-        }
-        return paymentDTOs;
+
+        return payments.stream().map(PaymentDTOMapper::getDTO).toList();
     }
 }

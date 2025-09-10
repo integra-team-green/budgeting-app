@@ -42,7 +42,7 @@ public class PaymentServiceRepoTest {
         assertEquals("Internet",payment.get().getName());
         assertEquals(BigDecimal.valueOf(50),payment.get().getAmount());
         assertEquals(Frequency.MONTHLY,payment.get().getFrequency());
-        System.out.println("Test repo save findById finished successfully");
+
     }
     @Test
     void testRepoFindAll(){
@@ -52,7 +52,7 @@ public class PaymentServiceRepoTest {
         paymentRepository.save(p2);
         payments=paymentRepository.findAll();
         assertEquals(2,payments.size());
-        System.out.println("Test repo find all finished successfully");
+
     }
     @Test
     void testRepoDelete(){
@@ -65,7 +65,7 @@ public class PaymentServiceRepoTest {
         assertEquals("Internet",payments.get(0).getName());
         assertEquals(BigDecimal.valueOf(50),payments.get(0).getAmount());
         assertEquals(Frequency.MONTHLY,payments.get(0).getFrequency());
-        System.out.println("Test repo delete finished successfully");
+
 
     }
 
@@ -82,7 +82,7 @@ public class PaymentServiceRepoTest {
         assertEquals("Gym",test.getName());
         assertEquals(BigDecimal.valueOf(1900),test.getAmount());
         assertEquals(Frequency.ONE_TIME,test.getFrequency());
-        System.out.println("Test repo update finished successfully");
+
 
     }
 
@@ -94,7 +94,7 @@ public class PaymentServiceRepoTest {
         assertEquals("Internet",test.getName());
         assertEquals(BigDecimal.valueOf(50),test.getAmount());
         assertEquals(Frequency.MONTHLY,test.getFrequency());
-        System.out.println("Test service save finished successfully");
+
 
     }
 
@@ -104,7 +104,7 @@ public class PaymentServiceRepoTest {
         service.addPayment(p2);
         List<Payment> payments=paymentRepository.findAll();
         assertEquals(2,payments.size());
-        System.out.println("Test service find all finished successfully");
+
     }
     @Test
     void testServiceDelete(){
@@ -117,7 +117,7 @@ public class PaymentServiceRepoTest {
         assertEquals("Internet",payments.get(0).getName());
         assertEquals(BigDecimal.valueOf(50),payments.get(0).getAmount());
         assertEquals(Frequency.MONTHLY,payments.get(0).getFrequency());
-        System.out.println("Test service delete finished successfully");
+
     }
     @Test
     void testServiceUpdate(){
@@ -133,7 +133,7 @@ public class PaymentServiceRepoTest {
         assertEquals("Gym",test.getName());
         assertEquals(BigDecimal.valueOf(1900),test.getAmount());
         assertEquals(Frequency.ONE_TIME,test.getFrequency());
-        System.out.println("Test service update finished successfully");
+
 
     }
 
@@ -148,14 +148,14 @@ public class PaymentServiceRepoTest {
         paymentRepository.delete(2L);
         assertEquals(1,paymentRepository.findAll().size());
         assertEquals("Internet",paymentRepository.findAll().get(0).getName());
-        System.out.println("Test repo delete failed, finished successfully");
+
     }
     @Test
     void testRepoFindByIdFailed(){
         paymentRepository.save(p1);
         paymentRepository.save(p2);
         assertThrows(RuntimeException.class, () -> 	paymentRepository.findById(100L).get());
-        System.out.println("Test repo find by id failed,finished successfully");
+
 
     }
 
@@ -165,7 +165,7 @@ public class PaymentServiceRepoTest {
         service.addPayment(p1);
         service.addPayment(p2);
         assertThrows(PaymentNotFoundException.class, () -> 	service.getPayment(100L));
-        System.out.println("Test service find by id failed,finished successfully");
+
     }
     @Test
     void testServiceUpdateFailed(){
@@ -178,7 +178,7 @@ public class PaymentServiceRepoTest {
         assertEquals("Gym",test.getName());
         assertEquals(BigDecimal.valueOf(150),test.getAmount());
         assertEquals(Frequency.MONTHLY,test.getFrequency());
-        System.out.println("Test service update failed, finished successfully");
+
 
     }
 
@@ -192,7 +192,7 @@ public class PaymentServiceRepoTest {
         assertThrows(RuntimeException.class, () -> service.deletePayment(100L));
         assertEquals(1,service.getPayments().size());
         assertEquals("Internet",service.getPayments().get(0).getName());
-        System.out.println("Test service delete failed, finished successfully");
+
     }
 
     @Test
@@ -205,7 +205,7 @@ public class PaymentServiceRepoTest {
         assertThrows(RuntimeException.class, () -> 	service.addPayment(p4));
         List<Payment> payments=service.getPayments();
         assertEquals(2,payments.size());
-        System.out.println("Test service save failed, finished successfully");
+
 
     }
 }

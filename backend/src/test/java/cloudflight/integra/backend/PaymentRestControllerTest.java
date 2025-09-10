@@ -46,7 +46,7 @@ public class PaymentRestControllerTest {
     }
     @Test
     void testGetPaymentById() throws Exception {
-        mockMvc.perform(get("/payments/1"))
+        mockMvc.perform(get("/api/v1/payments/1"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(p1.getId()))
@@ -57,7 +57,7 @@ public class PaymentRestControllerTest {
     }
     @Test
     void testGetPaymentByIdNotFound() throws Exception {
-        mockMvc.perform(get("/payments/100"))
+        mockMvc.perform(get("/api/v1/payments/100"))
                 .andDo(print())
                 .andExpect(status().isNotFound());
     }
@@ -70,7 +70,7 @@ public class PaymentRestControllerTest {
         paymentDTO.setFrequency(Frequency.MONTHLY);
         paymentDTO.setIsActive(true);
         paymentDTO.setNextDueDate(new Date());
-        mockMvc.perform(post("/payments")
+        mockMvc.perform(post("/api/v1/payments")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(paymentDTO)))
                 .andDo(print())
@@ -87,7 +87,7 @@ public class PaymentRestControllerTest {
         paymentDTO.setFrequency(Frequency.MONTHLY);
         paymentDTO.setIsActive(true);
         paymentDTO.setNextDueDate(new Date());
-        mockMvc.perform(put("/payments/1")
+        mockMvc.perform(put("/api/v1/payments/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(paymentDTO)))
                 .andDo(print())
@@ -97,10 +97,10 @@ public class PaymentRestControllerTest {
     }
     @Test
     void testDeletePayment() throws Exception {
-        mockMvc.perform(delete("/payments/2"))
+        mockMvc.perform(delete("/api/v1/payments/2"))
                 .andDo(print())
                 .andExpect(status().isOk());
-        mockMvc.perform(delete("/payments/2"))
+        mockMvc.perform(delete("/api/v1/payments/2"))
                 .andDo(print())
                 .andExpect(status().isNotFound());
     }
