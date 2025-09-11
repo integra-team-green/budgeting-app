@@ -24,7 +24,7 @@ public class UserValidator implements Validator<User> {
         List<String> errors = new ArrayList<>();
 
         if (!isValidName(user.getName())) {
-            errors.add("Name cannot be null or empty !");
+            errors.add("Name cannot be null or empty!");
         }
         if (!isValidEmail(user.getEmail())) {
             errors.add("Email is invalid or empty!");
@@ -34,7 +34,7 @@ public class UserValidator implements Validator<User> {
         }
 
         if (!errors.isEmpty()) {
-            throw new ValidationException(String.join(" ", errors));
+            throw new ValidationException(errors);
         }
     }
 

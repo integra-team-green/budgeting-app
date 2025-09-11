@@ -1,6 +1,7 @@
 package cloudflight.integra.backend.UserTests;
 
 import cloudflight.integra.backend.entity.User;
+import cloudflight.integra.backend.entity.validator.NotFoundException;
 import cloudflight.integra.backend.entity.validator.UserValidator;
 import cloudflight.integra.backend.entity.validator.ValidationException;
 import cloudflight.integra.backend.repository.UserRepositoryInMemoryImpl;
@@ -36,7 +37,8 @@ class UserServiceImplTest {
     @Test
     void testAddUser_InvalidEmail() {
         User invalidUser = new User(null, "Elis", "not-an-email", "1234");
-        assertThrows(ValidationException.class, () -> userService.addUser(invalidUser));
+        ValidationException ex = assertThrows(ValidationException.class, () -> userService.addUser(invalidUser));
+        assertTrue(ex.getMessages().contains("Email is invalid or empty!"));
     }
 
     @Test
@@ -49,7 +51,7 @@ class UserServiceImplTest {
 
     @Test
     void testGetUser_NotFound() {
-        assertThrows(RuntimeException.class, () -> userService.getUser(999L));
+        assertThrows(NotFoundException.class, () -> userService.getUser(999L));
     }
 
     @Test
@@ -64,26 +66,29 @@ class UserServiceImplTest {
     @Test
     void testUpdateUser_NotFound() {
         User notExisting = new User(123L, "Ghost", "ghost@email.com", "nopass");
-        assertThrows(RuntimeException.class, () -> userService.updateUser(notExisting));
+        assertThrows(NotFoundException.class, () -> userService.updateUser(notExisting));
     }
 
     @Test
     void testUpdateUser_InvalidData() {
         userService.addUser(user1);
         User invalid = new User(user1.getId(), null, "noemail", null);
-        assertThrows(ValidationException.class, () -> userService.updateUser(invalid));
+        ValidationException ex = assertThrows(ValidationException.class, () -> userService.updateUser(invalid));
+        assertTrue(ex.getMessages().contains("Name cannot be null or empty!"));
+        assertTrue(ex.getMessages().contains("Email is invalid or empty!"));
+        assertTrue(ex.getMessages().contains("Password cannot be null or empty!"));
     }
 
     @Test
     void testDeleteUser_Valid() {
         userService.addUser(user1);
         userService.deleteUser(user1.getId());
-        assertThrows(RuntimeException.class, () -> userService.getUser(user1.getId()));
+        assertThrows(NotFoundException.class, () -> userService.getUser(user1.getId()));
     }
 
     @Test
     void testDeleteUser_NotFound() {
-        assertThrows(RuntimeException.class, () -> userService.deleteUser(999L));
+        assertThrows(NotFoundException.class, () -> userService.deleteUser(999L));
     }
 
     @Test
@@ -110,5 +115,29 @@ class UserServiceImplTest {
     @Test
     void testDeleteUser_NullId() {
         assertThrows(IllegalArgumentException.class, () -> userService.deleteUser(null));
+    }
+
+    @Test
+    void testAddUser_DuplicateEmail() {
+        userService.addUser(user1);
+        User duplicate = new User(null, "Bob", "alice@email.com", "pass2");
+        ValidationException ex = assertThrows(ValidationException.class, () -> userService.addUser(duplicate));
+        assertTrue(ex.getMessages().contains("Email already exists!"));
+    }
+
+    @Test
+    void testUpdateUser_DuplicateEmail() {
+        userService.addUser(user1);
+        userService.addUser(user2);
+        User updated = new User(user2.getId(), "Marc", "alice@email.com", "abcd999");
+        ValidationException ex = assertThrows(ValidationException.class, () -> userService.updateUser(updated));
+        assertTrue(ex.getMessages().contains("Email already exists!"));
+    }
+
+    @Test
+    void testUpdateUser_SameEmailAllowed() {
+        userService.addUser(user1);
+        User updated = new User(user1.getId(), "Alice", "alice@email.com", "newpass");
+        assertDoesNotThrow(() -> userService.updateUser(updated));
     }
 }

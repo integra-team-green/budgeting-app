@@ -1,8 +1,11 @@
 package cloudflight.integra.backend.UserTests;
+
 import cloudflight.integra.backend.entity.User;
 import cloudflight.integra.backend.repository.UserRepositoryInMemoryImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,8 +23,9 @@ class UserRepositoryInMemoryImplTest {
     @Test
     void testSaveAndFindOne() {
         userRepo.save(user1);
-        User found = userRepo.findOne(user1.getId());
-        assertNotNull(found);
+        Optional<User> foundOpt = userRepo.findOne(user1.getId());
+        assertTrue(foundOpt.isPresent());
+        User found = foundOpt.get();
         assertEquals(user1.getId(), found.getId());
         assertEquals("Alice", found.getName());
         assertEquals("alice@email.com", found.getEmail());
@@ -52,7 +56,9 @@ class UserRepositoryInMemoryImplTest {
         userRepo.save(user1);
         user1.setName("Alice Updated");
         userRepo.update(user1);
-        User updated = userRepo.findOne(user1.getId());
+        Optional<User> updatedOpt = userRepo.findOne(user1.getId());
+        assertTrue(updatedOpt.isPresent());
+        User updated = updatedOpt.get();
         assertEquals("Alice Updated", updated.getName());
     }
 
@@ -61,7 +67,17 @@ class UserRepositoryInMemoryImplTest {
         userRepo.save(user1);
         userRepo.save(user2);
         userRepo.delete(user1.getId());
-        assertNull(userRepo.findOne(user1.getId()));
-        assertNotNull(userRepo.findOne(user2.getId()));
+        assertFalse(userRepo.findOne(user1.getId()).isPresent());
+        assertTrue(userRepo.findOne(user2.getId()).isPresent());
+    }
+
+    @Test
+    void testFindByEmail() {
+        userRepo.save(user1);
+        userRepo.save(user2);
+        Optional<User> foundOpt = userRepo.findByEmail("alice@email.com");
+        assertTrue(foundOpt.isPresent());
+        assertEquals("Alice", foundOpt.get().getName());
+        assertFalse(userRepo.findByEmail("notfound@email.com").isPresent());
     }
 }

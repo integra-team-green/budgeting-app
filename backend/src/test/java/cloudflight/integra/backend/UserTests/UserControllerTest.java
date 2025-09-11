@@ -38,7 +38,7 @@ class UserControllerTest {
 
     @Test
     void testGetUserById() throws Exception {
-        mockMvc.perform(get("/users/1"))
+        mockMvc.perform(get("/api/v1/users/1"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Alice"))
@@ -47,7 +47,7 @@ class UserControllerTest {
 
     @Test
     void testGetUserById_NotFound() throws Exception {
-        mockMvc.perform(get("/users/999"))
+        mockMvc.perform(get("/api/v1/users/999"))
                 .andDo(print())
                 .andExpect(status().isNotFound());
     }
@@ -55,11 +55,11 @@ class UserControllerTest {
     @Test
     void testAddUser() throws Exception {
         UserDto userDto = new UserDto();
-        userDto.name = "Bob";
-        userDto.email = "bob@email.com";
-        userDto.password = "passw";
+        userDto.setName("Bob");
+        userDto.setEmail("bob@email.com");
+        userDto.setPassword("passw");
 
-        mockMvc.perform(post("/users")
+        mockMvc.perform(post("/api/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userDto)))
                 .andDo(print())
@@ -72,11 +72,11 @@ class UserControllerTest {
     @Test
     void testUpdateUser() throws Exception {
         UserDto updateDto = new UserDto();
-        updateDto.name = "Alice Updated";
-        updateDto.email = "alice@new.com";
-        updateDto.password = "newpass";
+        updateDto.setName("Alice Updated");
+        updateDto.setEmail("alice@new.com");
+        updateDto.setPassword("newpass");
 
-        mockMvc.perform(put("/users/1")
+        mockMvc.perform(put("/api/v1/users/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateDto)))
                 .andDo(print())
@@ -87,11 +87,11 @@ class UserControllerTest {
 
     @Test
     void testDeleteUser() throws Exception {
-        mockMvc.perform(delete("/users/2"))
+        mockMvc.perform(delete("/api/v1/users/2"))
                 .andDo(print())
                 .andExpect(status().isNoContent());
 
-        mockMvc.perform(get("/users/2"))
+        mockMvc.perform(get("/api/v1/users/2"))
                 .andDo(print())
                 .andExpect(status().isNotFound());
     }

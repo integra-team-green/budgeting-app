@@ -13,11 +13,11 @@ public class UserMapper {
      */
     public static UserDto toDto(User user) {
         UserDto dto = new UserDto();
-        dto.id = user.getId();
-        dto.name = user.getName();
-        dto.email = user.getEmail();
-        dto.password = user.getPassword();
-        dto.createdAt = user.getCreatedAt();
+        dto.setId(user.getId());
+        dto.setName(user.getName());
+        dto.setEmail(user.getEmail());
+        dto.setPassword(user.getPassword());
+        dto.setCreatedAt(user.getCreatedAt());
         return dto;
     }
 
@@ -27,6 +27,6 @@ public class UserMapper {
      * @return the corresponding User entity
      * */
     public User fromDto(UserDto dto) {
-        return new User(dto.id, dto.name, dto.email, dto.password);
+        return new User(dto.getId(), dto.getName(), dto.getEmail(), dto.getPassword());
     }
 }

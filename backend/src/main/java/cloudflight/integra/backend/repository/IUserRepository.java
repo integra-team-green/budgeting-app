@@ -1,7 +1,7 @@
 package cloudflight.integra.backend.repository;
 
-import cloudflight.integra.backend.entity.User;
 
+import java.util.Optional;
 
 /**
  * Repository interface for managing User entities.
@@ -17,7 +17,7 @@ public interface IUserRepository<ID, User> {
      * @param id the identifier of the User
      * @return the User entity if found, otherwise null
      */
-    User findOne(ID id);
+    Optional<User> findOne(ID id);
 
     /**
      * Retrieves all User entities.
@@ -48,4 +48,12 @@ public interface IUserRepository<ID, User> {
      * @param entity the User entity to update
      */
     void update(User entity);
+
+    /**
+     * Checks if a user with the given email exists.
+     *
+     * @param email the email to check
+     * @return true if a user with the email exists, false otherwise
+     */
+    Optional<User> findByEmail(String email);
 }
