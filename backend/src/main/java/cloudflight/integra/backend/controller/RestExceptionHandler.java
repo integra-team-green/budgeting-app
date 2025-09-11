@@ -5,6 +5,7 @@ import cloudflight.integra.backend.model.validator.ValidationException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -28,6 +29,16 @@ public class RestExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleGeneric(Exception e, HttpServletRequest request) {
         return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), request, List.of());
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Object> handleInvalidEnum(HttpMessageNotReadableException e, HttpServletRequest request) {
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                "Invalid request body: " + e.getMostSpecificCause().getMessage(),
+                request,
+                List.of("Check if 'frequency' has a valid value")
+        );
     }
 
     private ResponseEntity<Object> buildErrorResponse(HttpStatus status, String message, HttpServletRequest request, List<String> errors) {
