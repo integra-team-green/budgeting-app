@@ -79,14 +79,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleGeneral(Exception ex) {
         log.error("Unexpected error: ", ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).
-                body(buildErrorMap(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage()));
+                body(buildErrorMap(ex.getMessage()));
     }
 
-    private Map<String, Object> buildErrorMap(HttpStatus status, String message) {
+    private Map<String, Object> buildErrorMap(String message) {
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());
-        body.put("status", status.value());
-        body.put("error", status.getReasonPhrase());
+        body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        body.put("error", "Internal Server Error");
         body.put("message", message);
         return body;
     }
