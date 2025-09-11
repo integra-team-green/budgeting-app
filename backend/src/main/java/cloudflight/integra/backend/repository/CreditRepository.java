@@ -5,6 +5,9 @@ import cloudflight.integra.backend.entity.Credit;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Repository interface for managing Credit entities.
+ */
 public interface CreditRepository {
 
     /**

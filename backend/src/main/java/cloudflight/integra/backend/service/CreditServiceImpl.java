@@ -38,7 +38,7 @@ public class CreditServiceImpl implements CreditService {
             throw new IllegalArgumentException("Credit not found");
         }
 
-        return repository.findById(id).orElseThrow(() -> new NotFoundException("Credit not found " + id));
+        return repository.findById(id).orElseThrow(() -> new NotFoundException("credit", id));
     }
 
     @Override
