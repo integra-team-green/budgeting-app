@@ -1,7 +1,7 @@
-package cloudflight.integra.backend.repository;
+package cloudflight.integra.backend.expense;
 
-import cloudflight.integra.backend.dto.ExpenseDto;
-import cloudflight.integra.backend.repository.impl.InMemoryExpenseRepository;
+import cloudflight.integra.backend.dto.ExpenseDTO;
+import cloudflight.integra.backend.repository.inMemoryImpl.InMemoryExpenseRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.*;
  * - findById
  * - findAllByUserId
  * - deleteById
- *
  * Also verifies that exceptions are thrown for invalid operations.
  */
 public class InMemoryExpenseRepoTest {
@@ -38,12 +37,12 @@ public class InMemoryExpenseRepoTest {
      */
     @Test
     void shouldSaveAndFindById() {
-        ExpenseDto expense = new ExpenseDto(null, 1L, new BigDecimal("100"), "Food", LocalDate.now(), "Lunch");
-        ExpenseDto saved = repository.addExpense(expense);
+        ExpenseDTO expense = new ExpenseDTO(null, 1L, new BigDecimal("100"), "Food", LocalDate.now(), "Lunch");
+        ExpenseDTO saved = repository.addExpense(expense);
 
         assertNotNull(saved.getId(), "Saved expense should have an ID");
 
-        Optional<ExpenseDto> found = repository.findById(saved.getId());
+        Optional<ExpenseDTO> found = repository.findById(saved.getId());
         assertTrue(found.isPresent(), "Expense should be found by ID");
         assertEquals("Food", found.get().getCategory());
     }
@@ -53,11 +52,11 @@ public class InMemoryExpenseRepoTest {
      */
     @Test
     void shouldReturnAllExpensesForUser() {
-        repository.addExpense(new ExpenseDto(null, 1L, new BigDecimal("50"), "Transport", LocalDate.now(), null));
-        repository.addExpense(new ExpenseDto(null, 2L, new BigDecimal("30"), "Food", LocalDate.now(), null));
-        repository.addExpense(new ExpenseDto(null, 1L, new BigDecimal("20"), "Coffee", LocalDate.now(), null));
+        repository.addExpense(new ExpenseDTO(null, 1L, new BigDecimal("50"), "Transport", LocalDate.now(), null));
+        repository.addExpense(new ExpenseDTO(null, 2L, new BigDecimal("30"), "Food", LocalDate.now(), null));
+        repository.addExpense(new ExpenseDTO(null, 1L, new BigDecimal("20"), "Coffee", LocalDate.now(), null));
 
-        List<ExpenseDto> user1Expenses = repository.findAllByUserId(1L);
+        List<ExpenseDTO> user1Expenses = repository.findAllByUserId(1L);
         assertEquals(2, user1Expenses.size(), "User 1 should have 2 expenses");
     }
 
@@ -66,9 +65,9 @@ public class InMemoryExpenseRepoTest {
      */
     @Test
     void shouldUpdateExistingExpense() {
-        ExpenseDto expense = repository.addExpense(new ExpenseDto(null, 1L, new BigDecimal("25"), "Snack", LocalDate.now(), null));
+        ExpenseDTO expense = repository.addExpense(new ExpenseDTO(null, 1L, new BigDecimal("25"), "Snack", LocalDate.now(), null));
         expense.setAmount(new BigDecimal("30"));
-        ExpenseDto updated = repository.updateExpense(expense);
+        ExpenseDTO updated = repository.updateExpense(expense);
 
         assertEquals(new BigDecimal("30"), updated.getAmount(), "Amount should be updated to 30");
     }
@@ -78,7 +77,7 @@ public class InMemoryExpenseRepoTest {
      */
     @Test
     void updateNonExistingExpenseShouldThrow() {
-        ExpenseDto expense = new ExpenseDto(999L, 1L, new BigDecimal("30"), "Snack", LocalDate.now(), null);
+        ExpenseDTO expense = new ExpenseDTO(999L, 1L, new BigDecimal("30"), "Snack", LocalDate.now(), null);
         assertThrows(IllegalArgumentException.class, () -> repository.updateExpense(expense));
     }
 
@@ -87,7 +86,7 @@ public class InMemoryExpenseRepoTest {
      */
     @Test
     void shouldDeleteExistingExpense() {
-        ExpenseDto expense = repository.addExpense(new ExpenseDto(null, 1L, new BigDecimal("15"), "Snack", LocalDate.now(), null));
+        ExpenseDTO expense = repository.addExpense(new ExpenseDTO(null, 1L, new BigDecimal("15"), "Snack", LocalDate.now(), null));
         Long id = expense.getId();
 
         repository.deleteById(id);

@@ -1,6 +1,6 @@
-package cloudflight.integra.backend.repository.impl;
+package cloudflight.integra.backend.repository.inMemoryImpl;
 
-import cloudflight.integra.backend.dto.ExpenseDto;
+import cloudflight.integra.backend.dto.ExpenseDTO;
 import cloudflight.integra.backend.repository.ExpenseRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,12 +14,12 @@ import java.util.stream.Collectors;
 
 @Repository
 public class InMemoryExpenseRepository implements ExpenseRepository {
-    private final Map<Long, ExpenseDto> expenses = new HashMap<>();
+    private final Map<Long, ExpenseDTO> expenses = new HashMap<>();
     private final AtomicLong nextId = new AtomicLong(1);
 
 
     @Override
-    public ExpenseDto addExpense(ExpenseDto expenseDto) {
+    public ExpenseDTO addExpense(ExpenseDTO expenseDto) {
         if(expenseDto.getId() == null) {
             expenseDto.setId(nextId.getAndIncrement());
         }
@@ -29,14 +29,14 @@ public class InMemoryExpenseRepository implements ExpenseRepository {
 
 
     @Override
-    public List<ExpenseDto> findAllByUserId(Long userId) {
+    public List<ExpenseDTO> findAllByUserId(Long userId) {
         return expenses.values().stream()
                 .filter(e -> e.getUserId().equals(userId))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public Optional<ExpenseDto> findById(Long id) {
+    public Optional<ExpenseDTO> findById(Long id) {
 
         return Optional.ofNullable(expenses.get(id));
     }
@@ -54,7 +54,7 @@ public class InMemoryExpenseRepository implements ExpenseRepository {
     }
 
     @Override
-    public ExpenseDto updateExpense(ExpenseDto expense) {
+    public ExpenseDTO updateExpense(ExpenseDTO expense) {
         if (expense.getId() == null || !expenses.containsKey(expense.getId())) {
             throw new IllegalArgumentException(
                     "Expense with id " + expense.getId() + " does not exist"

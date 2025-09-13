@@ -1,7 +1,6 @@
 package cloudflight.integra.backend.repository;
 
-import cloudflight.integra.backend.dto.ExpenseDto;
-import cloudflight.integra.backend.entity.Expense;
+import cloudflight.integra.backend.dto.ExpenseDTO;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +12,7 @@ public interface ExpenseRepository {
      * @param expenseDto the expense to add (id should be null for new expenses)
      * @return the created expense with generated id
      */
-    ExpenseDto addExpense(ExpenseDto expenseDto);
+    ExpenseDTO addExpense(ExpenseDTO expenseDto);
 
 
     /**
@@ -23,7 +22,7 @@ public interface ExpenseRepository {
      * @return the updated object
      * @throws IllegalArgumentException if the expense ID is null or does not exist in the repository
      */
-    ExpenseDto updateExpense(ExpenseDto expenseDto);
+    ExpenseDTO updateExpense(ExpenseDTO expenseDto);
 
 
     /**
@@ -32,14 +31,14 @@ public interface ExpenseRepository {
      * @param userId the user ID
      * @return a list of expenses for the user
      */
-    List<ExpenseDto> findAllByUserId(Long userId);
+    List<ExpenseDTO> findAllByUserId(Long userId);
 
     /**
      * Find an expense by its ID.
      *
      * @param id the expense ID
      */
-    Optional<ExpenseDto> findById(Long id);
+    Optional<ExpenseDTO> findById(Long id);
 
 
     /**
