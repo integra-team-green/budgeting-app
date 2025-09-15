@@ -1,21 +1,21 @@
-package cloudflight.integra.backend.dto;
+package cloudflight.integra.backend.entity;
 
-import cloudflight.integra.backend.entity.Frequency;
+
+
 
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class PaymentDTO {
+
+
+public class Payment {
     private Long id;
     private String name;
     private BigDecimal amount;
     private Frequency frequency;
     private Date nextDueDate;
     private Boolean isActive;
-    public PaymentDTO() {
-
-    }
-    public PaymentDTO(Long id, String name, BigDecimal amount, Frequency frequency, Date nextDueDate,Boolean isActive) {
+    public Payment(Long id, String name, BigDecimal amount,Frequency frequency,Date nextDueDate, Boolean isActive) {
         this.id = id;
         this.name = name;
         this.amount = amount;
@@ -43,13 +43,14 @@ public class PaymentDTO {
     }
     public Frequency getFrequency() {
         return frequency;
-
     }
     public void setFrequency(Frequency frequency) {
         this.frequency = frequency;
+
     }
     public Date getNextDueDate() {
         return nextDueDate;
+
     }
     public void setNextDueDate(Date nextDueDate) {
         this.nextDueDate = nextDueDate;
@@ -60,4 +61,5 @@ public class PaymentDTO {
     public void setIsActive(Boolean isActive) {
         this.isActive = isActive;
     }
+
 }

@@ -1,7 +1,7 @@
 package cloudflight.integra.backend.controller.problem;
 
-import cloudflight.integra.backend.entity.validator.NotFoundException;
-import cloudflight.integra.backend.entity.validator.ValidationException;
+import cloudflight.integra.backend.entity.validation.ValidationException;
+import cloudflight.integra.backend.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

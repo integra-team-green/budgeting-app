@@ -40,4 +40,9 @@ public interface IncomeRepository {
      * @param id the identifier of the Income
      */
     void delete(Long id);
+
+    /**
+     * Clears all incomes from the repository (for testing purposes).
+     */
+    void clearAll();
 }

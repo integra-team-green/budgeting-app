@@ -1,7 +1,7 @@
 package cloudflight.integra.backend.service;
 
-import cloudflight.integra.backend.dto.ExpenseDto;
-import cloudflight.integra.backend.entity.Expense;
+import cloudflight.integra.backend.dto.ExpenseDTO;
+
 import java.util.List;
 
 public interface ExpenseService {
@@ -11,7 +11,7 @@ public interface ExpenseService {
      * @param expenseDto the expense to create
      * @return the created expense
      */
-    ExpenseDto createExpense(ExpenseDto expenseDto);
+    ExpenseDTO createExpense(ExpenseDTO expenseDto);
 
     /**
      * Get all expenses for a specific user.
@@ -19,7 +19,7 @@ public interface ExpenseService {
      * @param userId the user ID
      * @return a list of expenses for the user
      */
-    List<ExpenseDto> findAllByUserId(Long userId);
+    List<ExpenseDTO> findAllByUserId(Long userId);
 
 
     /**
@@ -29,7 +29,7 @@ public interface ExpenseService {
      * @return the object with the given ID
      * @throws RuntimeException if no expense with the given ID is found
      */
-    ExpenseDto findById(Long id);
+    ExpenseDTO findById(Long id);
 
     /**
      * Update an existing expense by ID.
@@ -40,7 +40,7 @@ public interface ExpenseService {
      * @throws RuntimeException if no expense with the given ID exists
      * @throws IllegalArgumentException if the updated expense fails validation
      */
-    ExpenseDto updateExpense(Long id, ExpenseDto updatedExpense);
+    ExpenseDTO updateExpense(Long id, ExpenseDTO updatedExpense);
 
     /**
      * Delete an expense by its ID.
