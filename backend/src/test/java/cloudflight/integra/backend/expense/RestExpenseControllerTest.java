@@ -1,10 +1,11 @@
-package cloudflight.integra.backend.controller;
+package cloudflight.integra.backend.expense;
 
-import cloudflight.integra.backend.dto.ExpenseDto;
-import cloudflight.integra.backend.entity.validation.ExpenseValidation;
-import cloudflight.integra.backend.repository.impl.InMemoryExpenseRepository;
+import cloudflight.integra.backend.controller.RestExpenseController;
+import cloudflight.integra.backend.dto.ExpenseDTO;
+import cloudflight.integra.backend.entity.validation.ExpenseValidator;
+import cloudflight.integra.backend.repository.inMemoryImpl.InMemoryExpenseRepository;
 import cloudflight.integra.backend.service.ExpenseService;
-import cloudflight.integra.backend.service.impl.ExpenseServiceImplementation;
+import cloudflight.integra.backend.service.impl.ExpenseServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * Unit tests for {@link RestExpenseController}.
- *
  * Tests CRUD operations via MockMvc using ExpenseDto objects.
  */
 class RestExpenseControllerTests {
@@ -40,14 +40,14 @@ class RestExpenseControllerTests {
     void setUp() {
         InMemoryExpenseRepository repository = new InMemoryExpenseRepository();
 
-        repository.addExpense(new ExpenseDto(1L, 1L, new BigDecimal("50.00"), "Food", LocalDate.now(), "Lunch"));
-        repository.addExpense(new ExpenseDto(2L, 1L, new BigDecimal("150.00"), "Transport", LocalDate.now(), "Taxi"));
-        repository.addExpense(new ExpenseDto(3L, 2L, new BigDecimal("200.00"), "Shopping", LocalDate.now(), "Clothes"));
+        repository.addExpense(new ExpenseDTO(1L, 1L, new BigDecimal("50.00"), "Food", LocalDate.now(), "Lunch"));
+        repository.addExpense(new ExpenseDTO(2L, 1L, new BigDecimal("150.00"), "Transport", LocalDate.now(), "Taxi"));
+        repository.addExpense(new ExpenseDTO(3L, 2L, new BigDecimal("200.00"), "Shopping", LocalDate.now(), "Clothes"));
 
         LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
         validator.afterPropertiesSet();
 
-        ExpenseService expenseService = new ExpenseServiceImplementation(repository, new ExpenseValidation());
+        ExpenseService expenseService = new ExpenseServiceImpl(repository, new ExpenseValidator());
         RestExpenseController controller = new RestExpenseController(expenseService);
 
 
@@ -92,7 +92,7 @@ class RestExpenseControllerTests {
     @Test
     void testCreateExpense() throws Exception {
         // All fields non-null, amount positive
-        ExpenseDto newExpense = new ExpenseDto(null, 1L, new BigDecimal("75.00"), "Groceries", LocalDate.now(), "Weekly shopping");
+        ExpenseDTO newExpense = new ExpenseDTO(null, 1L, new BigDecimal("75.00"), "Groceries", LocalDate.now(), "Weekly shopping");
 
         mockMvc.perform(post("/api/v1/expenses")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -106,7 +106,7 @@ class RestExpenseControllerTests {
 
     @Test
     void testUpdateExpense() throws Exception {
-        ExpenseDto updatedExpense = new ExpenseDto(1L, 1L, new BigDecimal("55.00"), "Food", LocalDate.now(), "Lunch updated");
+        ExpenseDTO updatedExpense = new ExpenseDTO(1L, 1L, new BigDecimal("55.00"), "Food", LocalDate.now(), "Lunch updated");
 
         mockMvc.perform(put("/api/v1/expenses/1")
                         .contentType(MediaType.APPLICATION_JSON)

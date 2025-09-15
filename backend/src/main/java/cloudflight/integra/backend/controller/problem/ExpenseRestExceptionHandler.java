@@ -1,15 +1,15 @@
-package cloudflight.integra.backend.controller;
+package cloudflight.integra.backend.controller.problem;
 
-import cloudflight.integra.backend.entity.validation.ValidationExceptionExpense;
-import cloudflight.integra.backend.exceptions.ResourceNotFoundException;
+import cloudflight.integra.backend.entity.validation.ValidationException;
+import cloudflight.integra.backend.exception.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -18,16 +18,16 @@ import java.util.Map;
 /**
  * Global exception handler for REST controllers.
  */
-@RestControllerAdvice
-public class GlobalExceptionHandler {
+@ControllerAdvice(annotations = ExpenseApiErrorResponses.class)
+public class ExpenseRestExceptionHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(ExpenseRestExceptionHandler.class);
 
     /**
      * Handles resources not found (404).
      */
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleNotFound(ResourceNotFoundException ex) {
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleNotFound(NotFoundException ex) {
         log.error("Resource not found: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(buildErrorMap(HttpStatus.NOT_FOUND, "Not Found", ex.getMessage()));
@@ -36,8 +36,8 @@ public class GlobalExceptionHandler {
     /**
      * Handles validation errors (400).
      */
-    @ExceptionHandler(ValidationExceptionExpense.class)
-    public ResponseEntity<Map<String, Object>> handleValidation(ValidationExceptionExpense ex) {
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<Map<String, Object>> handleValidation(ValidationException ex) {
         log.warn("Validation failed: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(buildErrorMap(HttpStatus.BAD_REQUEST, "Bad Request", ex.getMessage()));

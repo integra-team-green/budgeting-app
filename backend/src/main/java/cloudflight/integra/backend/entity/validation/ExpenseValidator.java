@@ -1,7 +1,6 @@
 package cloudflight.integra.backend.entity.validation;
 
-import cloudflight.integra.backend.dto.ExpenseDto;
-import cloudflight.integra.backend.entity.Expense;
+import cloudflight.integra.backend.dto.ExpenseDTO;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -10,9 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class ExpenseValidation implements Validator<ExpenseDto> {
+public class ExpenseValidator implements Validator<ExpenseDTO> {
     @Override
-    public void validate(ExpenseDto expenseDto) throws ValidationExceptionExpense {
+    public void validate(ExpenseDTO expenseDto) throws ValidationException {
         List<String> errors = new ArrayList<>();
 
         if (expenseDto.getAmount() == null || expenseDto.getAmount().compareTo(BigDecimal.ZERO)<=0) {
@@ -28,6 +27,6 @@ public class ExpenseValidation implements Validator<ExpenseDto> {
             errors.add("Expense date cannot be in the future");
         }
         if (!errors.isEmpty())
-            throw new ValidationExceptionExpense(errors);
+            throw new ValidationException(errors);
     }
 }

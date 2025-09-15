@@ -12,7 +12,7 @@ import java.time.LocalDate;
  * Data Transfer Object (DTO) for transferring expense information
  * between the backend and clients via the REST API. **/
 
-public class ExpenseDto {
+public class ExpenseDTO {
     private Long id;
 
     @NotNull
@@ -43,7 +43,7 @@ public class ExpenseDto {
      * @param date        the date when it occurred
      * @param description an optional description
      */
-    public ExpenseDto(Long id, Long userId, BigDecimal amount, String category, LocalDate date, String description) {
+    public ExpenseDTO(Long id, Long userId, BigDecimal amount, String category, LocalDate date, String description) {
         this.id = id;
         this.userId = userId;
         this.amount = amount;

@@ -1,19 +1,19 @@
 package cloudflight.integra.backend.mapper;
 
-import cloudflight.integra.backend.dto.ExpenseDto;
+import cloudflight.integra.backend.dto.ExpenseDTO;
 import cloudflight.integra.backend.entity.Expense;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Mapper utility class for converting between {@link Expense} and {@link ExpenseDto}.
+ * Mapper utility class for converting between {@link Expense} and {@link ExpenseDTO}.
  * All methods are static, and the class should not be instantiated.
  */
-public class ExpenseDtoMapper {
+public class ExpenseMapper {
 
     // Private constructor to prevent instantiation
-    private ExpenseDtoMapper() {}
+    private ExpenseMapper() {}
 
     /**
      * Converts an Expense entity to ExpenseDto.
@@ -21,8 +21,8 @@ public class ExpenseDtoMapper {
      * @param expense the entity to convert
      * @return the corresponding DTO
      */
-    public static ExpenseDto getDto(Expense expense) {
-        return new ExpenseDto(
+    public static ExpenseDTO getDto(Expense expense) {
+        return new ExpenseDTO(
                 expense.getId(),
                 expense.getUserId(),
                 expense.getAmount(),
@@ -38,7 +38,7 @@ public class ExpenseDtoMapper {
      * @param expenseDto the DTO to convert
      * @return the corresponding entity
      */
-    public static Expense getFromDto(ExpenseDto expenseDto) {
+    public static Expense getFromDto(ExpenseDTO expenseDto) {
         return new Expense(
                 expenseDto.getId(),
                 expenseDto.getUserId(),
@@ -55,9 +55,9 @@ public class ExpenseDtoMapper {
      * @param expenseDtoList the list of DTOs
      * @return list of entities
      */
-    public static List<Expense> getExpenseFromDto(List<ExpenseDto> expenseDtoList) {
+    public static List<Expense> getExpenseFromDto(List<ExpenseDTO> expenseDtoList) {
         return expenseDtoList.stream()
-                .map(ExpenseDtoMapper::getFromDto)
+                .map(ExpenseMapper::getFromDto)
                 .collect(Collectors.toList());
     }
 
@@ -67,9 +67,9 @@ public class ExpenseDtoMapper {
      * @param expenseList the list of entities
      * @return list of DTOs
      */
-    public static List<ExpenseDto> getExpenseDtoFromExpense(List<Expense> expenseList) {
+    public static List<ExpenseDTO> getExpenseDtoFromExpense(List<Expense> expenseList) {
         return expenseList.stream()
-                .map(ExpenseDtoMapper::getDto)
+                .map(ExpenseMapper::getDto)
                 .collect(Collectors.toList());
     }
 }
