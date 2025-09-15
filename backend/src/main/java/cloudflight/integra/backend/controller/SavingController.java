@@ -7,7 +7,7 @@ import cloudflight.integra.backend.entity.validation.ValidationException;
 import cloudflight.integra.backend.exception.MoneyMindRuntimeException;
 import cloudflight.integra.backend.exception.NotFoundException;
 import cloudflight.integra.backend.mapper.SavingMapper;
-import cloudflight.integra.backend.service.ISavingService;
+import cloudflight.integra.backend.service.SavingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -20,14 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/savings")
@@ -36,10 +29,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class SavingController {
 
     private static final Logger log = LoggerFactory.getLogger(SavingController.class);
-    private final ISavingService savingService;
+    private final SavingService savingService;
 
     @Autowired
-    public SavingController(ISavingService savingService) {
+    public SavingController(SavingService savingService) {
         this.savingService = savingService;
     }
 
@@ -89,7 +82,7 @@ public class SavingController {
     })
     @PostMapping()
     public ResponseEntity<?> addSaving(
-        @RequestBody(
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "Saving to add",
             required = true,
             content = @Content(
@@ -106,7 +99,7 @@ public class SavingController {
                 }
             )
 
-        ) @org.springframework.web.bind.annotation.RequestBody SavingDTO savingDTO) {
+        ) @RequestBody SavingDTO savingDTO) {
         log.info("POST /savings called, adding new saving: {}", savingDTO);
 
         try {
@@ -134,7 +127,7 @@ public class SavingController {
     public ResponseEntity<?> updateSaving(
         @Parameter(description = "ID of saving to update")
         @PathVariable Long savingId,
-        @RequestBody(description = "Updated saving") @org.springframework.web.bind.annotation.RequestBody SavingDTO savingDTO) {
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Updated saving") @org.springframework.web.bind.annotation.RequestBody SavingDTO savingDTO) {
         log.info("PUT /savings/{} called, updating saving with ID: {}", savingId, savingId);
 
         try {
