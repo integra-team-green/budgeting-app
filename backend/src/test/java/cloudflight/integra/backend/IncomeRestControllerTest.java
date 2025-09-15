@@ -49,7 +49,7 @@ class IncomeRestControllerTest {
         dto.setDate(new Date());
         dto.setDescription("Bonus");
 
-        mockMvc.perform(post("/api/incomes")
+        mockMvc.perform(post("/api/v1/incomes")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated())
@@ -59,7 +59,7 @@ class IncomeRestControllerTest {
 
     @Test
     void getIncome_withNonExistingId_returns404() throws Exception {
-        mockMvc.perform(get("/api/incomes/999"))
+        mockMvc.perform(get("/api/v1/incomes/999"))
                 .andExpect(status().isNotFound());
     }
 
@@ -68,7 +68,7 @@ class IncomeRestControllerTest {
         repository.create(new Income(1L, new BigDecimal("100"), "Job1", new Date(), "Desc1"));
         repository.create(new Income(2L, new BigDecimal("200"), "Job2", new Date(), "Desc2"));
 
-        mockMvc.perform(get("/api/incomes"))
+        mockMvc.perform(get("/api/v1/incomes"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[1].id").value(2));
@@ -85,7 +85,7 @@ class IncomeRestControllerTest {
         dto.setDate(new Date());
         dto.setDescription("Desc Updated");
 
-        mockMvc.perform(put("/api/incomes/1")
+        mockMvc.perform(put("/api/v1/incomes/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
@@ -97,13 +97,13 @@ class IncomeRestControllerTest {
     void deleteIncome_existingIncome_returns204() throws Exception {
         repository.create(new Income(1L, new BigDecimal("100"), "Job1", new Date(), "Desc1"));
 
-        mockMvc.perform(delete("/api/incomes/1"))
+        mockMvc.perform(delete("/api/v1/incomes/1"))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     void deleteIncome_nonExistingIncome_returns404() throws Exception {
-        mockMvc.perform(delete("/api/incomes/999"))
+        mockMvc.perform(delete("/api/v1/incomes/999"))
                 .andExpect(status().isNotFound());
     }
 }

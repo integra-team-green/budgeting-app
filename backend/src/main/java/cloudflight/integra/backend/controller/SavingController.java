@@ -89,7 +89,7 @@ public class SavingController {
     })
     @PostMapping()
     public ResponseEntity<?> addSaving(
-        @RequestBody(
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "Saving to add",
             required = true,
             content = @Content(
@@ -106,7 +106,7 @@ public class SavingController {
                 }
             )
 
-        ) @org.springframework.web.bind.annotation.RequestBody SavingDTO savingDTO) {
+        ) @RequestBody SavingDTO savingDTO) {
         log.info("POST /savings called, adding new saving: {}", savingDTO);
 
         try {
@@ -134,7 +134,7 @@ public class SavingController {
     public ResponseEntity<?> updateSaving(
         @Parameter(description = "ID of saving to update")
         @PathVariable Long savingId,
-        @RequestBody(description = "Updated saving") @org.springframework.web.bind.annotation.RequestBody SavingDTO savingDTO) {
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Updated saving") @RequestBody SavingDTO savingDTO) {
         log.info("PUT /savings/{} called, updating saving with ID: {}", savingId, savingId);
 
         try {
