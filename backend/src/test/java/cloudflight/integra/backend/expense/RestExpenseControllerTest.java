@@ -1,6 +1,7 @@
 package cloudflight.integra.backend.expense;
 
-import cloudflight.integra.backend.controller.RestExpenseController;
+import cloudflight.integra.backend.controller.ExpenseController;
+import cloudflight.integra.backend.controller.problem.ExpenseRestExceptionHandler;
 import cloudflight.integra.backend.dto.ExpenseDTO;
 import cloudflight.integra.backend.entity.validation.ExpenseValidator;
 import cloudflight.integra.backend.repository.inMemoryImpl.InMemoryExpenseRepository;
@@ -24,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
- * Unit tests for {@link RestExpenseController}.
+ * Unit tests for {@link ExpenseRestExceptionHandler}.
  * Tests CRUD operations via MockMvc using ExpenseDto objects.
  */
 class RestExpenseControllerTests {
@@ -48,10 +49,11 @@ class RestExpenseControllerTests {
         validator.afterPropertiesSet();
 
         ExpenseService expenseService = new ExpenseServiceImpl(repository, new ExpenseValidator());
-        RestExpenseController controller = new RestExpenseController(expenseService);
+        ExpenseController controller = new ExpenseController(expenseService);
 
 
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
+                .setControllerAdvice(new ExpenseRestExceptionHandler())
                 .setValidator(validator) // enables @Valid
                 .build();
 

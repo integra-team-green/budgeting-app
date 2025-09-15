@@ -1,7 +1,8 @@
 package cloudflight.integra.backend.controller;
 
+import cloudflight.integra.backend.controller.problem.ExpenseApiErrorResponses;
 import cloudflight.integra.backend.dto.ExpenseDTO;
-import cloudflight.integra.backend.exception.NotFoundException;
+import cloudflight.integra.backend.entity.validator.NotFoundException;
 import cloudflight.integra.backend.service.ExpenseService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -18,13 +19,14 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/v1/expenses")
-public class RestExpenseController {
+@ExpenseApiErrorResponses
+public class ExpenseController {
 
-    private static final Logger log = LoggerFactory.getLogger(RestExpenseController.class);
+    private static final Logger log = LoggerFactory.getLogger(ExpenseController.class);
 
     private final ExpenseService expenseService;
 
-    public RestExpenseController(ExpenseService expenseService) {
+    public ExpenseController(ExpenseService expenseService) {
         this.expenseService = expenseService;
     }
 

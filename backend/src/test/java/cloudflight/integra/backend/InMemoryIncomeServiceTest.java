@@ -1,7 +1,6 @@
 package cloudflight.integra.backend;
 
 import cloudflight.integra.backend.entity.Income;
-import cloudflight.integra.backend.exception.NotFoundException;
 import cloudflight.integra.backend.repository.impl.InMemoryIncomeRepository;
 import cloudflight.integra.backend.service.impl.InMemoryIncomeService;
 import cloudflight.integra.backend.validation.IncomeValidator;
@@ -13,10 +12,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.stream.StreamSupport;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryIncomeServiceTest {
 
@@ -114,8 +110,7 @@ class InMemoryIncomeServiceTest {
         service.createIncome(income);
 
         service.deleteIncome(income.getId());
-        assertThrows(NotFoundException.class, () ->
-            service.getIncomeById(income.getId()));
+        assertNull(service.getIncomeById(income.getId()));
         System.out.println("Deleted income ID: " + income.getId());
     }
 }
