@@ -10,7 +10,7 @@ import java.util.Optional;
  * @param <User> the type of the User entity
  */
 
-public interface IUserRepository<ID, User> {
+public interface UserRepository<ID, User> {
     /**
      * Finds a User by its identifier.
      *

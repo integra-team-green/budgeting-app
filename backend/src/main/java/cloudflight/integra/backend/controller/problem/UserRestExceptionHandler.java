@@ -1,19 +1,24 @@
 package cloudflight.integra.backend.controller.problem;
 
-import cloudflight.integra.backend.entity.validator.NotFoundException;
-import cloudflight.integra.backend.entity.validator.ValidationException;
+import cloudflight.integra.backend.exception.NotFoundException;
+import cloudflight.integra.backend.entity.validation.ValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @ControllerAdvice(annotations = UserApiErrorResponses.class)
 public class UserRestExceptionHandler {
 
     /**
-     * Handles validation exceptions and returns a 400 Bad Request response with the exception message.
+     * Handles validation exceptions and returns a 400 Bad Request response with a list of errors.
      * */
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<String> handleValidation(ValidationException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("errors", ex.getErrors());
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
 

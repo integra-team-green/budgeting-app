@@ -2,16 +2,16 @@ package cloudflight.integra.backend.dto;
 
 import java.time.LocalDateTime;
 
-public class UserDto {
+public class UserDTO {
     private Long id;
     private String name;
     private String email;
     private String password;
     private LocalDateTime createdAt;
 
-    public UserDto() {}
+    public UserDTO() {}
 
-    public UserDto(Long id, String name, String email, String password, LocalDateTime createdAt) {
+    public UserDTO(Long id, String name, String email, String password, LocalDateTime createdAt) {
         this.id = id;
         this.name = name;
         this.email = email;

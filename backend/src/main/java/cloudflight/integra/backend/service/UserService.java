@@ -5,7 +5,7 @@ import cloudflight.integra.backend.entity.User;
 /**
  * Service interface for managing User entities.
  */
-public interface IUserService {
+public interface UserService {
     /**
      * Adds a new user to the system.
      *

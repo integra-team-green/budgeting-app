@@ -1,10 +1,10 @@
 package cloudflight.integra.backend.controller;
 
 import cloudflight.integra.backend.controller.problem.UserApiErrorResponses;
-import cloudflight.integra.backend.dto.UserDto;
+import cloudflight.integra.backend.dto.UserDTO;
 import cloudflight.integra.backend.entity.User;
 import cloudflight.integra.backend.mapper.UserMapper;
-import cloudflight.integra.backend.service.IUserService;
+import cloudflight.integra.backend.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,17 +17,17 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
-    private final IUserService userService;
+    private final UserService userService;
     private final UserMapper userMapper;
 
     @Autowired
-    public UserController(IUserService userService, UserMapper userMapper) {
+    public UserController(UserService userService, UserMapper userMapper) {
         this.userService = userService;
         this.userMapper = userMapper;
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDto> getUser(@PathVariable Long id) {
+    public ResponseEntity<UserDTO> getUser(@PathVariable Long id) {
         logger.info("Received GET request for user with id: {}", id);
         User user = userService.getUser(id);
         logger.info("User retrieved: {}", user);
@@ -35,7 +35,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDto> addUser(@RequestBody UserDto userDto) {
+    public ResponseEntity<UserDTO> addUser(@RequestBody UserDTO userDto) {
         logger.info("Received POST request to add user: {}", userDto);
         User userToAdd = userMapper.fromDto(userDto);
         User createdUser = userService.addUser(userToAdd);
@@ -44,7 +44,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
+    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO userDto) {
         logger.info("Received PUT request to update user with id: {}. Data: {}", id, userDto);
         User userToUpdate = userMapper.fromDto(userDto);
         userToUpdate.setId(id);

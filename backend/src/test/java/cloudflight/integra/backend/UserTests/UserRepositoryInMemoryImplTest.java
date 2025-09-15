@@ -1,7 +1,7 @@
 package cloudflight.integra.backend.UserTests;
 
 import cloudflight.integra.backend.entity.User;
-import cloudflight.integra.backend.repository.UserRepositoryInMemoryImpl;
+import cloudflight.integra.backend.repository.inMemoryImpl.InMemoryUserRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -10,12 +10,12 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserRepositoryInMemoryImplTest {
-    private UserRepositoryInMemoryImpl userRepo;
+    private InMemoryUserRepositoryImpl userRepo;
     private User user1, user2;
 
     @BeforeEach
     void setUp() {
-        userRepo = new UserRepositoryInMemoryImpl();
+        userRepo = new InMemoryUserRepositoryImpl();
         user1 = new User(null, "Alice", "alice@email.com", "123");
         user2 = new User(null, "Marc", "marc@yahoo.com", "abcd999");
     }

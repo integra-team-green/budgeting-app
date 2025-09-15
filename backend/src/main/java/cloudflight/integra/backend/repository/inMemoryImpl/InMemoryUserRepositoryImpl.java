@@ -1,6 +1,7 @@
-package cloudflight.integra.backend.repository;
+package cloudflight.integra.backend.repository.inMemoryImpl;
 
 import cloudflight.integra.backend.entity.User;
+import cloudflight.integra.backend.repository.UserRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
@@ -9,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
-public class UserRepositoryInMemoryImpl implements IUserRepository<Long, User> {
+public class InMemoryUserRepositoryImpl implements UserRepository<Long, User> {
     private final ConcurrentHashMap<Long, User> users = new ConcurrentHashMap<>();
     private final AtomicLong nextId = new AtomicLong(1);
 

@@ -1,8 +1,8 @@
 package cloudflight.integra.backend.UserTests;
 
-import cloudflight.integra.backend.dto.UserDto;
+import cloudflight.integra.backend.dto.UserDTO;
 import cloudflight.integra.backend.entity.User;
-import cloudflight.integra.backend.repository.UserRepositoryInMemoryImpl;
+import cloudflight.integra.backend.repository.inMemoryImpl.InMemoryUserRepositoryImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,7 @@ class UserControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private UserRepositoryInMemoryImpl userRepo;
+    private InMemoryUserRepositoryImpl userRepo;
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -54,7 +54,7 @@ class UserControllerTest {
 
     @Test
     void testAddUser() throws Exception {
-        UserDto userDto = new UserDto();
+        UserDTO userDto = new UserDTO();
         userDto.setName("Bob");
         userDto.setEmail("bob@email.com");
         userDto.setPassword("passw");
@@ -71,7 +71,7 @@ class UserControllerTest {
 
     @Test
     void testUpdateUser() throws Exception {
-        UserDto updateDto = new UserDto();
+        UserDTO updateDto = new UserDTO();
         updateDto.setName("Alice Updated");
         updateDto.setEmail("alice@new.com");
         updateDto.setPassword("newpass");

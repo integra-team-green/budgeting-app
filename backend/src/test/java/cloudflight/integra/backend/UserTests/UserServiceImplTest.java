@@ -1,25 +1,25 @@
 package cloudflight.integra.backend.UserTests;
 
 import cloudflight.integra.backend.entity.User;
-import cloudflight.integra.backend.entity.validator.NotFoundException;
-import cloudflight.integra.backend.entity.validator.UserValidator;
-import cloudflight.integra.backend.entity.validator.ValidationException;
-import cloudflight.integra.backend.repository.UserRepositoryInMemoryImpl;
-import cloudflight.integra.backend.service.UserServiceImpl;
+import cloudflight.integra.backend.exception.NotFoundException;
+import cloudflight.integra.backend.entity.validation.UserValidator;
+import cloudflight.integra.backend.entity.validation.ValidationException;
+import cloudflight.integra.backend.repository.inMemoryImpl.InMemoryUserRepositoryImpl;
+import cloudflight.integra.backend.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserServiceImplTest {
-    private UserRepositoryInMemoryImpl userRepo;
+    private InMemoryUserRepositoryImpl userRepo;
     private UserValidator userValidator;
     private UserServiceImpl userService;
     private User user1, user2;
 
     @BeforeEach
     void setUp() {
-        userRepo = new UserRepositoryInMemoryImpl();
+        userRepo = new InMemoryUserRepositoryImpl();
         userValidator = new UserValidator();
         userService = new UserServiceImpl(userRepo, userValidator);
         user1 = new User(null, "Alice", "alice@email.com", "123");
@@ -38,7 +38,7 @@ class UserServiceImplTest {
     void testAddUser_InvalidEmail() {
         User invalidUser = new User(null, "Elis", "not-an-email", "1234");
         ValidationException ex = assertThrows(ValidationException.class, () -> userService.addUser(invalidUser));
-        assertTrue(ex.getMessages().contains("Email is invalid or empty!"));
+        assertTrue(ex.getErrors().contains("Email is invalid or empty!"));
     }
 
     @Test
@@ -74,9 +74,9 @@ class UserServiceImplTest {
         userService.addUser(user1);
         User invalid = new User(user1.getId(), null, "noemail", null);
         ValidationException ex = assertThrows(ValidationException.class, () -> userService.updateUser(invalid));
-        assertTrue(ex.getMessages().contains("Name cannot be null or empty!"));
-        assertTrue(ex.getMessages().contains("Email is invalid or empty!"));
-        assertTrue(ex.getMessages().contains("Password cannot be null or empty!"));
+        assertTrue(ex.getErrors().contains("Name cannot be null or empty!"));
+        assertTrue(ex.getErrors().contains("Email is invalid or empty!"));
+        assertTrue(ex.getErrors().contains("Password cannot be null or empty!"));
     }
 
     @Test
@@ -122,7 +122,7 @@ class UserServiceImplTest {
         userService.addUser(user1);
         User duplicate = new User(null, "Bob", "alice@email.com", "pass2");
         ValidationException ex = assertThrows(ValidationException.class, () -> userService.addUser(duplicate));
-        assertTrue(ex.getMessages().contains("Email already exists!"));
+        assertTrue(ex.getErrors().contains("Email already exists!"));
     }
 
     @Test
@@ -131,7 +131,7 @@ class UserServiceImplTest {
         userService.addUser(user2);
         User updated = new User(user2.getId(), "Marc", "alice@email.com", "abcd999");
         ValidationException ex = assertThrows(ValidationException.class, () -> userService.updateUser(updated));
-        assertTrue(ex.getMessages().contains("Email already exists!"));
+        assertTrue(ex.getErrors().contains("Email already exists!"));
     }
 
     @Test

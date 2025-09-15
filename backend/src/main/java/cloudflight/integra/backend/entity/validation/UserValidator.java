@@ -1,6 +1,8 @@
-package cloudflight.integra.backend.entity.validator;
+package cloudflight.integra.backend.entity.validation;
 
 import cloudflight.integra.backend.entity.User;
+import cloudflight.integra.backend.entity.validation.ValidationException;
+import cloudflight.integra.backend.entity.validation.Validator;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -17,7 +19,7 @@ public class UserValidator implements Validator<User> {
      * Collects all validation errors and throws a ValidationException with all messages.
      *
      * @param user the user to validate
-     * @throws ValidationException if any of the user's fields are invalid
+     * @throws cloudflight.integra.backend.entity.validation.ValidationException if any of the user's fields are invalid
      */
     @Override
     public void validate(User user) throws ValidationException {

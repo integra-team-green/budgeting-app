@@ -1,20 +1,19 @@
-package cloudflight.integra.backend.service;
+package cloudflight.integra.backend.service.impl;
 
 import cloudflight.integra.backend.entity.User;
-import cloudflight.integra.backend.entity.validator.NotFoundException;
-import cloudflight.integra.backend.entity.validator.UserValidator;
-import cloudflight.integra.backend.entity.validator.ValidationException;
-import cloudflight.integra.backend.repository.IUserRepository;
+import cloudflight.integra.backend.exception.NotFoundException;
+import cloudflight.integra.backend.entity.validation.UserValidator;
+import cloudflight.integra.backend.entity.validation.ValidationException;
+import cloudflight.integra.backend.repository.UserRepository;
+import cloudflight.integra.backend.service.UserService;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
-public class UserServiceImpl implements IUserService {
-    private final IUserRepository<Long, User> userRepository;
+public class UserServiceImpl implements UserService {
+    private final UserRepository<Long, User> userRepository;
     private final UserValidator userValidator;
 
-    public UserServiceImpl(IUserRepository<Long, User> userRepository, UserValidator userValidator) {
+    public UserServiceImpl(UserRepository<Long, User> userRepository, UserValidator userValidator) {
         this.userRepository = userRepository;
         this.userValidator = userValidator;
     }
@@ -36,7 +35,7 @@ public class UserServiceImpl implements IUserService {
         if (id == null)
             throw new IllegalArgumentException("User ID must not be null.");
         return userRepository.findOne(id)
-                .orElseThrow(() -> new NotFoundException("User not found!"));
+                .orElseThrow(() -> new NotFoundException("User", id));
     }
 
     @Override
@@ -48,7 +47,7 @@ public class UserServiceImpl implements IUserService {
         userValidator.validate(user);
 
         User existing = userRepository.findOne(user.getId())
-                .orElseThrow(() -> new NotFoundException("User not found!"));
+                .orElseThrow(() -> new NotFoundException("User", user.getId()));
 
         userRepository.findByEmail(user.getEmail())
                 .filter(u -> !u.getId().equals(user.getId()))
@@ -68,7 +67,7 @@ public class UserServiceImpl implements IUserService {
         if (id == null)
             throw new IllegalArgumentException("User ID must not be null.");
         if (userRepository.findOne(id).isEmpty()) {
-            throw new NotFoundException("User not found!");
+            throw new NotFoundException("User", id);
         }
         userRepository.delete(id);
     }
