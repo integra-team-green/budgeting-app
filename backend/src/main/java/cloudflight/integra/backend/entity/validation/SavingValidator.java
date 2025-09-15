@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.List;
 
 @Component
-public class SavingValidation implements Validator<Saving> {
+public class SavingValidator implements Validator<Saving> {
 
     /**
      * This method validates a Saving object.

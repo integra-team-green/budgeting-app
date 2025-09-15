@@ -1,12 +1,12 @@
-package cloudflight.integra.backend;
+package cloudflight.integra.backend.SavingTests;
 
 import cloudflight.integra.backend.entity.Saving;
-import cloudflight.integra.backend.entity.validation.SavingValidation;
+import cloudflight.integra.backend.entity.validation.SavingValidator;
 import cloudflight.integra.backend.entity.validation.ValidationException;
-import cloudflight.integra.backend.repository.ISavingRepository;
-import cloudflight.integra.backend.repository.implementation.InMemorySavingRepository;
-import cloudflight.integra.backend.service.ISavingService;
-import cloudflight.integra.backend.service.impl.SavingService;
+import cloudflight.integra.backend.repository.SavingRepository;
+import cloudflight.integra.backend.repository.inMemoryImpl.InMemorySavingRepositoryImpl;
+import cloudflight.integra.backend.service.SavingService;
+import cloudflight.integra.backend.service.impl.SavingServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,8 +20,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 @SpringBootTest
 class InMemoryRepositoryTests {
-    private ISavingRepository<Long, Saving> TESTsavingRepository;
-    private ISavingService TESTsavingService;
+    private SavingRepository<Long, Saving> TESTsavingRepository;
+    private SavingService TESTsavingService;
 
     @BeforeEach
     void setUp() {
@@ -29,14 +29,14 @@ class InMemoryRepositoryTests {
         Saving saving2 = new Saving(2L, new BigDecimal("2500.00"), new Date(), "Golf 5", "dream car");
         Saving saving3 = new Saving(4L, new BigDecimal("5000.00"), new Date(), "Sicily trip");
 
-        TESTsavingRepository = new InMemorySavingRepository();
+        TESTsavingRepository = new InMemorySavingRepositoryImpl();
 
         TESTsavingRepository.save(saving);
         TESTsavingRepository.save(saving2);
         TESTsavingRepository.save(saving3);
 
-        SavingValidation TESTsavingValidator = new SavingValidation();
-        TESTsavingService = new SavingService(TESTsavingRepository, TESTsavingValidator);
+        SavingValidator TESTsavingValidator = new SavingValidator();
+        TESTsavingService = new SavingServiceImpl(TESTsavingRepository, TESTsavingValidator);
 
     }
 

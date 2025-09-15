@@ -2,7 +2,7 @@ package cloudflight.integra.backend.service;
 
 import cloudflight.integra.backend.entity.Saving;
 
-public interface ISavingService {
+public interface SavingService {
 
     /**
      * First validates the saving and then adds it to the repository

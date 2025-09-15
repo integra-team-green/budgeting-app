@@ -1,6 +1,6 @@
 package cloudflight.integra.backend.repository;
 
-public interface ISavingRepository<ID, Saving> {
+public interface SavingRepository<ID, Saving> {
 
     /**
      * * Finds a saving by its ID.

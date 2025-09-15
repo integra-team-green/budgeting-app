@@ -1,14 +1,14 @@
-package cloudflight.integra.backend;
+package cloudflight.integra.backend.SavingTests;
 
 import cloudflight.integra.backend.controller.SavingController;
 import cloudflight.integra.backend.dto.SavingDTO;
 import cloudflight.integra.backend.entity.Saving;
-import cloudflight.integra.backend.entity.validation.SavingValidation;
+import cloudflight.integra.backend.entity.validation.SavingValidator;
 import cloudflight.integra.backend.mapper.SavingMapper;
-import cloudflight.integra.backend.repository.ISavingRepository;
-import cloudflight.integra.backend.repository.implementation.InMemorySavingRepository;
-import cloudflight.integra.backend.service.ISavingService;
-import cloudflight.integra.backend.service.impl.SavingService;
+import cloudflight.integra.backend.repository.SavingRepository;
+import cloudflight.integra.backend.repository.inMemoryImpl.InMemorySavingRepositoryImpl;
+import cloudflight.integra.backend.service.SavingService;
+import cloudflight.integra.backend.service.impl.SavingServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 class RestSavingControllerTests {
-    private ISavingService TESTsavingService;
+    private SavingService TESTsavingService;
 
     private MockMvc TESTmockMvc;
 
@@ -48,14 +48,14 @@ class RestSavingControllerTests {
         Saving saving2 = new Saving(2L, new BigDecimal("2500.00"), new Date(), "Golf 5", "dream car");
         Saving saving3 = new Saving(4L, new BigDecimal("5000.00"), new Date(), "Sicily trip");
 
-        ISavingRepository<Long, Saving> TESTsavingRepository = new InMemorySavingRepository();
+        SavingRepository<Long, Saving> TESTsavingRepository = new InMemorySavingRepositoryImpl();
 
         TESTsavingRepository.save(saving);
         TESTsavingRepository.save(saving2);
         TESTsavingRepository.save(saving3);
 
-        SavingValidation TESTsavingValidator = new SavingValidation();
-        TESTsavingService = new SavingService(TESTsavingRepository, TESTsavingValidator);
+        SavingValidator TESTsavingValidator = new SavingValidator();
+        TESTsavingService = new SavingServiceImpl(TESTsavingRepository, TESTsavingValidator);
 
         SavingController TESTrestSavingController = new SavingController(TESTsavingService);
 

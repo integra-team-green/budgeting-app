@@ -1,15 +1,15 @@
 package cloudflight.integra.backend.service.impl;
 
 import cloudflight.integra.backend.entity.Saving;
-import cloudflight.integra.backend.entity.validation.SavingValidation;
-import cloudflight.integra.backend.repository.ISavingRepository;
-import cloudflight.integra.backend.service.ISavingService;
+import cloudflight.integra.backend.entity.validation.SavingValidator;
+import cloudflight.integra.backend.repository.SavingRepository;
+import cloudflight.integra.backend.service.SavingService;
 import org.springframework.stereotype.Service;
 
 @Service
-public class SavingService implements ISavingService {
-    private final ISavingRepository<Long, Saving> savingRepository;
-    private final SavingValidation savingValidator;
+public class SavingServiceImpl implements SavingService {
+    private final SavingRepository<Long, Saving> savingRepository;
+    private final SavingValidator savingValidator;
 
     /**
      * Constructor for SavingService with Validatior and Repository
@@ -17,7 +17,7 @@ public class SavingService implements ISavingService {
      * @param savingRepository -
      * @param savingValidator  -
      */
-    public SavingService(ISavingRepository<Long, Saving> savingRepository, SavingValidation savingValidator) {
+    public SavingServiceImpl(SavingRepository<Long, Saving> savingRepository, SavingValidator savingValidator) {
         this.savingRepository = savingRepository;
         this.savingValidator = savingValidator;
     }

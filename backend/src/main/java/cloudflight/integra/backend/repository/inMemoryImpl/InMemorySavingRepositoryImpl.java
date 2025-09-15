@@ -1,18 +1,18 @@
-package cloudflight.integra.backend.repository.implementation;
+package cloudflight.integra.backend.repository.inMemoryImpl;
 
 import cloudflight.integra.backend.entity.Saving;
 import cloudflight.integra.backend.exception.NotFoundException;
-import cloudflight.integra.backend.repository.ISavingRepository;
+import cloudflight.integra.backend.repository.SavingRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Repository
-public class InMemorySavingRepository implements ISavingRepository<Long, Saving> {
+public class InMemorySavingRepositoryImpl implements SavingRepository<Long, Saving> {
     private final Map<Long, Saving> savings;
 
-    public InMemorySavingRepository() {
+    public InMemorySavingRepositoryImpl() {
         this.savings = new HashMap<>();
     }
 
