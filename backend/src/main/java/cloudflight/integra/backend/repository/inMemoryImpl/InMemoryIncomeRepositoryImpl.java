@@ -1,4 +1,4 @@
-package cloudflight.integra.backend.repository.impl;
+package cloudflight.integra.backend.repository.inMemoryImpl;
 
 import cloudflight.integra.backend.entity.Income;
 import cloudflight.integra.backend.repository.IncomeRepository;
@@ -9,12 +9,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
-public class InMemoryIncomeRepository implements IncomeRepository {
+public class InMemoryIncomeRepositoryImpl implements IncomeRepository {
 
     private final Map<Long, Income> incomes;
     private final AtomicLong idGenerator;
 
-    public InMemoryIncomeRepository() {
+    public InMemoryIncomeRepositoryImpl() {
         this.incomes = new ConcurrentHashMap<>();
         this.idGenerator = new AtomicLong(0);
     }

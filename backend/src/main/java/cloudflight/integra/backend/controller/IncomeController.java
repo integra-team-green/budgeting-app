@@ -18,13 +18,13 @@ import java.util.stream.StreamSupport;
 @RestController
 @RequestMapping("/api/v1/incomes")
 @IncomeApiErrorResponses
-public class IncomeRestController {
+public class IncomeController {
 
-    private static final Logger log = LoggerFactory.getLogger(IncomeRestController.class);
+    private static final Logger log = LoggerFactory.getLogger(IncomeController.class);
 
     private final IncomeService incomeService;
 
-    public IncomeRestController(IncomeService incomeService) {
+    public IncomeController(IncomeService incomeService) {
         this.incomeService = incomeService;
     }
 

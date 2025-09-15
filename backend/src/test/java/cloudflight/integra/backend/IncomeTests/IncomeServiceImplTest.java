@@ -1,10 +1,10 @@
-package cloudflight.integra.backend;
+package cloudflight.integra.backend.IncomeTests;
 
 import cloudflight.integra.backend.entity.Income;
-import cloudflight.integra.backend.repository.impl.InMemoryIncomeRepository;
-import cloudflight.integra.backend.service.impl.InMemoryIncomeService;
-import cloudflight.integra.backend.validation.IncomeValidator;
-import cloudflight.integra.backend.validation.ValidationException;
+import cloudflight.integra.backend.repository.inMemoryImpl.InMemoryIncomeRepositoryImpl;
+import cloudflight.integra.backend.service.impl.IncomeServiceImpl;
+import cloudflight.integra.backend.entity.validation.IncomeValidator;
+import cloudflight.integra.backend.entity.validation.ValidationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -14,15 +14,15 @@ import java.util.stream.StreamSupport;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class InMemoryIncomeServiceTest {
+class IncomeServiceImplTest {
 
-    private InMemoryIncomeService service;
+    private IncomeServiceImpl service;
 
     @BeforeEach
     void setUp() {
-        InMemoryIncomeRepository repo = new InMemoryIncomeRepository();
+        InMemoryIncomeRepositoryImpl repo = new InMemoryIncomeRepositoryImpl();
         IncomeValidator validator = new IncomeValidator();
-        service = new InMemoryIncomeService(repo, validator);
+        service = new IncomeServiceImpl(repo, validator);
     }
 
     @Test
@@ -36,23 +36,36 @@ class InMemoryIncomeServiceTest {
 
     @Test
     void createIncome_withNegativeAmount_throwsValidationException() {
+        // Arrange
         Income income = new Income(null, BigDecimal.valueOf(-100), "Job", new Date(), "Salary");
 
-        ValidationException ex = assertThrows(ValidationException.class, () -> service.createIncome(income));
+        // Act & Assert
+        ValidationException ex = assertThrows(
+                ValidationException.class,
+                () -> service.createIncome(income)
+        );
+
         ex.getErrors().forEach(err ->
-                System.out.println("Validation error: " + err.getCode() + " - " + err.getMessage())
+                System.out.println("Validation error: " + err)
         );
     }
 
     @Test
     void createIncome_withNullSource_throwsValidationException() {
+        // Arrange
         Income income = new Income(null, BigDecimal.valueOf(100), null, new Date(), "Salary");
 
-        ValidationException ex = assertThrows(ValidationException.class, () -> service.createIncome(income));
+        // Act & Assert
+        ValidationException ex = assertThrows(
+                ValidationException.class,
+                () -> service.createIncome(income)
+        );
+
         ex.getErrors().forEach(err ->
-                System.out.println("Validation error: " + err.getCode() + " - " + err.getMessage())
+                System.out.println("Validation error: " + err)
         );
     }
+
 
     @Test
     void getAllIncomes_returnsAllCreatedIncomes() {

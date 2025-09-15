@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  *
  * Tests CRUD operations via MockMvc using ExpenseDto objects.
  */
-class RestExpenseControllerTests {
+class RestExpenseControllerTest {
 
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;

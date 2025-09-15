@@ -4,16 +4,16 @@ import cloudflight.integra.backend.entity.Income;
 import cloudflight.integra.backend.exception.NotFoundException;
 import cloudflight.integra.backend.repository.IncomeRepository;
 import cloudflight.integra.backend.service.IncomeService;
-import cloudflight.integra.backend.validation.IncomeValidator;
+import cloudflight.integra.backend.entity.validation.IncomeValidator;
 import org.springframework.stereotype.Service;
 
 @Service
-public class InMemoryIncomeService implements IncomeService {
+public class IncomeServiceImpl implements IncomeService {
 
     private final IncomeRepository incomeRepo;
     private final IncomeValidator incomeValidator;
 
-    public InMemoryIncomeService(IncomeRepository incomeRepo, IncomeValidator incomeValidator) {
+    public IncomeServiceImpl(IncomeRepository incomeRepo, IncomeValidator incomeValidator) {
         this.incomeRepo = incomeRepo;
         this.incomeValidator = incomeValidator;
     }

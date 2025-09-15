@@ -106,7 +106,7 @@ public class SavingController {
                 }
             )
 
-        ) @org.springframework.web.bind.annotation.RequestBody SavingDTO savingDTO) {
+        ) SavingDTO savingDTO) {
         log.info("POST /savings called, adding new saving: {}", savingDTO);
 
         try {

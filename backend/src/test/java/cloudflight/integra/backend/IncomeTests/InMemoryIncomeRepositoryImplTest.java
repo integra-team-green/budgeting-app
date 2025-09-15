@@ -1,7 +1,7 @@
-package cloudflight.integra.backend;
+package cloudflight.integra.backend.IncomeTests;
 
 import cloudflight.integra.backend.entity.Income;
-import cloudflight.integra.backend.repository.impl.InMemoryIncomeRepository;
+import cloudflight.integra.backend.repository.inMemoryImpl.InMemoryIncomeRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -11,13 +11,13 @@ import java.util.stream.StreamSupport;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class InMemoryIncomeRepositoryTest {
+class InMemoryIncomeRepositoryImplTest {
 
-    private InMemoryIncomeRepository repository;
+    private InMemoryIncomeRepositoryImpl repository;
 
     @BeforeEach
     void setUp() {
-        repository = new InMemoryIncomeRepository();
+        repository = new InMemoryIncomeRepositoryImpl();
     }
 
     @Test
