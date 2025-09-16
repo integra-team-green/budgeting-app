@@ -1,7 +1,7 @@
 package cloudflight.integra.backend.expense;
 
 import cloudflight.integra.backend.dto.ExpenseDTO;
-import cloudflight.integra.backend.repository.inMemoryImpl.InMemoryExpenseRepository;
+import cloudflight.integra.backend.repository.inMemoryImpl.InMemoryExpenseRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +13,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit tests for {@link InMemoryExpenseRepository}.
+ * Unit tests for {@link InMemoryExpenseRepositoryImpl}.
  *
  * <p>Tests cover CRUD operations:
  * - addExpense
@@ -25,11 +25,11 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class InMemoryExpenseRepoTest {
 
-    private InMemoryExpenseRepository repository;
+    private InMemoryExpenseRepositoryImpl repository;
 
     @BeforeEach
     void setUp() {
-        repository = new InMemoryExpenseRepository();
+        repository = new InMemoryExpenseRepositoryImpl();
     }
 
     /**

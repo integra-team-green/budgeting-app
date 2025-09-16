@@ -4,7 +4,7 @@ import cloudflight.integra.backend.controller.ExpenseController;
 import cloudflight.integra.backend.controller.problem.ExpenseRestExceptionHandler;
 import cloudflight.integra.backend.dto.ExpenseDTO;
 import cloudflight.integra.backend.entity.validation.ExpenseValidator;
-import cloudflight.integra.backend.repository.inMemoryImpl.InMemoryExpenseRepository;
+import cloudflight.integra.backend.repository.inMemoryImpl.InMemoryExpenseRepositoryImpl;
 import cloudflight.integra.backend.service.ExpenseService;
 import cloudflight.integra.backend.service.impl.ExpenseServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,7 +39,7 @@ class RestExpenseControllerTests {
      */
     @BeforeEach
     void setUp() {
-        InMemoryExpenseRepository repository = new InMemoryExpenseRepository();
+        InMemoryExpenseRepositoryImpl repository = new InMemoryExpenseRepositoryImpl();
 
         repository.addExpense(new ExpenseDTO(1L, 1L, new BigDecimal("50.00"), "Food", LocalDate.now(), "Lunch"));
         repository.addExpense(new ExpenseDTO(2L, 1L, new BigDecimal("150.00"), "Transport", LocalDate.now(), "Taxi"));

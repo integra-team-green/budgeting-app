@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 
 @Repository
-public class InMemoryExpenseRepository implements ExpenseRepository {
+public class InMemoryExpenseRepositoryImpl implements ExpenseRepository {
     private final Map<Long, ExpenseDTO> expenses = new HashMap<>();
     private final AtomicLong nextId = new AtomicLong(1);
 
