@@ -1,7 +1,7 @@
 package cloudflight.integra.backend.service.impl;
 
 import cloudflight.integra.backend.entity.Income;
-import cloudflight.integra.backend.exception.NotFoundException;
+import cloudflight.integra.backend.entity.validation.ValidationException;
 import cloudflight.integra.backend.repository.IncomeRepository;
 import cloudflight.integra.backend.service.IncomeService;
 import cloudflight.integra.backend.entity.validation.IncomeValidator;
@@ -33,7 +33,7 @@ public class IncomeServiceImpl implements IncomeService {
     public Income getIncomeById(Long id) {
         Income income = incomeRepo.findById(id);
         if (income == null) {
-            throw new NotFoundException("Income with id " + id + " not found");
+            throw new ValidationException("Income with id " + id + " not found");
         }
         return income;
     }
@@ -42,7 +42,7 @@ public class IncomeServiceImpl implements IncomeService {
     public void updateIncome(Income income) {
         incomeValidator.validate(income);
         if (incomeRepo.findById(income.getId()) == null) {
-            throw new NotFoundException("Income with id " + income.getId() + " not found for update");
+            throw new ValidationException("Income with id " + income.getId() + " not found for update");
         }
         incomeRepo.update(income);
     }
@@ -50,7 +50,7 @@ public class IncomeServiceImpl implements IncomeService {
     @Override
     public void deleteIncome(Long id) {
         if (incomeRepo.findById(id) == null) {
-            throw new NotFoundException("Income with id " + id + " not found for delete");
+            throw new ValidationException("Income with id " + id + " not found for delete");
         }
         incomeRepo.delete(id);
     }

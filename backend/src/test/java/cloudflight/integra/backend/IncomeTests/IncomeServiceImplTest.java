@@ -111,11 +111,15 @@ class IncomeServiceImplTest {
         service.createIncome(income);
 
         income.setAmount(BigDecimal.valueOf(-500));
-        ValidationException ex = assertThrows(ValidationException.class, () -> service.updateIncome(income));
+
+        ValidationException ex =
+                assertThrows(ValidationException.class, () -> service.updateIncome(income));
+
         ex.getErrors().forEach(err ->
-                System.out.println("Validation error on update: " + err.getCode() + " - " + err.getMessage())
+                System.out.println("Validation error on update: " + err)
         );
     }
+
 
     @Test
     void deleteIncome_removesIncome() {
@@ -123,7 +127,10 @@ class IncomeServiceImplTest {
         service.createIncome(income);
 
         service.deleteIncome(income.getId());
-        assertNull(service.getIncomeById(income.getId()));
+
+        assertThrows(ValidationException.class, () -> service.getIncomeById(income.getId()));
         System.out.println("Deleted income ID: " + income.getId());
     }
+
+
 }

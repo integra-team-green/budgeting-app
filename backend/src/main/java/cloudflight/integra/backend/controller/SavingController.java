@@ -1,3 +1,4 @@
+
 package cloudflight.integra.backend.controller;
 
 import cloudflight.integra.backend.controller.problem.SavingApiErrorResponses;
@@ -20,14 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/savings")
@@ -43,15 +37,14 @@ public class SavingController {
         this.savingService = savingService;
     }
 
-
     @Operation(summary = "Get saving by ID", description = "Returns a single saving")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Saving found"),
-        @ApiResponse(responseCode = "404", description = "Saving not found")
+            @ApiResponse(responseCode = "200", description = "Saving found"),
+            @ApiResponse(responseCode = "404", description = "Saving not found")
     })
     @GetMapping(value = "/{savingId}")
     public ResponseEntity<?> getSavingById(
-        @Parameter(description = "ID of saving to return") @PathVariable Long savingId) {
+            @Parameter(description = "ID of saving to return") @PathVariable Long savingId) {
         log.info("GET /savings/{} called, searching for saving with ID: {}", savingId, savingId);
 
         try {
@@ -64,7 +57,6 @@ public class SavingController {
             return ResponseEntity.status(500).body("Error: " + e.getMessage());
         }
     }
-
 
     @Operation(summary = "Get all savings", description = "Returns all available savings")
     @GetMapping()
@@ -81,32 +73,31 @@ public class SavingController {
         }
     }
 
-
     @Operation(summary = "Add a new saving")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Saving added successfully"),
-        @ApiResponse(responseCode = "400", description = "Invalid input"),
+            @ApiResponse(responseCode = "200", description = "Saving added successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
     })
     @PostMapping()
     public ResponseEntity<?> addSaving(
-        @RequestBody(
-            description = "Saving to add",
-            required = true,
-            content = @Content(
-                schema = @Schema(implementation = SavingDTO.class),
-                examples = {
-                    @ExampleObject(
-                        name = "SavingExample",
-                        value = "{ \"amount\": 10000.00, \"date\": \"2025-09-04T10:47:00+00:00\", \"goal\": \"Apartament\", \"description\": \"My dream apartament\" }"
-                    ),
-                    @ExampleObject(
-                        name = "BadExample",
-                        value = "{ \"amount\": -2000.00, \"date\": \"2222-09-04T10:47:00+00:00\", \"goal\": \"\", \"description\": \"bad description\" }"
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Saving to add",
+                    required = true,
+                    content = @Content(
+                            schema = @Schema(implementation = SavingDTO.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "SavingExample",
+                                            value = "{ \"amount\": 10000.00, \"date\": \"2025-09-04T10:47:00+00:00\", \"goal\": \"Apartament\", \"description\": \"My dream apartament\" }"
+                                    ),
+                                    @ExampleObject(
+                                            name = "BadExample",
+                                            value = "{ \"amount\": -2000.00, \"date\": \"2222-09-04T10:47:00+00:00\", \"goal\": \"\", \"description\": \"bad description\" }"
+                                    )
+                            }
                     )
-                }
             )
-
-        ) SavingDTO savingDTO) {
+            @RequestBody SavingDTO savingDTO) {
         log.info("POST /savings called, adding new saving: {}", savingDTO);
 
         try {
@@ -123,18 +114,17 @@ public class SavingController {
         }
     }
 
-
     @Operation(summary = "Update an existing saving by ID")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Saving updated"),
-        @ApiResponse(responseCode = "400", description = "ID mismatch"),
-        @ApiResponse(responseCode = "404", description = "Saving not found")
+            @ApiResponse(responseCode = "200", description = "Saving updated"),
+            @ApiResponse(responseCode = "400", description = "ID mismatch"),
+            @ApiResponse(responseCode = "404", description = "Saving not found")
     })
     @PutMapping("/{savingId}")
     public ResponseEntity<?> updateSaving(
-        @Parameter(description = "ID of saving to update")
-        @PathVariable Long savingId,
-        @RequestBody(description = "Updated saving") @org.springframework.web.bind.annotation.RequestBody SavingDTO savingDTO) {
+            @Parameter(description = "ID of saving to update")
+            @PathVariable Long savingId,
+            @RequestBody SavingDTO savingDTO) {
         log.info("PUT /savings/{} called, updating saving with ID: {}", savingId, savingId);
 
         try {
@@ -158,15 +148,14 @@ public class SavingController {
         }
     }
 
-
     @Operation(summary = "Delete a saving by ID")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "204", description = "Saving deleted"),
-        @ApiResponse(responseCode = "404", description = "Saving not found")
+            @ApiResponse(responseCode = "204", description = "Saving deleted"),
+            @ApiResponse(responseCode = "404", description = "Saving not found")
     })
     @DeleteMapping("/{savingId}")
     public ResponseEntity<?> deleteSaving(
-        @Parameter(description = "ID of saving to delete") @PathVariable Long savingId) {
+            @Parameter(description = "ID of saving to delete") @PathVariable Long savingId) {
         log.info("DELETE /savings/{} called, deleting saving with ID: {}", savingId, savingId);
 
         try {
