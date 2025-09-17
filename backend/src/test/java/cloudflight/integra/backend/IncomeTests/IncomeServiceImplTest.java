@@ -1,6 +1,7 @@
 package cloudflight.integra.backend.IncomeTests;
 
 import cloudflight.integra.backend.entity.Income;
+import cloudflight.integra.backend.exception.NotFoundException;
 import cloudflight.integra.backend.repository.inMemoryImpl.InMemoryIncomeRepositoryImpl;
 import cloudflight.integra.backend.service.impl.IncomeServiceImpl;
 import cloudflight.integra.backend.entity.validation.IncomeValidator;
@@ -128,7 +129,7 @@ class IncomeServiceImplTest {
 
         service.deleteIncome(income.getId());
 
-        assertThrows(ValidationException.class, () -> service.getIncomeById(income.getId()));
+        assertThrows(NotFoundException.class, () -> service.getIncomeById(income.getId()));
         System.out.println("Deleted income ID: " + income.getId());
     }
 
