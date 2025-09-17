@@ -21,6 +21,7 @@ public class IncomeRestExceptionHandler {
         return buildErrorResponse(HttpStatus.BAD_REQUEST, "Validation Failed", req, ex.getErrors());
     }
 
+
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<Object> handleNotFound(NotFoundException ex, HttpServletRequest req) {
         return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), req, List.of());
