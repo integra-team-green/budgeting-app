@@ -11,6 +11,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: '21'
+          distribution: 'temurin'
 
       - name: Run Checkstyle
         working-directory: backend
