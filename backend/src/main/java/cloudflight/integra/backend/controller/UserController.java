@@ -8,7 +8,6 @@ import cloudflight.integra.backend.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -52,36 +51,27 @@ public class UserController {
     public ResponseEntity<?> addUser(@RequestBody UserDTO userDto) {
         logger.info("Received POST request to add user: {}", userDto);
 
-        try {
-            User userToAdd = UserMapper.fromDto(userDto);
-            User createdUser = userService.addUser(userToAdd);
-            logger.info("User created: {}", createdUser);
-            return ResponseEntity.ok(UserMapper.toDto(Optional.ofNullable(createdUser)));
-        } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.status(400).body("Email already exists!");
-        }
+        User userToAdd = UserMapper.fromDto(userDto);
+        User createdUser = userService.addUser(userToAdd);
+        logger.info("User created: {}", createdUser);
+        return ResponseEntity.ok(UserMapper.toDto(Optional.ofNullable(createdUser)));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserDTO userDto) {
         logger.info("Received PUT request to update user with id: {}. Data: {}", id, userDto);
-        try {
-            if (!id.equals(userDto.getId())) {
-                return ResponseEntity.status(400).body("ID in path and request body do not match.");
-            }
-
-            User userToUpdate = UserMapper.fromDto(userDto);
-            if (userDto.getBalance() == null) {
-                Optional<User> existingUser = userService.getUser(id);
-                existingUser.ifPresent(user -> userToUpdate.setBalance(user.getBalance()));
-            }
-
-            User updatedUser = userService.updateUser(userToUpdate);
-            logger.info("User updated: {}", updatedUser);
-            return ResponseEntity.ok(UserMapper.toDto(Optional.ofNullable(updatedUser)));
-        } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.status(400).body("Email already exists!");
+        if (!id.equals(userDto.getId())) {
+            return ResponseEntity.status(400).body("ID in path and request body do not match.");
         }
+        User userToUpdate = UserMapper.fromDto(userDto);
+        if (userDto.getBalance() == null) {
+            Optional<User> existingUser = userService.getUser(id);
+            existingUser.ifPresent(user -> userToUpdate.setBalance(user.getBalance()));
+        }
+        User updatedUser = userService.updateUser(userToUpdate);
+        logger.info("User updated: {}", updatedUser);
+        return ResponseEntity.ok(UserMapper.toDto(Optional.ofNullable(updatedUser)));
+
     }
 
     @DeleteMapping("/{id}")
