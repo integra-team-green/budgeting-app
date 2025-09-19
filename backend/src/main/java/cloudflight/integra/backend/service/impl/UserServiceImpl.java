@@ -2,40 +2,48 @@ package cloudflight.integra.backend.service.impl;
 
 import cloudflight.integra.backend.entity.User;
 import cloudflight.integra.backend.entity.validation.UserValidator;
-import cloudflight.integra.backend.entity.validation.ValidationException;
 import cloudflight.integra.backend.exception.NotFoundException;
 import cloudflight.integra.backend.repository.UserRepository;
 import cloudflight.integra.backend.service.UserService;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.Optional;
+
 @Service
 public class UserServiceImpl implements UserService {
-    private final UserRepository<Long, User> userRepository;
+    private final UserRepository userRepository;
     private final UserValidator userValidator;
 
-    public UserServiceImpl(UserRepository<Long, User> userRepository, UserValidator userValidator) {
+    public UserServiceImpl(UserRepository userRepository, UserValidator userValidator) {
         this.userRepository = userRepository;
         this.userValidator = userValidator;
     }
 
     @Override
-    public User addUser(User user) {
-        if (user == null)
-            throw new IllegalArgumentException("User must not be null.");
-        userValidator.validate(user);
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            throw new ValidationException(java.util.List.of("Email already exists!"));
-        }
-        userRepository.save(user);
-        return user;
+    public Optional<User> getUser(Long id) {
+        if (id == null)
+            throw new IllegalArgumentException("User ID must not be null.");
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User with id " + id + " not found"));
+
+        return Optional.of(user);
     }
 
     @Override
-    public User getUser(Long id) {
-        if (id == null)
-            throw new IllegalArgumentException("User ID must not be null.");
-        return userRepository.findOne(id)
-                .orElseThrow(() -> new NotFoundException("User not found!"));
+    public Iterable<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+
+    @Override
+    public User addUser(User user) {
+        userValidator.validate(user);
+        if (user.getBalance() == null) {
+            user.setBalance(BigDecimal.ZERO);
+        }
+        return userRepository.save(user);
     }
 
     @Override
@@ -43,32 +51,35 @@ public class UserServiceImpl implements UserService {
         if (user == null)
             throw new IllegalArgumentException("User must not be null.");
         if (user.getId() == null)
-            throw new IllegalArgumentException("User ID must not be null for update.");
+            throw new IllegalArgumentException("Id must not be null.");
+
         userValidator.validate(user);
 
-        User existing = userRepository.findOne(user.getId())
-                .orElseThrow(() -> new NotFoundException("User not found!"));
+        if (userRepository.findById(user.getId()).isEmpty())
+            throw new NotFoundException("User with id " + user.getId() + " not found");
 
-        userRepository.findByEmail(user.getEmail())
-                .filter(u -> !u.getId().equals(user.getId()))
-                .ifPresent(u -> {
-                    throw new ValidationException(java.util.List.of("Email already exists!"));
-                });
-
-        existing.setName(user.getName());
-        existing.setEmail(user.getEmail());
-        existing.setPassword(user.getPassword());
-        userRepository.update(existing);
-        return existing;
+        return userRepository.save(user);
     }
+
 
     @Override
     public void deleteUser(Long id) {
         if (id == null)
-            throw new IllegalArgumentException("User ID must not be null.");
-        if (userRepository.findOne(id).isEmpty()) {
-            throw new NotFoundException("User not found!");
-        }
-        userRepository.delete(id);
+            throw new IllegalArgumentException("Id must not be null");
+
+        if (userRepository.findById(id).isEmpty())
+            throw new NotFoundException("User with id " + id + " not found");
+
+        userRepository.deleteById(id);
+    }
+
+
+    @Override
+    public User getUserByEmail(String email) {
+        if (email == null || email.isBlank())
+            throw new IllegalArgumentException("Email must not be null or blank");
+
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("User with email " + email + " not found"));
     }
 }

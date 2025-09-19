@@ -1,13 +1,32 @@
 package cloudflight.integra.backend.entity;
 
+import jakarta.persistence.*;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "Users")
 public class User {
+
+    @Id()
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "name")
     private String name;
+
+    @Column(name = "email", unique = true)
     private String email;
+
+    @Column(name = "password")
     private String password;
+
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @Column(name = "balance")
+    private BigDecimal balance;
 
     //Constructor
     public User(Long id, String name, String email, String password){
@@ -16,6 +35,20 @@ public class User {
         this.email = email;
         this.password = password;
         this.createdAt = LocalDateTime.now();
+        this.balance = BigDecimal.ZERO;
+    }
+
+    public User(Long id, String name, String email, String password, BigDecimal balance) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.createdAt = LocalDateTime.now();
+        this.balance = balance;
+    }
+
+    public User() {
+
     }
 
     //Getters and Setters
@@ -57,6 +90,14 @@ public class User {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public BigDecimal getBalance() {
+        return balance;
+    }
+
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
     }
 
     @Override

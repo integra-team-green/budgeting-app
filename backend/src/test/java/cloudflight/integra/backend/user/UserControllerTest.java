@@ -1,8 +1,7 @@
 package cloudflight.integra.backend.user;
 
 import cloudflight.integra.backend.dto.UserDTO;
-import cloudflight.integra.backend.entity.User;
-import cloudflight.integra.backend.repository.inMemoryImpl.InMemoryUserRepositoryImpl;
+import cloudflight.integra.backend.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,10 +11,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -25,20 +24,20 @@ class UserControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private InMemoryUserRepositoryImpl userRepo;
+    private UserRepository userRepo;
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setUp() {
-        userRepo.clear();
-        userRepo.save(new User(null, "Alice", "alice@email.com", "123"));
-        userRepo.save(new User(null, "Marc", "marc@yahoo.com", "abcd999"));
+//        userRepo.deleteAll();
+//        userRepo.save(new User(null, "Alice", "alice@email.com", "123"));
+//        userRepo.save(new User(null, "Marc", "marc@yahoo.com", "abcd999"));
     }
 
     @Test
     void testGetUserById() throws Exception {
-        mockMvc.perform(get("/api/v1/users/1"))
+        mockMvc.perform(get("/api/v1/users/29"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Alice"))
@@ -76,7 +75,7 @@ class UserControllerTest {
         updateDto.setEmail("alice@new.com");
         updateDto.setPassword("newpass");
 
-        mockMvc.perform(put("/api/v1/users/1")
+        mockMvc.perform(put("/api/v1/users/26")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateDto)))
                 .andDo(print())
@@ -87,12 +86,32 @@ class UserControllerTest {
 
     @Test
     void testDeleteUser() throws Exception {
-        mockMvc.perform(delete("/api/v1/users/2"))
+        mockMvc.perform(delete("/api/v1/users/26"))
                 .andDo(print())
                 .andExpect(status().isNoContent());
 
-        mockMvc.perform(get("/api/v1/users/2"))
+        mockMvc.perform(get("/api/v1/users/26"))
                 .andDo(print())
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void testGetAllUsers() throws Exception {
+        mockMvc.perform(get("/api/v1/users"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(2));
+    }
+
+    @Test
+    void testGetUserByEmail() throws Exception {
+        mockMvc.perform(get("/api/v1/users/by-email")
+                        .param("email", "alice@email.com")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Alice"))
+                .andExpect(jsonPath("$.email").value("alice@email.com"));
     }
 }
