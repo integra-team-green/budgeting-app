@@ -1,9 +1,9 @@
 package cloudflight.integra.backend.service.impl;
-
 import cloudflight.integra.backend.entity.Payment;
 import cloudflight.integra.backend.entity.validation.PaymentValidator;
 import cloudflight.integra.backend.entity.validation.ValidationException;
 import cloudflight.integra.backend.exception.NotFoundException;
+import cloudflight.integra.backend.repository.DBPaymentRepository;
 import cloudflight.integra.backend.repository.PaymentRepository;
 import cloudflight.integra.backend.service.PaymentService;
 import org.springframework.stereotype.Service;
@@ -12,11 +12,11 @@ import java.util.List;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
-    private final PaymentRepository IPaymentRepository;
+    private final DBPaymentRepository dbPaymentRepository;
     private final PaymentValidator paymentValidator;
 
-    public PaymentServiceImpl(PaymentRepository IPaymentRepository, PaymentValidator paymentValidator) {
-        this.IPaymentRepository = IPaymentRepository;
+    public PaymentServiceImpl(DBPaymentRepository dbPaymentRepository, PaymentValidator paymentValidator) {
+        this.dbPaymentRepository = dbPaymentRepository;
         this.paymentValidator = paymentValidator;
     }
 
@@ -27,32 +27,33 @@ public class PaymentServiceImpl implements PaymentService {
         } catch (ValidationException e) {
             throw new ValidationException(List.of(e.getMessage()));
         }
-        return IPaymentRepository.save(payment);
+        return dbPaymentRepository.save(payment);
     }
 
     @Override
     public Payment getPayment(Long id) {
-        return IPaymentRepository.findById(id).orElseThrow(() -> new NotFoundException("Payment not found with id: " + id));
+        return dbPaymentRepository.findById(id).orElseThrow(() -> new NotFoundException("Payment not found with id: " + id));
     }
 
     @Override
     public Payment updatePayment(Payment payment) {
-        try {
-            paymentValidator.validate(payment);
-        } catch (ValidationException e) {
-            throw new ValidationException(List.of(e.getMessage()));
+        paymentValidator.validate(payment);
+        if (!dbPaymentRepository.existsById(payment.getId())) {
+            throw new NotFoundException("Payment not found with id: " + payment.getId());
         }
-        return IPaymentRepository.update(payment).orElseThrow(() -> new NotFoundException("Payment not found with id: " + payment.getId()));
-
+        return dbPaymentRepository.save(payment);
     }
 
     @Override
     public Payment deletePayment(Long id) {
-       return IPaymentRepository.delete(id).orElseThrow(() -> new NotFoundException("Payment not found with id: " + id));
+        Payment payment = dbPaymentRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Payment not found with id: " + id));
+        dbPaymentRepository.delete(payment);
+        return payment;
     }
 
     @Override
     public List<Payment> getPayments() {
-        return IPaymentRepository.findAll();
+        return dbPaymentRepository.findAll();
     }
 }

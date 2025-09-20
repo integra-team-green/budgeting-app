@@ -1,11 +1,8 @@
 package cloudflight.integra.backend.mapper;
-
 import cloudflight.integra.backend.dto.PaymentDTO;
-import cloudflight.integra.backend.entity.Frequency;
 import cloudflight.integra.backend.entity.Payment;
-
-import java.math.BigDecimal;
-import java.util.Date;
+import cloudflight.integra.backend.repository.ExpenseRepository;
+import java.time.LocalDate;
 import java.util.List;
 
 public class PaymentMapper {
@@ -15,29 +12,35 @@ public class PaymentMapper {
      * @return new PaymentDto
      */
     public static PaymentDTO getDTO(Payment payment) {
-        String nume= payment.getName();
-        Long id= payment.getId();
-        BigDecimal amount= payment.getAmount();
-        Date nextDueDate= payment.getNextDueDate();
-        Frequency frequency= payment.getFrequency();
-        Boolean isActive= payment.getIsActive();
-        return new PaymentDTO(id,nume,amount,frequency,nextDueDate,isActive);
+        Long id = payment.getId();
+        String name = payment.getName();
+        String status = payment.getStatus() != null ? payment.getStatus().name() : null; // convert enum -> String
+        LocalDate paymentDate = payment.getPaymentDate();
+        Long expenseId = payment.getExpense() != null ? payment.getExpense().getId() : null;
+
+        return new PaymentDTO(id, expenseId, name, status, paymentDate);
     }
+
 
     /**
      * Map PaymentDto to Payment
      * @param paymentDTO
      * @return new Payment object
      */
-    public static Payment getFromDTO(PaymentDTO paymentDTO) {
-        String nume= paymentDTO.getName();
-        Long id= paymentDTO.getId();
-        BigDecimal amount= paymentDTO.getAmount();
-        Date nextDueDate= paymentDTO.getNextDueDate();
-        Frequency frequency= paymentDTO.getFrequency();
-        Boolean isActive= paymentDTO.getIsActive();
-        return new Payment(id,nume,amount,frequency,nextDueDate,isActive);
+    public static Payment getFromDTO(PaymentDTO paymentDTO, ExpenseRepository expenseRepo) {
+        Payment payment = new Payment();
+        payment.setId(paymentDTO.getId());
+        payment.setName(paymentDTO.getName());
+        payment.setStatus(paymentDTO.getStatus() != null ? Payment.Status.valueOf(paymentDTO.getStatus()) : null); // String -> enum
+        payment.setPaymentDate(paymentDTO.getPaymentDate());
+
+        if (paymentDTO.getExpenseId() != null) {
+            payment.setExpense(expenseRepo.getReferenceById(paymentDTO.getExpenseId()));
+        }
+
+        return payment;
     }
+
 
     /**
      * Map a list of Dtos into a list of objects

@@ -1,5 +1,7 @@
 package cloudflight.integra.backend.entity;
 
+import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -16,9 +18,13 @@ import java.util.Objects;
 
 
 /** Represents a financial expense entry for a specific user.**/
+@Entity
+@Table(name = "expense")
 public class Expense {
 
     /** Unique identifier of the expense. */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     /** Identifier of the user who created the expense. */
@@ -53,6 +59,9 @@ public class Expense {
         this.category = category;
         this.date = date;
         this.description = description;
+    }
+
+    protected Expense() {
     }
 
     /** @return unique identifier of the expense */
