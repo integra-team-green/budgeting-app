@@ -1,6 +1,4 @@
 package cloudflight.integra.backend.payment;
-import cloudflight.integra.backend.dto.ExpenseDTO;
-import cloudflight.integra.backend.dto.PaymentDTO;
 import cloudflight.integra.backend.entity.Expense;
 import cloudflight.integra.backend.entity.Payment;
 import cloudflight.integra.backend.repository.ExpenseRepository;

@@ -1,7 +1,9 @@
 package cloudflight.integra.backend.service;
 import cloudflight.integra.backend.dto.PaymentDTO;
 import cloudflight.integra.backend.entity.Payment;
+
 import java.util.List;
+
 public interface PaymentService {
     /**
      * Saves a new Payment
