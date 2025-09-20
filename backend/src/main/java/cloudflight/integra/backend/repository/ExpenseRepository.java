@@ -1,6 +1,7 @@
 package cloudflight.integra.backend.repository;
 
 import cloudflight.integra.backend.dto.ExpenseDTO;
+import cloudflight.integra.backend.entity.Expense;
 
 import java.util.List;
 import java.util.Optional;
