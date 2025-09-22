@@ -48,8 +48,13 @@ public class PaymentMapper {
      * @return list of objects
      */
 
-    public static List<Payment> getPaymentsFromDto(List<PaymentDTO> paymentDTOList) {
-        return paymentDTOList.stream().map(PaymentMapper::getFromDTO).toList();
+    public static List<Payment> getPaymentsFromDto(List<PaymentDTO> paymentDTOList, ExpenseRepository expenseRepo) {
+        if (paymentDTOList == null) {
+            return List.of();
+        }
+        return paymentDTOList.stream()
+                .map(dto -> getFromDTO(dto, expenseRepo))
+                .toList();
     }
 
     /**

@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /*As a user, I want to manage my expenses so that I can track all my spending.
@@ -26,6 +28,9 @@ public class Expense {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @OneToMany(mappedBy = "expense", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Payment> payments = new ArrayList<>();
 
     /** Identifier of the user who created the expense. */
     private Long userId;
@@ -61,7 +66,7 @@ public class Expense {
         this.description = description;
     }
 
-    protected Expense() {
+    public Expense() {
     }
 
     /** @return unique identifier of the expense */
@@ -134,7 +139,8 @@ public class Expense {
 
         this.description = description;
    }
-
+    public List<Payment> getPayments() { return payments; }
+    public void setPayments(List<Payment> payments) { this.payments = payments; }
 
    @Override
    public boolean equals(Object o) {

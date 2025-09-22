@@ -1,13 +1,16 @@
 package cloudflight.integra.backend.service.impl;
 
 import cloudflight.integra.backend.dto.ExpenseDTO;
+import cloudflight.integra.backend.entity.Expense;
 import cloudflight.integra.backend.entity.validation.ExpenseValidator;
 import cloudflight.integra.backend.exception.NotFoundException;
+import cloudflight.integra.backend.mapper.ExpenseMapper;
 import cloudflight.integra.backend.repository.ExpenseRepository;
 import cloudflight.integra.backend.service.ExpenseService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -27,7 +30,10 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Override
     public ExpenseDTO createExpense(ExpenseDTO expenseDto) {
         expenseValidation.validate(expenseDto);
-        return expenseRepository.addExpense(expenseDto);
+
+        Expense entity = ExpenseMapper.getFromDto(expenseDto);
+        Expense saved = expenseRepository.save(entity);
+        return ExpenseMapper.getDto(saved);
     }
 
 
@@ -38,29 +44,43 @@ public class ExpenseServiceImpl implements ExpenseService {
         if (updatedExpense.getId() == null || !id.equals(updatedExpense.getId())) {
             throw new IllegalArgumentException("ID in path and DTO do not match");
         }
-        ExpenseDTO existingExpense = expenseRepository.findById(id)
+
+        Expense existing = expenseRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Expense with id " + id + " not found"));
-        return expenseRepository.updateExpense(updatedExpense);
+
+        existing.setCategory(updatedExpense.getCategory());
+        existing.setAmount(updatedExpense.getAmount());
+        existing.setDate(updatedExpense.getDate());
+        existing.setDescription(updatedExpense.getDescription());
+        existing.setUserId(updatedExpense.getUserId());
+
+        Expense saved = expenseRepository.save(existing);
+        return ExpenseMapper.getDto(saved);
     }
 
 
 
     @Override
     public List<ExpenseDTO> findAllByUserId(Long userId) {
-
-        return expenseRepository.findAllByUserId(userId);
+        return expenseRepository.findAll().stream()  // filtrăm pe userId
+                .filter(e -> userId.equals(e.getUserId()))
+                .map(ExpenseMapper::getDto)
+                .collect(Collectors.toList());
     }
 
     @Override
     public ExpenseDTO findById(Long id) {
-        return expenseRepository.findById(id)
+        Expense expense = expenseRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Expense with id: " + id + " not found"));
+        return ExpenseMapper.getDto(expense);
     }
 
 
     public void deleteExpense(Long id) {
-        ExpenseDTO existing = expenseRepository.findById(id)
+        Expense expense = expenseRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Expense with id " + id + " not found"));
+
+        ExpenseDTO existingExpense = ExpenseMapper.getDto(expense);
         expenseRepository.deleteById(id);
     }
 
