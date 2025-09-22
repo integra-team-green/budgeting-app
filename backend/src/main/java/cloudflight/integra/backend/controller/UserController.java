@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 import java.util.Optional;
 
 @RestController
@@ -30,7 +31,7 @@ public class UserController {
     public ResponseEntity<?> getAllUsers() {
         logger.info("Received GET request for all users");
 
-        Iterable<User> users = userService.getAllUsers();
+        Collection<User> users = userService.getAllUsers();
         Iterable<UserDTO> userDTOs = UserMapper.toDtoList(users);
         logger.info("Users retrieved: {}", userDTOs);
         return ResponseEntity.ok(userDTOs);
@@ -38,7 +39,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getUser(@PathVariable Long id) {
+    public ResponseEntity<UserDTO> getUser(@PathVariable Long id) {
         logger.info("Received GET request for user with id: {}", id);
 
         User user = userService.getUser(id).orElse(null);
@@ -48,7 +49,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addUser(@RequestBody UserDTO userDto) {
+    public ResponseEntity<UserDTO> addUser(@RequestBody UserDTO userDto) {
         logger.info("Received POST request to add user: {}", userDto);
 
         User userToAdd = UserMapper.fromDto(userDto);
@@ -58,10 +59,10 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserDTO userDto) {
+    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO userDto) {
         logger.info("Received PUT request to update user with id: {}. Data: {}", id, userDto);
         if (!id.equals(userDto.getId())) {
-            return ResponseEntity.status(400).body("ID in path and request body do not match.");
+            throw new IllegalArgumentException("ID in path and request body do not match.");
         }
         User userToUpdate = UserMapper.fromDto(userDto);
         if (userDto.getBalance() == null) {
@@ -75,7 +76,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
+    public ResponseEntity<UserDTO> delete(@PathVariable Long id) {
         logger.info("Received DELETE request for user with id: {}", id);
         userService.deleteUser(id);
         logger.info("User with id {} deleted.", id);
@@ -83,7 +84,7 @@ public class UserController {
     }
 
     @GetMapping("/by-email")
-    public ResponseEntity<?> getUserByEmail(@RequestParam String email) {
+    public ResponseEntity<UserDTO> getUserByEmail(@RequestParam String email) {
         logger.info("Received GET request for user with email: {}", email);
         User user = userService.getUserByEmail(email);
         logger.info("User retrieved by email: {}", user);

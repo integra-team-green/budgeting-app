@@ -16,14 +16,18 @@ public class UserMapper {
      * @return the corresponding UserDto
      */
     public static UserDTO toDto(Optional<User> user) {
-        UserDTO dto = new UserDTO();
-        dto.setId(user.get().getId());
-        dto.setName(user.get().getName());
-        dto.setEmail(user.get().getEmail());
-        dto.setPassword(user.get().getPassword());
-        dto.setCreatedAt(user.get().getCreatedAt());
-        dto.setBalance(user.get().getBalance());
-        return dto;
+        if (user.isPresent()) {
+            User u = user.get();
+            UserDTO dto = new UserDTO();
+            dto.setId(u.getId());
+            dto.setName(u.getName());
+            dto.setEmail(u.getEmail());
+            dto.setPassword(u.getPassword());
+            dto.setCreatedAt(u.getCreatedAt());
+            dto.setBalance(u.getBalance());
+            return dto;
+        }
+        return null;
     }
 
     /**

@@ -37,6 +37,7 @@ dependencies {
     // Test dependencies
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation 'com.h2database:h2'
 
     implementation 'org.openapitools:jackson-databind-nullable:0.2.6'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.1'

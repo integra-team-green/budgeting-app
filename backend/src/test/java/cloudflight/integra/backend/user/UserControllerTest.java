@@ -1,6 +1,7 @@
 package cloudflight.integra.backend.user;
 
 import cloudflight.integra.backend.dto.UserDTO;
+import cloudflight.integra.backend.entity.User;
 import cloudflight.integra.backend.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,9 +31,9 @@ class UserControllerTest {
 
     @BeforeEach
     void setUp() {
-//        userRepo.deleteAll();
-//        userRepo.save(new User(null, "Alice", "alice@email.com", "123"));
-//        userRepo.save(new User(null, "Marc", "marc@yahoo.com", "abcd999"));
+        userRepo.deleteAll();
+        userRepo.save(new User(null, "Alice", "alice@email.com", "123"));
+        userRepo.save(new User(null, "Marc", "marc@yahoo.com", "abcd999"));
     }
 
     @Test

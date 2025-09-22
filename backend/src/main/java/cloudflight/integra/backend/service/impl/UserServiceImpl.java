@@ -2,6 +2,7 @@ package cloudflight.integra.backend.service.impl;
 
 import cloudflight.integra.backend.entity.User;
 import cloudflight.integra.backend.entity.validation.UserValidator;
+import cloudflight.integra.backend.entity.validation.ValidationException;
 import cloudflight.integra.backend.exception.NotFoundException;
 import cloudflight.integra.backend.repository.UserRepository;
 import cloudflight.integra.backend.service.UserService;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.Optional;
 
 @Service
@@ -35,7 +37,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public Iterable<User> getAllUsers() {
+    public Collection<User> getAllUsers() {
         return userRepository.findAll();
     }
 
@@ -44,6 +46,12 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User addUser(User user) {
         userValidator.validate(user);
+
+        Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
+        if (existingUser.isPresent()) {
+            throw new ValidationException("Email already exists!");
+        }
+
         if (user.getBalance() == null) {
             user.setBalance(BigDecimal.ZERO);
         }
@@ -62,6 +70,11 @@ public class UserServiceImpl implements UserService {
 
         if (userRepository.findById(user.getId()).isEmpty())
             throw new NotFoundException("User with id " + user.getId() + " not found");
+
+        Optional<User> userWithSameEmail = userRepository.findByEmail(user.getEmail());
+        if (userWithSameEmail.isPresent() && !userWithSameEmail.get().getId().equals(user.getId())) {
+            throw new ValidationException("Email already exists!");
+        }
 
         return userRepository.save(user);
     }

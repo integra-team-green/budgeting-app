@@ -2,6 +2,7 @@ package cloudflight.integra.backend.service;
 
 import cloudflight.integra.backend.entity.User;
 
+import java.util.Collection;
 import java.util.Optional;
 
 /**
@@ -29,7 +30,7 @@ public interface UserService {
      *
      * @return an iterable of all User entities
      */
-    Iterable<User> getAllUsers();
+    Collection<User> getAllUsers();
 
     /**
      * Updates an existing user's details.
