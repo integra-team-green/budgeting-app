@@ -6,6 +6,7 @@ import cloudflight.integra.backend.exception.NotFoundException;
 import cloudflight.integra.backend.repository.UserRepository;
 import cloudflight.integra.backend.service.UserService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -21,6 +22,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<User> getUser(Long id) {
         if (id == null)
             throw new IllegalArgumentException("User ID must not be null.");
@@ -32,12 +34,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Iterable<User> getAllUsers() {
         return userRepository.findAll();
     }
 
 
     @Override
+    @Transactional
     public User addUser(User user) {
         userValidator.validate(user);
         if (user.getBalance() == null) {
@@ -47,6 +51,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public User updateUser(User user) {
         if (user == null)
             throw new IllegalArgumentException("User must not be null.");
@@ -63,6 +68,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
+    @Transactional
     public void deleteUser(Long id) {
         if (id == null)
             throw new IllegalArgumentException("Id must not be null");
@@ -75,6 +81,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
+    @Transactional(readOnly = true)
     public User getUserByEmail(String email) {
         if (email == null || email.isBlank())
             throw new IllegalArgumentException("Email must not be null or blank");
