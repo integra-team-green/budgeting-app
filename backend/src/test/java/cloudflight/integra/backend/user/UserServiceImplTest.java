@@ -10,9 +10,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.DataIntegrityViolationException;
-
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,14 +18,13 @@ class UserServiceImplTest {
 
     @Autowired
     private UserRepository userRepo;
-    private UserValidator userValidator;
     private UserServiceImpl userService;
     private User user1, user2;
 
     @BeforeEach
     void setUp() {
         userRepo.deleteAll();
-        userValidator = new UserValidator();
+        UserValidator userValidator = new UserValidator();
         userService = new UserServiceImpl(userRepo, userValidator);
         user1 = new User(null, "Alice", "alice@email.com", "123");
         user2 = new User(null, "Marc", "marc@yahoo.com", "abcd999");
@@ -52,9 +48,9 @@ class UserServiceImplTest {
     @Test
     void testGetUser_Valid() {
         userService.addUser(user1);
-        Optional<User> found = userService.getUser(user1.getId());
+        User found = userService.getUser(user1.getId());
         assertNotNull(found);
-        assertEquals("Alice", found.get().getName());
+        assertEquals("Alice", found.getName());
     }
 
     @Test

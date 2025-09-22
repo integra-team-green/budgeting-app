@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -28,11 +27,11 @@ public class UserController {
     }
 
     @GetMapping()
-    public ResponseEntity<?> getAllUsers() {
+    public ResponseEntity<Collection<UserDTO>> getAllUsers() {
         logger.info("Received GET request for all users");
 
         Collection<User> users = userService.getAllUsers();
-        Iterable<UserDTO> userDTOs = UserMapper.toDtoList(users);
+        Collection<UserDTO> userDTOs = UserMapper.toDtoList(users);
         logger.info("Users retrieved: {}", userDTOs);
         return ResponseEntity.ok(userDTOs);
 
@@ -42,9 +41,9 @@ public class UserController {
     public ResponseEntity<UserDTO> getUser(@PathVariable Long id) {
         logger.info("Received GET request for user with id: {}", id);
 
-        User user = userService.getUser(id).orElse(null);
+        User user = userService.getUser(id);
         logger.info("User retrieved: {}", user);
-        return ResponseEntity.ok(UserMapper.toDto(Optional.ofNullable(user)));
+        return ResponseEntity.ok(UserMapper.toDto(user));
 
     }
 
@@ -55,7 +54,7 @@ public class UserController {
         User userToAdd = UserMapper.fromDto(userDto);
         User createdUser = userService.addUser(userToAdd);
         logger.info("User created: {}", createdUser);
-        return ResponseEntity.ok(UserMapper.toDto(Optional.ofNullable(createdUser)));
+        return ResponseEntity.ok(UserMapper.toDto(createdUser));
     }
 
     @PutMapping("/{id}")
@@ -65,13 +64,9 @@ public class UserController {
             throw new IllegalArgumentException("ID in path and request body do not match.");
         }
         User userToUpdate = UserMapper.fromDto(userDto);
-        if (userDto.getBalance() == null) {
-            Optional<User> existingUser = userService.getUser(id);
-            existingUser.ifPresent(user -> userToUpdate.setBalance(user.getBalance()));
-        }
         User updatedUser = userService.updateUser(userToUpdate);
         logger.info("User updated: {}", updatedUser);
-        return ResponseEntity.ok(UserMapper.toDto(Optional.ofNullable(updatedUser)));
+        return ResponseEntity.ok(UserMapper.toDto(updatedUser));
 
     }
 
@@ -88,6 +83,6 @@ public class UserController {
         logger.info("Received GET request for user with email: {}", email);
         User user = userService.getUserByEmail(email);
         logger.info("User retrieved by email: {}", user);
-        return ResponseEntity.ok(UserMapper.toDto(Optional.ofNullable(user)));
+        return ResponseEntity.ok(UserMapper.toDto(user));
     }
 }

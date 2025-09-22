@@ -3,7 +3,6 @@ package cloudflight.integra.backend.service;
 import cloudflight.integra.backend.entity.User;
 
 import java.util.Collection;
-import java.util.Optional;
 
 /**
  * Service interface for managing User entities.
@@ -23,7 +22,7 @@ public interface UserService {
      * @param id the ID of the user
      * @return the User entity
      */
-    Optional<User> getUser(Long id);
+    User getUser(Long id);
 
     /**
      * Retrieves all users in the system.

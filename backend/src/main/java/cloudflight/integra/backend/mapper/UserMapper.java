@@ -5,8 +5,8 @@ import cloudflight.integra.backend.entity.User;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public class UserMapper {
@@ -15,19 +15,8 @@ public class UserMapper {
      * @param user the User entity to convert
      * @return the corresponding UserDto
      */
-    public static UserDTO toDto(Optional<User> user) {
-        if (user.isPresent()) {
-            User u = user.get();
-            UserDTO dto = new UserDTO();
-            dto.setId(u.getId());
-            dto.setName(u.getName());
-            dto.setEmail(u.getEmail());
-            dto.setPassword(u.getPassword());
-            dto.setCreatedAt(u.getCreatedAt());
-            dto.setBalance(u.getBalance());
-            return dto;
-        }
-        return null;
+    public static UserDTO toDto(User user) {
+        return new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getPassword(), user.getCreatedAt(), user.getBalance());
     }
 
     /**
@@ -39,11 +28,11 @@ public class UserMapper {
         return new User(dto.getId(), dto.getName(), dto.getEmail(), dto.getPassword(), dto.getBalance());
     }
 
-    public static Iterable<UserDTO> toDtoList(Iterable<User> users) {
+    public static Collection<UserDTO> toDtoList(Collection<User> users) {
         List<UserDTO> userDTOS = new ArrayList<>();
 
         for (User user : users) {
-            userDTOS.add(toDto(Optional.ofNullable(user)));
+            userDTOS.add(toDto(user));
         }
 
         return userDTOS;

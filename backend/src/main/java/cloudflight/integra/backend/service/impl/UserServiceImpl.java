@@ -25,14 +25,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<User> getUser(Long id) {
+    public User getUser(Long id) {
         if (id == null)
             throw new IllegalArgumentException("User ID must not be null.");
 
-        User user = userRepository.findById(id)
+        return userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User with id " + id + " not found"));
-
-        return Optional.of(user);
     }
 
     @Override
