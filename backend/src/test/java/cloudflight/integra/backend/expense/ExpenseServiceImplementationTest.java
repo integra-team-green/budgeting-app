@@ -4,7 +4,7 @@ import cloudflight.integra.backend.dto.ExpenseDTO;
 import cloudflight.integra.backend.entity.validation.ExpenseValidator;
 import cloudflight.integra.backend.entity.validation.ValidationException;
 import cloudflight.integra.backend.exception.NotFoundException;
-import cloudflight.integra.backend.repository.inMemoryImpl.InMemoryExpenseRepositoryImpl;
+//import cloudflight.integra.backend.repository.inMemoryImpl.InMemoryExpenseRepositoryImpl;
 import cloudflight.integra.backend.service.impl.ExpenseServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,7 @@ public class ExpenseServiceImplementationTest {
 
     @BeforeEach
     public void setUp() {
-        service = new ExpenseServiceImpl(new InMemoryExpenseRepositoryImpl(), new ExpenseValidator());
+        //service = new ExpenseServiceImpl(new InMemoryExpenseRepositoryImpl(), new ExpenseValidator());
     }
 
     /** Test creating a valid expense. */

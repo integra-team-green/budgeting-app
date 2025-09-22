@@ -3,24 +3,24 @@ import cloudflight.integra.backend.entity.Payment;
 import cloudflight.integra.backend.entity.validation.PaymentValidator;
 import cloudflight.integra.backend.entity.validation.ValidationException;
 import cloudflight.integra.backend.exception.NotFoundException;
-import cloudflight.integra.backend.repository.DBPaymentRepository;
 import cloudflight.integra.backend.repository.PaymentRepository;
 import cloudflight.integra.backend.service.PaymentService;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
-    private final DBPaymentRepository dbPaymentRepository;
+    private final PaymentRepository dbPaymentRepository;
     private final PaymentValidator paymentValidator;
 
-    public PaymentServiceImpl(DBPaymentRepository dbPaymentRepository, PaymentValidator paymentValidator) {
+    public PaymentServiceImpl(PaymentRepository dbPaymentRepository, PaymentValidator paymentValidator) {
         this.dbPaymentRepository = dbPaymentRepository;
         this.paymentValidator = paymentValidator;
     }
 
-    @Override
+    @Transactional
     public Payment addPayment(Payment payment) {
         try {
             paymentValidator.validate(payment);
@@ -30,12 +30,12 @@ public class PaymentServiceImpl implements PaymentService {
         return dbPaymentRepository.save(payment);
     }
 
-    @Override
+    @Transactional(readOnly = true)
     public Payment getPayment(Long id) {
         return dbPaymentRepository.findById(id).orElseThrow(() -> new NotFoundException("Payment not found with id: " + id));
     }
 
-    @Override
+    @Transactional
     public Payment updatePayment(Payment payment) {
         paymentValidator.validate(payment);
         if (!dbPaymentRepository.existsById(payment.getId())) {
@@ -44,7 +44,7 @@ public class PaymentServiceImpl implements PaymentService {
         return dbPaymentRepository.save(payment);
     }
 
-    @Override
+    @Transactional
     public Payment deletePayment(Long id) {
         Payment payment = dbPaymentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Payment not found with id: " + id));
@@ -52,7 +52,7 @@ public class PaymentServiceImpl implements PaymentService {
         return payment;
     }
 
-    @Override
+    @Transactional(readOnly = true)
     public List<Payment> getPayments() {
         return dbPaymentRepository.findAll();
     }

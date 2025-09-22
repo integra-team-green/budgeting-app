@@ -14,9 +14,8 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
     @ManyToOne(optional = false)
-    @JoinColumn(name = "expense_id", nullable = false)
+    @JoinColumn(name = "expense_id", nullable = false) //asigură că fiecare Payment trebuie să aibă un Expense
     private Expense expense;
 
     @Column(nullable = false)

@@ -21,8 +21,8 @@ public class PaymentValidator implements Validator<Payment>{
         List<String> errors = new ArrayList<>();
         if(entity.getAmount().compareTo(BigDecimal.ZERO)<=0)
             errors.add("Amount must be greater than 0");
-        if(entity.getFrequency()!= Frequency.MONTHLY && entity.getFrequency()!= Frequency.YEARLY && entity.getFrequency()!=Frequency.ONE_TIME)
-            errors.add("Invalid frequency");
+       // if(entity.getFrequency()!= Frequency.MONTHLY && entity.getFrequency()!= Frequency.YEARLY && entity.getFrequency()!=Frequency.ONE_TIME)
+           // errors.add("Invalid frequency");
         if (!errors.isEmpty()) {
             throw new ValidationException(errors);
         }
