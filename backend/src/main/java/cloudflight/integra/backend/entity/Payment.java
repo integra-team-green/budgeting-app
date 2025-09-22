@@ -3,7 +3,6 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Date;
 
 
 @Entity
@@ -22,23 +21,20 @@ public class Payment {
     private String name;
 
     @Enumerated(EnumType.STRING)
-    private Status status; //pending, paid, failed
+    private StatusEnum status; //pending, paid, failed
 
     private LocalDate paymentDate;
 
     @Column(nullable = false)
     private BigDecimal amount;
 
-    //private Frequency frequency;
-    //private Date nextDueDate;
-    //private Boolean isActive;
 
     // Enum pentru status
-    public enum Status {
+    public enum StatusEnum {
         PENDING, PAID, FAILED
     }
 
-    public Payment(Expense expense, String name, Status status, LocalDate paymentDate) {
+    public Payment(Expense expense, String name, StatusEnum status, LocalDate paymentDate) {
         this.expense = expense;
         this.name = name;
         this.status = status;
@@ -76,10 +72,10 @@ public class Payment {
     public void setExpense(Expense expense) {
         this.expense = expense;
     }
-    public Status getStatus() {
+    public StatusEnum getStatus() {
         return status;
     }
-    public void setStatus(Status status) {
+    public void setStatus(StatusEnum status) {
         this.status = status;
     }
     public LocalDate getPaymentDate() {
@@ -88,24 +84,4 @@ public class Payment {
     public void setPaymentDate(LocalDate paymentDate) {
         this.paymentDate = paymentDate;
     }
-
-    //public Frequency getFrequency() {
-    //    return frequency;
-    //}
-    //public void setFrequency(Frequency frequency) {
-    //    this.frequency = frequency;
-    //}
-    //public Date getNextDueDate() {
-    //    return nextDueDate;
-    //}
-    //public void setNextDueDate(Date nextDueDate) {
-    //    this.nextDueDate = nextDueDate;
-    //}
-    //public Boolean getIsActive() {
-    //    return isActive;
-    //}
-    //public void setIsActive(Boolean isActive) {
-    //    this.isActive = isActive;
-    //}
-
 }

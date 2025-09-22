@@ -1,4 +1,6 @@
 package cloudflight.integra.backend.payment;
+import cloudflight.integra.backend.dto.ExpenseDTO;
+import cloudflight.integra.backend.dto.PaymentDTO;
 import cloudflight.integra.backend.entity.Expense;
 import cloudflight.integra.backend.entity.Payment;
 import cloudflight.integra.backend.entity.validation.PaymentValidator;
@@ -26,52 +28,57 @@ public class PaymentServiceTest {
     @Autowired
     private PaymentRepository paymentRepository;
 
-    @Autowired
-    private ExpenseRepository expenseRepository;
-
     @MockitoBean
     private PaymentValidator paymentValidator;
 
     private PaymentService paymentService;
 
-    private Expense expense;
-    private Payment payment1;
-    private Payment payment2;
+    @Autowired
+    private ExpenseRepository expenseRepository;
+
+    private ExpenseDTO expense;
+    private PaymentDTO payment1;
+    private PaymentDTO payment2;
 
     @BeforeEach
     void setUp() {
-        paymentService = new PaymentServiceImpl(paymentRepository, paymentValidator);
+        paymentService = new PaymentServiceImpl(paymentRepository, expenseRepository, paymentValidator);
 
-        expense = new Expense();
-        expense.setCategory("Rent");
-        expense.setAmount(BigDecimal.valueOf(1000));
-        expense.setDate(LocalDate.now());
-        expense = expenseRepository.save(expense);
+        Expense expenseEntity = new Expense();
+        expenseEntity.setCategory("Rent");
+        expenseEntity.setAmount(BigDecimal.valueOf(1000));
+        expenseEntity.setDate(LocalDate.now());
+        expenseEntity = expenseRepository.saveAndFlush(expenseEntity);
 
+        expense = new ExpenseDTO();
+        expense.setId(expenseEntity.getId());
+        expense.setCategory(expenseEntity.getCategory());
+        expense.setAmount(expenseEntity.getAmount());
+        expense.setDate(expenseEntity.getDate());
 
-        payment1 = new Payment();
+        payment1 = new PaymentDTO();
         payment1.setName("September Rent");
         payment1.setExpense(expense);
-        payment1.setAmount(new BigDecimal("500"));
-        payment1.setStatus(Payment.Status.PENDING);
+        payment1.setAmount(BigDecimal.valueOf(500));
+        payment1.setStatus(Payment.StatusEnum.PENDING);
         payment1.setPaymentDate(LocalDate.of(2025, 9, 22));
 
-        payment2 = new Payment();
+        payment2 = new PaymentDTO();
         payment2.setName("October Rent");
         payment2.setExpense(expense);
-        payment2.setAmount(new BigDecimal("600"));
-        payment2.setStatus(Payment.Status.PAID);
+        payment2.setAmount(BigDecimal.valueOf(600));
+        payment2.setStatus(Payment.StatusEnum.PAID);
         payment2.setPaymentDate(LocalDate.of(2025, 10, 1));
     }
 
     @Test
     void testAddAndGetPayment() {
-        Payment saved = paymentService.addPayment(payment1);
-        Payment found = paymentService.getPayment(saved.getId());
+        PaymentDTO saved = paymentService.addPayment(payment1);
+        PaymentDTO found = paymentService.getPaymentById(saved.getId());
 
         assertThat(found.getName()).isEqualTo("September Rent");
         assertThat(found.getAmount()).isEqualByComparingTo(new BigDecimal("500"));
-        assertThat(found.getStatus()).isEqualTo(Payment.Status.PENDING);
+        assertThat(found.getStatus()).isEqualTo(Payment.StatusEnum.PENDING);
         assertThat(found.getPaymentDate()).isEqualTo(LocalDate.of(2025, 9, 22));
         assertThat(found.getExpense().getCategory()).isEqualTo("Rent");
     }
@@ -81,32 +88,32 @@ public class PaymentServiceTest {
         paymentService.addPayment(payment1);
         paymentService.addPayment(payment2);
 
-        List<Payment> payments = paymentService.getPayments();
+        List<PaymentDTO> payments = paymentService.getAllPayments();
         assertThat(payments).hasSize(2);
     }
 
     @Test
     void testDelete() {
-        Payment saved1 = paymentService.addPayment(payment1);
-        Payment saved2 = paymentService.addPayment(payment2);
+        PaymentDTO saved1 = paymentService.addPayment(payment1);
+        PaymentDTO saved2 = paymentService.addPayment(payment2);
 
         paymentService.deletePayment(saved2.getId());
 
-        List<Payment> payments = paymentService.getPayments();
+        List<PaymentDTO> payments = paymentService.getAllPayments();
         assertThat(payments).hasSize(1);
         assertThat(payments.get(0).getName()).isEqualTo("September Rent");
     }
 
     @Test
     void testUpdate() {
-        Payment saved = paymentService.addPayment(payment1);
+        PaymentDTO saved = paymentService.addPayment(payment1);
 
         saved.setAmount(new BigDecimal("550"));
-        saved.setStatus(Payment.Status.PAID);
+        saved.setStatus(Payment.StatusEnum.PAID);
         paymentService.updatePayment(saved);
 
-        Payment updated = paymentService.getPayment(saved.getId());
+        PaymentDTO updated = paymentService.getPaymentById(saved.getId());
         assertThat(updated.getAmount()).isEqualByComparingTo(new BigDecimal("550"));
-        assertThat(updated.getStatus()).isEqualTo(Payment.Status.PAID);
+        assertThat(updated.getStatus()).isEqualTo(Payment.StatusEnum.PAID);
     }
 }

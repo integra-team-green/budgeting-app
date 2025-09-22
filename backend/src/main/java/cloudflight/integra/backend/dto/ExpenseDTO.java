@@ -52,7 +52,11 @@ public class ExpenseDTO {
         this.description = description;
     }
 
-        public Long getId() {
+    public ExpenseDTO() {
+
+    }
+
+    public Long getId() {
         return id;
     }
         public void setId(Long id) {
