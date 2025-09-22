@@ -1,80 +1,69 @@
 package cloudflight.integra.backend.mapper;
-
-import cloudflight.integra.backend.dto.ExpenseDTO;
 import cloudflight.integra.backend.dto.PaymentDTO;
 import cloudflight.integra.backend.entity.Payment;
 import cloudflight.integra.backend.repository.ExpenseRepository;
-
-import java.util.List;
 import java.time.LocalDate;
+import java.util.List;
 
 public class PaymentMapper {
-
     /**
-     * Map Payment to PaymentDTO
+     * map Payment to PaymentDTO
      * @param payment
-     * @return new PaymentDTO
+     * @return new PaymentDto
      */
     public static PaymentDTO getDTO(Payment payment) {
-        if (payment == null) return null;
-
         Long id = payment.getId();
         String name = payment.getName();
-        Payment.StatusEnum status = payment.getStatus();
+        String status = payment.getStatus() != null ? payment.getStatus().name() : null; // convert enum -> String
         LocalDate paymentDate = payment.getPaymentDate();
+        Long expenseId = payment.getExpense() != null ? payment.getExpense().getId() : null;
 
-        ExpenseDTO expenseDto = null;
-        if (payment.getExpense() != null) {
-            cloudflight.integra.backend.entity.Expense expense = payment.getExpense();
-            expenseDto = new ExpenseDTO();
-            expenseDto.setId(expense.getId());
-            expenseDto.setCategory(expense.getCategory());
-            expenseDto.setAmount(expense.getAmount());
-            expenseDto.setDate(expense.getDate());
-        }
-
-        return new PaymentDTO(id, expenseDto, name, status, paymentDate);
+        return new PaymentDTO(id, expenseId, name, status, paymentDate);
     }
 
+
     /**
-     * Map PaymentDTO to Payment
+     * Map PaymentDto to Payment
      * @param paymentDTO
      * @return new Payment object
      */
     public static Payment getFromDTO(PaymentDTO paymentDTO, ExpenseRepository expenseRepo) {
-        if (paymentDTO == null) return null;
-
         Payment payment = new Payment();
         payment.setId(paymentDTO.getId());
         payment.setName(paymentDTO.getName());
-        payment.setStatus(paymentDTO.getStatus());
+        payment.setStatus(paymentDTO.getStatus() != null ? Payment.Status.valueOf(paymentDTO.getStatus()) : null); // String -> enum
         payment.setPaymentDate(paymentDTO.getPaymentDate());
 
-        // map ExpenseDTO -> Expense entity
-        if (paymentDTO.getExpense() != null && paymentDTO.getExpense().getId() != null) {
-            payment.setExpense(expenseRepo.getReferenceById(paymentDTO.getExpense().getId()));
+        if (paymentDTO.getExpenseId() != null) {
+            payment.setExpense(expenseRepo.getReferenceById(paymentDTO.getExpenseId()));
         }
 
         return payment;
     }
 
+
     /**
-     * Map a list of PaymentDTOs into a list of Payments
+     * Map a list of Dtos into a list of objects
+     * @param paymentDTOList
+     * @return list of objects
      */
+
     public static List<Payment> getPaymentsFromDto(List<PaymentDTO> paymentDTOList, ExpenseRepository expenseRepo) {
-        if (paymentDTOList == null) return List.of();
+        if (paymentDTOList == null) {
+            return List.of();
+        }
         return paymentDTOList.stream()
                 .map(dto -> getFromDTO(dto, expenseRepo))
                 .toList();
     }
 
     /**
-     * Map a list of Payments into a list of PaymentDTOs
+     * Map a list of objects into a list of dtos
+     * @param payments
+     * @return list of dtos
      */
     public static List<PaymentDTO> getPaymentDTOsFromPayments(List<Payment> payments) {
-        if (payments == null) return List.of();
-        return payments.stream()
-                .map(PaymentMapper::getDTO)
-                .toList();
+
+        return payments.stream().map(PaymentMapper::getDTO).toList();
     }
 }

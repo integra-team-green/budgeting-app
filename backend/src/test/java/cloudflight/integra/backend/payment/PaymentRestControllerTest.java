@@ -1,10 +1,11 @@
 package cloudflight.integra.backend.payment;
 
-import cloudflight.integra.backend.dto.ExpenseDTO;
 import cloudflight.integra.backend.dto.PaymentDTO;
+import cloudflight.integra.backend.entity.Expense;
 import cloudflight.integra.backend.entity.Payment;
-import cloudflight.integra.backend.service.ExpenseService;
-import cloudflight.integra.backend.service.PaymentService;
+import cloudflight.integra.backend.entity.Payment.Status;
+import cloudflight.integra.backend.repository.ExpenseRepository;
+import cloudflight.integra.backend.repository.PaymentRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,40 +32,41 @@ public class PaymentRestControllerTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private PaymentService paymentService;
+    private PaymentRepository paymentRepository;
 
     @Autowired
-    private ExpenseService expenseService;
+    private ExpenseRepository expenseRepository;
 
-    private ExpenseDTO expense;
-    private PaymentDTO payment1;
-    private PaymentDTO payment2;
+    private Expense expense;
+    private Payment payment1;
+    private Payment payment2;
 
     @BeforeEach
     void setUp() {
-        expense = new ExpenseDTO();
+        paymentRepository.deleteAll();
+        expenseRepository.deleteAll();
+
+        expense = new Expense();
         expense.setCategory("Rent");
         expense.setAmount(BigDecimal.valueOf(1000));
         expense.setDate(LocalDate.now());
-        expense = expenseService.createExpense(expense);
+        expense = expenseRepository.save(expense);
 
-
-        payment1 = new PaymentDTO();
+        payment1 = new Payment();
         payment1.setName("September Rent");
         payment1.setAmount(BigDecimal.valueOf(500));
-        payment1.setStatus(Payment.StatusEnum.PENDING);
+        payment1.setStatus(Status.PENDING);
         payment1.setPaymentDate(LocalDate.of(2025, 9, 22));
         payment1.setExpense(expense);
-        payment1 = paymentService.addPayment(payment1);
+        payment1 = paymentRepository.save(payment1);
 
-
-        payment2 = new PaymentDTO();
+        payment2 = new Payment();
         payment2.setName("October Rent");
         payment2.setAmount(BigDecimal.valueOf(600));
-        payment2.setStatus(Payment.StatusEnum.PAID);
+        payment2.setStatus(Status.PAID);
         payment2.setPaymentDate(LocalDate.of(2025, 10, 1));
         payment2.setExpense(expense);
-        payment2 = paymentService.addPayment(payment2);
+        payment2 = paymentRepository.save(payment2);
     }
 
     @Test
@@ -74,8 +76,7 @@ public class PaymentRestControllerTest {
                 .andExpect(jsonPath("$.id").value(payment1.getId()))
                 .andExpect(jsonPath("$.name").value("September Rent"))
                 .andExpect(jsonPath("$.amount").value(500))
-                .andExpect(jsonPath("$.status").value("PENDING"))
-                .andExpect(jsonPath("$.expense.category").value("Rent"));
+                .andExpect(jsonPath("$.status").value("PENDING"));
     }
 
     @Test
@@ -90,17 +91,16 @@ public class PaymentRestControllerTest {
         dto.setName("Netflix");
         dto.setAmount(BigDecimal.valueOf(50));
         dto.setPaymentDate(LocalDate.of(2025, 11, 1));
-        dto.setStatus(Payment.StatusEnum.PENDING);
-        dto.setExpense(expense);
+        dto.setStatus("PENDING");
+        dto.setExpenseId(expense.getId());
 
         mockMvc.perform(post("/api/v1/payments")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isCreated())
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.name").value("Netflix"))
-                .andExpect(jsonPath("$.status").value("PENDING"))
-                .andExpect(jsonPath("$.expense.category").value("Rent"));
+                .andExpect(jsonPath("$.status").value("PENDING"));
     }
 
     @Test
@@ -110,8 +110,8 @@ public class PaymentRestControllerTest {
         dto.setName("HBO");
         dto.setAmount(BigDecimal.valueOf(550));
         dto.setPaymentDate(LocalDate.of(2025, 9, 30));
-        dto.setStatus(Payment.StatusEnum.PAID);
-        dto.setExpense(expense); // ✅ ExpenseDTO
+        dto.setStatus("PAID");
+        dto.setExpenseId(expense.getId());
 
         mockMvc.perform(put("/api/v1/payments/" + payment1.getId())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -119,16 +119,13 @@ public class PaymentRestControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("HBO"))
                 .andExpect(jsonPath("$.amount").value(550))
-                .andExpect(jsonPath("$.status").value("PAID"))
-                .andExpect(jsonPath("$.expense.category").value("Rent"));
+                .andExpect(jsonPath("$.status").value("PAID"));
     }
 
     @Test
     void testDeletePayment() throws Exception {
         mockMvc.perform(delete("/api/v1/payments/" + payment2.getId()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(payment2.getId()))
-                .andExpect(jsonPath("$.name").value("October Rent"));
+                .andExpect(status().isNoContent());
 
         mockMvc.perform(delete("/api/v1/payments/" + payment2.getId()))
                 .andExpect(status().isNotFound());
@@ -179,4 +176,3 @@ public class PaymentRestControllerTest {
     }
 
 }
-

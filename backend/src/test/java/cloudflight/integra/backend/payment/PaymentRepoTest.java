@@ -45,7 +45,7 @@ public class PaymentRepoTest {
         payment1.setName("September Rent");
         payment1.setExpense(expense);
         payment1.setAmount(new BigDecimal("500"));
-        payment1.setStatus(Payment.StatusEnum.PENDING);
+        payment1.setStatus(Payment.Status.PENDING);
         payment1.setPaymentDate(LocalDate.of(2025, 9, 22));
 
         //payment 2
@@ -53,60 +53,60 @@ public class PaymentRepoTest {
         payment2.setName("October Rent");
         payment2.setExpense(expense);
         payment2.setAmount(new BigDecimal("600"));
-        payment2.setStatus(Payment.StatusEnum.PAID);
+        payment2.setStatus(Payment.Status.PAID);
         payment2.setPaymentDate(LocalDate.of(2025, 10, 1));
 
     }
 
 
     @Test
-    void testSaveFindById() {
+    void testSaveFindById(){
         Payment saved = paymentRepository.save(payment1);
         Payment found = paymentRepository.findById(saved.getId())
                 .orElseThrow(() -> new RuntimeException("Payment not found"));
 
         assertEquals("September Rent", found.getName());
         assertEquals(new BigDecimal("500"), found.getAmount());
-        assertEquals(Payment.StatusEnum.PENDING, found.getStatus());
+        assertEquals(Payment.Status.PENDING, found.getStatus());
         assertEquals(LocalDate.of(2025, 9, 22), found.getPaymentDate());
-    }
 
+    }
     @Test
-    void testFindAll() {
+    void testFindAll(){
         List<Payment> payments = paymentRepository.findAll();
-        assertEquals(0, payments.size());
+        assertEquals(0,payments.size());
 
         paymentRepository.save(payment1);
         paymentRepository.save(payment2);
         payments = paymentRepository.findAll();
-        assertEquals(2, payments.size());
+        assertEquals(2,payments.size());
     }
 
 
     @Test
-    void testDelete() {
+    void testDelete(){
         Payment saved1 = paymentRepository.save(payment1);
         Payment saved2 = paymentRepository.save(payment2);
 
         paymentRepository.deleteById(saved2.getId());
 
         List<Payment> payments = paymentRepository.findAll();
-        assertEquals(1, payments.size());
+        assertEquals(1,payments.size());
         assertEquals("September Rent", payments.get(0).getName());
     }
 
 
     @Test
-    void testUpdate() {
+    void testUpdate(){
         Payment saved = paymentRepository.save(payment1);
 
         saved.setAmount(new BigDecimal("550"));
-        saved.setStatus(Payment.StatusEnum.PAID);
+        saved.setStatus(Payment.Status.PAID);
         paymentRepository.save(saved);
 
         Payment updated = paymentRepository.findById(saved.getId()).get();
         assertEquals(new BigDecimal("550"), updated.getAmount());
-        assertEquals(Payment.StatusEnum.PAID, updated.getStatus());
+        assertEquals(Payment.Status.PAID, updated.getStatus());
     }
 
     @Test
