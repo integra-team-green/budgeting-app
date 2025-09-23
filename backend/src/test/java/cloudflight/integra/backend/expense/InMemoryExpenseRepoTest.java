@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * Also verifies that exceptions are thrown for invalid operations.
  */
-@Disabled("It will be fixed with ticker #21")
+@Disabled("It will be fixed with ticket #21")
 public class InMemoryExpenseRepoTest {
 
     private InMemoryExpenseRepositoryImpl repository;
