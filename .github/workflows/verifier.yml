@@ -1,6 +1,10 @@
 name: Verifier
 
-on: [push, pull_request]
+on: [ pull_request ]
+
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
   build:
