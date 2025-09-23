@@ -1,30 +1,18 @@
 package cloudflight.integra.backend.controller;
 
 import cloudflight.integra.backend.controller.problem.ExpenseApiErrorResponses;
-import cloudflight.integra.backend.dto.ExpenseDTO;
-import cloudflight.integra.backend.exception.NotFoundException;
+import cloudflight.integra.backend.entity.Expense;
 import cloudflight.integra.backend.service.ExpenseService;
-import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 /**
- * REST controller for managing expenses.
- * Provides CRUD operations for {@link ExpenseDTO}.
+ * REST controller for managing {@link Expense} entities.
  */
 @RestController
 @ExpenseApiErrorResponses
@@ -42,82 +30,75 @@ public class ExpenseController {
     /**
      * Get an expense by its ID.
      *
-     * @param id ID of the expense
-     * @return {@link ExpenseDTO} if found
+     * @param id the ID of the expense to retrieve
+     * @return the {@link Expense} if found
      */
     @GetMapping("/{id}")
-    public ResponseEntity<ExpenseDTO> getExpenseById(@PathVariable Long id) {
+    public ResponseEntity<Expense> getExpense(@PathVariable Long id) {
         log.info("Fetching expense with id={}", id);
-        ExpenseDTO expenseDto = expenseService.findById(id);
-        log.debug("Found expense: {}", expenseDto);
-        return ResponseEntity.ok(expenseDto);
+        Expense expense = expenseService.getExpense(id);
+        log.info("Expense retrieved: {}", expense);
+        return ResponseEntity.ok(expense);
+    }
+
+    /**
+     * Get all expenses for a specific user.
+     *
+     * @param userId the ID of the user whose expenses to retrieve
+     * @return list of {@link Expense} objects
+     */
+    @GetMapping
+    public ResponseEntity<List<Expense>> getAllExpenses(@RequestParam Long userId) {
+        log.info("Fetching all expenses for userId={}", userId);
+        List<Expense> expenses = expenseService.getAllExpensesByUser(userId);
+        log.info("Found {} expenses", expenses.size());
+        return ResponseEntity.ok(expenses);
     }
 
     /**
      * Create a new expense.
      *
-     * @param expenseDto DTO of the expense to create
-     * @return created {@link ExpenseDTO}
+     * @param expense the expense to create
+     * @return the created {@link Expense} with generated ID
      */
     @PostMapping
-    public ResponseEntity<ExpenseDTO> addExpense(@Valid @RequestBody ExpenseDTO expenseDto) {
-        log.info("Creating new expense for userId={}", expenseDto.getUserId());
-        ExpenseDTO created = expenseService.createExpense(expenseDto);
-        log.debug("Created expense: {}", created);
-        return new ResponseEntity<>(created, HttpStatus.CREATED);
-    }
-
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<String> handleNotFound(NotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-    }
-
-    /**
-     * Get all expenses for a given user.
-     *
-     * @param userId ID of the user
-     * @return list of {@link ExpenseDTO}
-     */
-    @GetMapping
-    public ResponseEntity<List<ExpenseDTO>> getAllExpenses(@RequestParam Long userId) {
-        log.info("Fetching all expenses for userId={}", userId);
-        List<ExpenseDTO> expenses = expenseService.findAllByUserId(userId);
-        log.debug("Found {} expenses for userId={}", expenses.size(), userId);
-        return ResponseEntity.ok(expenses);
+    public ResponseEntity<Expense> addExpense(@RequestBody Expense expense) {
+        log.info("Creating new expense for userId={}", expense.getUser().getId());
+        Expense created = expenseService.createExpense(expense);
+        log.info("Expense created: {}", created);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     /**
      * Update an existing expense.
      *
-     * @param id         ID of the expense to update
-     * @param expenseDto new values for the expense
-     * @return updated {@link ExpenseDTO}
+     * @param id      the ID of the expense to update
+     * @param expense the updated expense object
+     * @return the updated {@link Expense}
+     * @throws IllegalArgumentException if the ID in the path and in the body do not match
      */
     @PutMapping("/{id}")
-    public ResponseEntity<ExpenseDTO> updateExpense(@PathVariable Long id,
-                                                    @Valid @RequestBody ExpenseDTO expenseDto) {
+    public ResponseEntity<Expense> updateExpense(@PathVariable Long id, @RequestBody Expense expense) {
         log.info("Updating expense with id={}", id);
-        if (!id.equals(expenseDto.getId())) {
-            log.warn("ID in path {} does not match ID in body {}", id, expenseDto.getId());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(null);
+        if (!id.equals(expense.getId())) {
+            throw new IllegalArgumentException("ID in path and body do not match.");
         }
-        ExpenseDTO updated = expenseService.updateExpense(id, expenseDto);
-        log.debug("Updated expense: {}", updated);
+        Expense updated = expenseService.updateExpense(expense);
+        log.info("Expense updated: {}", updated);
         return ResponseEntity.ok(updated);
     }
 
     /**
      * Delete an expense by its ID.
      *
-     * @param id ID of the expense to delete
-     * @return 200 OK if deleted
+     * @param id the ID of the expense to delete
+     * @return 204 No Content if deleted successfully
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteExpense(@PathVariable Long id) {
         log.info("Deleting expense with id={}", id);
         expenseService.deleteExpense(id);
-        log.debug("Deleted expense with id={}", id);
-        return ResponseEntity.ok().build();
+        log.info("Expense deleted");
+        return ResponseEntity.noContent().build();
     }
 }

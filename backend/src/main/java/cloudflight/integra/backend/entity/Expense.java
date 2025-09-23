@@ -1,155 +1,184 @@
 package cloudflight.integra.backend.entity;
 
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
-/*As a user, I want to manage my expenses so that I can track all my spending.
-*
-* Fields:
-    id: Long
-    userId: Long (FK → User)
-    amount: BigDecimal
-    category: String
-    date: Date
-    description: String (optional)*/
-
-
-/** Represents a financial expense entry for a specific user.**/
+@Entity
+@Table(name = "Expense")
 public class Expense {
 
-    /** Unique identifier of the expense. */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /** Identifier of the user who created the expense. */
-    private Long userId;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-    /** Monetary value of the expense. */
+    @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal amount;
 
-    /** Category of the expense. */
+    @Column(nullable = false)
     private String category;
 
-    /** Date when the expense occurred. */
+    @Column(nullable = false)
     private LocalDate date;
 
-    /** Optional description with extra details about the expense. */
+    @Column
     private String description;
 
-    /**
-     * Full constructor for creating an {@code Expense} instance.
-     *
-     * @param id          unique identifier of the expense
-     * @param userId      identifier of the user who created it
-     * @param amount      monetary value of the expense
-     * @param category    category of the expense
-     * @param date        date when the expense occurred
-     * @param description optional description
-     */
-   public Expense(Long id, Long userId, BigDecimal amount, String category, LocalDate date, String description) {
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Frequency frequency;
+
+    @Column(name = "end_date")
+    private LocalDate endDate;
+
+    @Column(name = "next_due_date")
+    private LocalDate nextDueDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_method", nullable = false)
+    private PaymentMethod paymentMethod;
+
+    @OneToOne(mappedBy = "expense", cascade = CascadeType.ALL, optional = true, fetch = FetchType.LAZY)
+    private Payment payment;
+
+    public Expense(Long id, User user, BigDecimal amount, String category, LocalDate date, String description, Frequency frequency, LocalDate endDate, LocalDate nextDueDate, PaymentMethod paymentMethod, Payment payment) {
         this.id = id;
-        this.userId = userId;
+        this.user = user;
         this.amount = amount;
         this.category = category;
         this.date = date;
+        this.description = description;
+        this.frequency = frequency;
+        this.endDate = endDate;
+        this.nextDueDate = nextDueDate;
+        this.paymentMethod = paymentMethod;
+        this.payment = payment;
+    }
+
+    public Expense() {}
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
+    public Frequency getFrequency() {
+        return frequency;
+    }
+
+    public void setFrequency(Frequency frequency) {
+        this.frequency = frequency;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
         this.description = description;
     }
 
-    /** @return unique identifier of the expense */
-    public Long getId() {
+    public LocalDate getNextDueDate() {
+        return nextDueDate;
+    }
 
-        return id;
-   }
+    public void setNextDueDate(LocalDate nextDueDate) {
+        this.nextDueDate = nextDueDate;
+    }
 
-    /** @param id unique identifier of the expense */
-    public void setId(Long id) {
+    public LocalDate getEndDate() {
+        return endDate;
+    }
 
-        this.id = id;
-   }
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
 
-    /** @return user identifier */
-    public Long getUserId() {
+    public PaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
 
-        return userId;
-   }
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
 
-    /** @param userId identifier of the user who created the expense */
-    public void setUserId(Long userId) {
+    public Payment getPayment() {
+        return payment;
+    }
 
-        this.userId = userId;
-   }
+    public void setPayment(Payment payment) {
+        this.payment = payment;
+    }
 
-    /** @return monetary value of the expense */
-    public BigDecimal getAmount() {
-
-        return amount;
-   }
-
-    /** @param amount monetary value of the expense */
-    public void setAmount(BigDecimal amount) {
-
-        this.amount = amount;
-   }
-
-    /** @return category of the expense */
-    public String getCategory() {
-
-        return category;
-   }
-
-    /** @param category category of the expense */
-    public void setCategory(String category) {
-
-        this.category = category;
-   }
-
-    /** @return date when the expense occurred */
-    public LocalDate getDate() {
-       return date;
-   }
-
-    /** @param date date when the expense occurred */
-    public void setDate(LocalDate date) {
-
-        this.date = date;
-   }
-
-    /** @return optional description of the expense */
-    public String getDescription() {
-
-        return description;
-   }
-
-    /** @param description optional description of the expense */
-    public void setDescription(String description) {
-
-        this.description = description;
-   }
-
-
-   @Override
-   public boolean equals(Object o) {
-        if(o == null || getClass() != o.getClass()) {
-            return false;
-        }
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
         Expense expense = (Expense) o;
-        return Objects.equals(id, expense.id) && Objects.equals(userId, expense.userId) && Objects.equals(amount, expense.amount) && Objects.equals(category, expense.category) && Objects.equals(date, expense.date) && Objects.equals(description, expense.description);
-   }
-   @Override
-   public int hashCode() {
-       return Objects.hash(id, userId, amount, category, date, description);
-   }
+        return Objects.equals(id, expense.id) && Objects.equals(user, expense.user) && Objects.equals(amount, expense.amount) && Objects.equals(category, expense.category) && Objects.equals(date, expense.date) && Objects.equals(description, expense.description) && frequency == expense.frequency && Objects.equals(endDate, expense.endDate) && Objects.equals(nextDueDate, expense.nextDueDate) && paymentMethod == expense.paymentMethod && Objects.equals(payment, expense.payment);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, user, amount, category, date, description, frequency, endDate, nextDueDate, paymentMethod, payment);
+    }
 
-    /** @return string representation of the expense for logging/debugging */
-   @Override
+    @Override
     public String toString() {
-       return "Expense {" +
-               "Id: " + id +
-               "UserId: " + userId +
-               "Amount: " + amount +
-               "Category: " + category +
-               "Date: " + date +
-               "Description: " + description;
-   }
+        return "Expense{" +
+                "id=" + id +
+                ", user=" + user +
+                ", amount=" + amount +
+                ", category='" + category + '\'' +
+                ", date=" + date +
+                ", description='" + description + '\'' +
+                ", frequency=" + frequency +
+                ", endDate=" + endDate +
+                ", nextDueDate=" + nextDueDate +
+                ", paymentMethod=" + paymentMethod +
+                ", payment=" + payment +
+                '}';
+    }
+
+    public enum Frequency { ONE_TIME, MONTHLY, YEARLY }
+    public enum PaymentMethod { CARD, TRANSFER }
 }
