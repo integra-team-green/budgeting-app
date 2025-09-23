@@ -13,6 +13,9 @@ public class Income {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @ManyToOne
+    @JoinColumn(name="user_id",nullable=false)
+    private User user;
     private BigDecimal amount;
     private String source;
     private Date date;
@@ -29,9 +32,9 @@ public class Income {
      * @param date the date of the income
      * @param description the description of the income(can be optional)
      */
-    public Income(Long id ,BigDecimal amount, String source, Date date, String description, Frequency frequency, Date endDate) {
+    public Income(Long id ,User user,BigDecimal amount, String source, Date date, String description, Frequency frequency, Date endDate) {
         this.id = id;
-//        this.user = user;
+        this.user = user;
         this.amount = amount;
         this.source = source;
         this.date = date;
@@ -40,13 +43,16 @@ public class Income {
         this.endDate = endDate;
     }
 
-    public Income(Long id, BigDecimal amount, String source, Date date,Frequency frequency, Date endDate) {
+    public Income(Long id,User user ,BigDecimal amount, String source, Date date,Frequency frequency, Date endDate) {
         this.id = id;
+        this.user = user;
         this.amount = amount;
         this.source = source;
         this.date = date;
+        this.frequency = frequency;
         this.endDate = endDate;
     }
+
 
     public Income(){}
 
@@ -98,6 +104,9 @@ public class Income {
 
     public void setEndDate(Date endDate) {this.endDate = endDate;}
 
+    public User getUser() { return user; }
+
+    public void setUser(User user) { this.user = user; }
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;

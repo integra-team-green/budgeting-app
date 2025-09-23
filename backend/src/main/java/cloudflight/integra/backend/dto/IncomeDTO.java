@@ -8,6 +8,7 @@ import java.util.Date;
 public class IncomeDTO {
 
     private Long id;
+    private Long userId;
     private BigDecimal amount;
     private String source;
     private Date date;
@@ -62,6 +63,10 @@ public class IncomeDTO {
     public Date getEndDate() { return endDate; }
 
     public void setEndDate(Date endDate) { this.endDate = endDate; }
+
+    public Long getUserId() { return userId;}
+
+    public void setUserId(Long userId) { this.userId = userId; }
 
 
 

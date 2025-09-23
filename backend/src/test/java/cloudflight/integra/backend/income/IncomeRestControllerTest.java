@@ -3,7 +3,9 @@ package cloudflight.integra.backend.income;
 import cloudflight.integra.backend.dto.IncomeDTO;
 import cloudflight.integra.backend.entity.Frequency;
 import cloudflight.integra.backend.entity.Income;
+import cloudflight.integra.backend.entity.User;
 import cloudflight.integra.backend.repository.IncomeRepository;
+import cloudflight.integra.backend.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,9 +38,17 @@ class IncomeRestControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    private User user1,user2;
+
     @BeforeEach
     void resetRepository() {
         repository.deleteAll();
+        userRepository.deleteAll();
+        user1 = userRepository.save(new User(null, "Alice", "alice@email.com", "123"));
+        user2 = userRepository.save(new User(null, "Marc", "marc@yahoo.com", "abcd999"));
     }
 
 
@@ -49,6 +59,7 @@ class IncomeRestControllerTest {
         dto.setSource("Extra Job");
         dto.setDate(new Date());
         dto.setDescription("Bonus");
+        dto.setUserId(user1.getId());
 
         mockMvc.perform(post("/api/v1/incomes")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -66,8 +77,8 @@ class IncomeRestControllerTest {
 
     @Test
     void getAllIncomes_returnsList() throws Exception {
-        repository.save(new Income(null,new BigDecimal("100"), "Job1", new Date(), "Desc1", Frequency.ONE_TIME,null));
-        repository.save(new Income(null, new BigDecimal("200"), "Job2", new Date(), "Desc2",Frequency.ONE_TIME,null));
+        repository.save(new Income(null,user1,new BigDecimal("100"), "Job1", new Date(), "Desc1", Frequency.ONE_TIME,null));
+        repository.save(new Income(null, user2,new BigDecimal("200"), "Job2", new Date(), "Desc2",Frequency.ONE_TIME,null));
 
         mockMvc.perform(get("/api/v1/incomes"))
                 .andExpect(status().isOk())
@@ -80,7 +91,7 @@ class IncomeRestControllerTest {
     @Test
     void updateIncome_existingIncome_returns200() throws Exception {
         resetRepository();
-        Income income = new Income(null, new BigDecimal("100"), "Job1", new Date(), "Desc1",Frequency.ONE_TIME,null);
+        Income income = new Income(null, user1,new BigDecimal("100"), "Job1", new Date(), "Desc1",Frequency.ONE_TIME,null);
         Income saved= repository.save(income);
 
         IncomeDTO dto = new IncomeDTO();
@@ -88,19 +99,21 @@ class IncomeRestControllerTest {
         dto.setSource("Job Updated");
         dto.setDate(new Date());
         dto.setDescription("Desc Updated");
+        dto.setUserId(user2.getId());
 
         mockMvc.perform(put("/api/v1/incomes/"+saved.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.amount").value(150))
+                .andExpect(jsonPath("$.userId").value(user2.getId()))
                 .andExpect(jsonPath("$.source").value("Job Updated"));
     }
 
     @Test
     void deleteIncome_existingIncome_returns204() throws Exception {
         resetRepository();
-        Income saved =repository.save(new Income(null, new BigDecimal("100"), "Job1", new Date(), "Desc1",Frequency.ONE_TIME,null));
+        Income saved =repository.save(new Income(null, user1,new BigDecimal("100"), "Job1", new Date(), "Desc1",Frequency.ONE_TIME,null));
 
         mockMvc.perform(delete("/api/v1/incomes/"+saved.getId()))
                 .andExpect(status().isNoContent());

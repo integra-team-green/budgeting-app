@@ -2,6 +2,7 @@ package cloudflight.integra.backend.mapper;
 
 import cloudflight.integra.backend.dto.IncomeDTO;
 import cloudflight.integra.backend.entity.Income;
+import cloudflight.integra.backend.entity.User;
 
 
 public class IncomeMapper {
@@ -12,9 +13,14 @@ public class IncomeMapper {
      * @return the corresponding Income entity
      */
     public static Income toEntity(IncomeDTO dto) {
+        User user = new User();
+        if(dto.getUserId() != null) {
+            user.setId(dto.getUserId());
+        }
 
         return new Income(
                 dto.getId(),
+                user,
                 dto.getAmount(),
                 dto.getSource(),
                 dto.getDate(),
@@ -38,6 +44,7 @@ public class IncomeMapper {
         dto.setDescription(income.getDescription());
         dto.setFrequency(income.getFrequency());
         dto.setEndDate(income.getEndDate());
+        dto.setUserId(income.getUser().getId());
 
         return dto;
     }
