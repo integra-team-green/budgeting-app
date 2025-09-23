@@ -14,20 +14,47 @@ public class ExpenseValidator implements Validator<Expense> {
     public void validate(Expense expense) throws ValidationException {
         List<String> errors = new ArrayList<>();
 
-        if (expense.getAmount() == null || expense.getAmount().compareTo(BigDecimal.ZERO)<=0) {
-            errors.add("Amount must be greater than or equal to 0");
+        // Amount must be positive
+        if (expense.getAmount() == null || expense.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+            errors.add("Amount must be greater than 0");
         }
+
+        // Category cannot be empty
         if (expense.getCategory() == null || expense.getCategory().isEmpty()) {
             errors.add("Category cannot be empty");
         }
-        if (expense.getDate() == null){
+
+        // Date cannot be null or in the future
+        if (expense.getDate() == null) {
             errors.add("Date cannot be null");
-        }
-        if  (expense.getDate().isAfter(LocalDate.now())) {
+        } else if (expense.getDate().isAfter(LocalDate.now())) {
             errors.add("Expense date cannot be in the future");
         }
-        if (!errors.isEmpty())
+
+        // Frequency must not be null
+        if (expense.getFrequency() == null) {
+            errors.add("Frequency must be set");
+        }
+
+        // PaymentMethod must not be null
+        if (expense.getPaymentMethod() == null) {
+            errors.add("Payment method must be set");
+        }
+
+        // Optional: endDate must not be before date (if endDate exists)
+        if (expense.getEndDate() != null && expense.getEndDate().isBefore(expense.getDate())) {
+            errors.add("End date cannot be before the expense date");
+        }
+
+        // Optional: nextDueDate must not be before date (if nextDueDate exists)
+        if (expense.getNextDueDate() != null && expense.getNextDueDate().isBefore(expense.getDate())) {
+            errors.add("Next due date cannot be before the expense date");
+        }
+
+        if (!errors.isEmpty()) {
             throw new ValidationException(errors);
+        }
     }
+
 
 }
