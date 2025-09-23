@@ -1,19 +1,18 @@
 package cloudflight.integra.backend.repository;
 
 import cloudflight.integra.backend.entity.User;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    /**
-     * Checks if a user with the given email exists.
-     *
-     * @param email the email to check
-     * @return true if a user with the email exists, false otherwise
-     */
-    Optional<User> findByEmail(String email);
+  /**
+   * Checks if a user with the given email exists.
+   *
+   * @param email the email to check
+   * @return true if a user with the email exists, false otherwise
+   */
+  Optional<User> findByEmail(String email);
 }
