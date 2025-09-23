@@ -5,10 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Marker interface for Credit API error responses.
- */
+/** Marker interface for Credit API error responses. */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface SavingApiErrorResponses {
-}
+public @interface SavingApiErrorResponses {}

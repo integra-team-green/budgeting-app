@@ -1,0 +1,26 @@
+name: Verifier
+
+on: [ pull_request ]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources 📄
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 24 ☕
+        uses: actions/setup-java@v4
+        with:
+          java-version: '24'
+          distribution: 'temurin'
+
+      - name: Grant execute permission for gradlew 💾
+        run: chmod +x gradlew
+
+      - name: Run Spotless check 🏗️
+        run: ./gradlew :backend:spotlessCheck

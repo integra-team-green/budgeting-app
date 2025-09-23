@@ -1,5 +1,10 @@
 package cloudflight.integra.backend.user;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import cloudflight.integra.backend.dto.UserDTO;
 import cloudflight.integra.backend.entity.User;
 import cloudflight.integra.backend.repository.UserRepository;
@@ -12,107 +17,102 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @SpringBootTest
 @AutoConfigureMockMvc
 class UserControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-    @Autowired
-    private UserRepository userRepo;
+  @Autowired private UserRepository userRepo;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+  private ObjectMapper objectMapper = new ObjectMapper();
 
-    @BeforeEach
-    void setUp() {
-        userRepo.deleteAll();
-        userRepo.save(new User(null, "Alice", "alice@email.com", "123"));
-        userRepo.save(new User(null, "Marc", "marc@yahoo.com", "abcd999"));
-    }
+  @BeforeEach
+  void setUp() {
+    userRepo.deleteAll();
+    userRepo.save(new User(null, "Alice", "alice@email.com", "123"));
+    userRepo.save(new User(null, "Marc", "marc@yahoo.com", "abcd999"));
+  }
 
-    @Test
-    void testGetUserById() throws Exception {
-        mockMvc.perform(get("/api/v1/users/29"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Alice"))
-                .andExpect(jsonPath("$.email").value("alice@email.com"));
-    }
+  @Test
+  void testGetUserById() throws Exception {
+    mockMvc
+        .perform(get("/api/v1/users/29"))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.name").value("Alice"))
+        .andExpect(jsonPath("$.email").value("alice@email.com"));
+  }
 
-    @Test
-    void testGetUserById_NotFound() throws Exception {
-        mockMvc.perform(get("/api/v1/users/999"))
-                .andDo(print())
-                .andExpect(status().isNotFound());
-    }
+  @Test
+  void testGetUserById_NotFound() throws Exception {
+    mockMvc.perform(get("/api/v1/users/999")).andDo(print()).andExpect(status().isNotFound());
+  }
 
-    @Test
-    void testAddUser() throws Exception {
-        UserDTO userDto = new UserDTO();
-        userDto.setName("Bob");
-        userDto.setEmail("bob@email.com");
-        userDto.setPassword("passw");
+  @Test
+  void testAddUser() throws Exception {
+    UserDTO userDto = new UserDTO();
+    userDto.setName("Bob");
+    userDto.setEmail("bob@email.com");
+    userDto.setPassword("passw");
 
-        mockMvc.perform(post("/api/v1/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userDto)))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.name").value("Bob"))
-                .andExpect(jsonPath("$.email").value("bob@email.com"));
-    }
+    mockMvc
+        .perform(
+            post("/api/v1/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userDto)))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").exists())
+        .andExpect(jsonPath("$.name").value("Bob"))
+        .andExpect(jsonPath("$.email").value("bob@email.com"));
+  }
 
-    @Test
-    void testUpdateUser() throws Exception {
-        UserDTO updateDto = new UserDTO();
-        updateDto.setName("Alice Updated");
-        updateDto.setEmail("alice@new.com");
-        updateDto.setPassword("newpass");
+  @Test
+  void testUpdateUser() throws Exception {
+    UserDTO updateDto = new UserDTO();
+    updateDto.setName("Alice Updated");
+    updateDto.setEmail("alice@new.com");
+    updateDto.setPassword("newpass");
 
-        mockMvc.perform(put("/api/v1/users/26")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateDto)))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Alice Updated"))
-                .andExpect(jsonPath("$.email").value("alice@new.com"));
-    }
+    mockMvc
+        .perform(
+            put("/api/v1/users/26")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateDto)))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.name").value("Alice Updated"))
+        .andExpect(jsonPath("$.email").value("alice@new.com"));
+  }
 
-    @Test
-    void testDeleteUser() throws Exception {
-        mockMvc.perform(delete("/api/v1/users/26"))
-                .andDo(print())
-                .andExpect(status().isNoContent());
+  @Test
+  void testDeleteUser() throws Exception {
+    mockMvc.perform(delete("/api/v1/users/26")).andDo(print()).andExpect(status().isNoContent());
 
-        mockMvc.perform(get("/api/v1/users/26"))
-                .andDo(print())
-                .andExpect(status().isNotFound());
-    }
+    mockMvc.perform(get("/api/v1/users/26")).andDo(print()).andExpect(status().isNotFound());
+  }
 
-    @Test
-    void testGetAllUsers() throws Exception {
-        mockMvc.perform(get("/api/v1/users"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()").value(2));
-    }
+  @Test
+  void testGetAllUsers() throws Exception {
+    mockMvc
+        .perform(get("/api/v1/users"))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$").isArray())
+        .andExpect(jsonPath("$.length()").value(2));
+  }
 
-    @Test
-    void testGetUserByEmail() throws Exception {
-        mockMvc.perform(get("/api/v1/users/by-email")
-                        .param("email", "alice@email.com")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Alice"))
-                .andExpect(jsonPath("$.email").value("alice@email.com"));
-    }
+  @Test
+  void testGetUserByEmail() throws Exception {
+    mockMvc
+        .perform(
+            get("/api/v1/users/by-email")
+                .param("email", "alice@email.com")
+                .contentType(MediaType.APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.name").value("Alice"))
+        .andExpect(jsonPath("$.email").value("alice@email.com"));
+  }
 }
