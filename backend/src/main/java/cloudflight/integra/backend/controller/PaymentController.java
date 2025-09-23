@@ -1,97 +1,84 @@
 package cloudflight.integra.backend.controller;
+
 import cloudflight.integra.backend.controller.problem.PaymentApiErrorResponses;
 import cloudflight.integra.backend.dto.PaymentDTO;
-import cloudflight.integra.backend.entity.validation.ValidationException;
 import cloudflight.integra.backend.exception.NotFoundException;
-import cloudflight.integra.backend.mapper.PaymentMapper;
-import cloudflight.integra.backend.entity.Payment;
-import cloudflight.integra.backend.repository.ExpenseRepository;
 import cloudflight.integra.backend.service.PaymentService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
-
-
+/**
+ * REST controller for managing payments.
+ * Provides CRUD operations for {@link PaymentDTO}.
+ */
 @RestController
 @PaymentApiErrorResponses
 @RequestMapping("/api/v1/payments")
 public class PaymentController {
 
-    private final PaymentService paymentService;
-    private final ExpenseRepository expenseRepository;
     private static final Logger log = LoggerFactory.getLogger(PaymentController.class);
 
-    public PaymentController(PaymentService paymentService, ExpenseRepository expenseRepository) {
+    private final PaymentService paymentService;
+
+    public PaymentController(PaymentService paymentService) {
         this.paymentService = paymentService;
-        this.expenseRepository = expenseRepository;
     }
-
-
-    @PostMapping
-    public ResponseEntity<PaymentDTO> create(@RequestBody PaymentDTO paymentDTO){
-        log.debug("Creating payment {}", paymentDTO);
-        Payment payment= PaymentMapper.getFromDTO(paymentDTO, expenseRepository);
-        Payment savedPayment = paymentService.addPayment(payment);
-        PaymentDTO savedDTO = PaymentMapper.getDTO(savedPayment);
-        return ResponseEntity.ok(savedDTO);
-    }
-
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Long id){
-        log.debug("Get by id "+id);
-        Payment payment = paymentService.getPayment(id);
-        PaymentDTO response = PaymentMapper.getDTO(payment);
-        if (payment == null) {
-            throw new NotFoundException("Payment with id " + id + " not found");
-        }
-        return ResponseEntity.ok(PaymentMapper.getDTO(payment));
+    public ResponseEntity<PaymentDTO> getPaymentById(@PathVariable Long id) {
+        log.info("Fetching payment with id={}", id);
+        PaymentDTO paymentDto = paymentService.getPaymentById(id);
+        log.debug("Found payment: {}", paymentDto);
+        return ResponseEntity.ok(paymentDto);
     }
 
+    @PostMapping
+    public ResponseEntity<PaymentDTO> createPayment(@Valid @RequestBody PaymentDTO paymentDto) {
+        Long expenseId = (paymentDto.getExpense() != null) ? paymentDto.getExpense().getId() : null;
+        log.info("Creating new payment for expenseId={}", expenseId);
+
+        PaymentDTO created = paymentService.addPayment(paymentDto);
+        log.debug("Created payment: {}", created);
+        return new ResponseEntity<>(created, HttpStatus.CREATED);
+    }
 
     @GetMapping
     public ResponseEntity<List<PaymentDTO>> getAllPayments() {
-        log.debug("Get all payments");
-        List<Payment> payments = paymentService.getPayments();
-        List<PaymentDTO> dtos = PaymentMapper.getPaymentDTOsFromPayments(payments);
-        return ResponseEntity.ok(dtos);
+        log.info("Fetching all payments");
+        List<PaymentDTO> payments = paymentService.getAllPayments();
+        log.debug("Found {} payments", payments.size());
+        return ResponseEntity.ok(payments);
     }
-
-
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody PaymentDTO paymentDTO){
-        log.debug("Update payment {}", paymentDTO);
-        if (!id.equals(paymentDTO.getId())) {
-            throw new ValidationException(List.of("Path ID and object ID do not match"));
+    public ResponseEntity<PaymentDTO> updatePayment(@PathVariable Long id,
+                                                    @Valid @RequestBody PaymentDTO paymentDto) {
+        log.info("Updating payment with id={}", id);
+        if (!id.equals(paymentDto.getId())) {
+            log.warn("ID in path {} does not match ID in body {}", id, paymentDto.getId());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-        Payment payment = PaymentMapper.getFromDTO(paymentDTO, expenseRepository);
-        if (payment == null) {
-            throw new NotFoundException("Payment with id " + id + " not found");
-        }
-        Payment updated = paymentService.updatePayment(payment);
-        return ResponseEntity.ok(PaymentMapper.getDTO(updated));
+        PaymentDTO updated = paymentService.updatePayment(paymentDto);
+        log.debug("Updated payment: {}", updated);
+        return ResponseEntity.ok(updated);
     }
-
-
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<PaymentDTO> delete(@PathVariable Long id){
-        log.debug("Delete payment {}", id);
-
-        Payment deletedPayment = paymentService.deletePayment(id);
-        PaymentDTO response = PaymentMapper.getDTO(deletedPayment);
-        if (response == null)
-            throw new NotFoundException("Payment with id " + id + " not found");
-        else {
-
-            return new ResponseEntity<PaymentDTO>(response, HttpStatus.OK);
-        }
-
+    public ResponseEntity<PaymentDTO> deletePayment(@PathVariable Long id) {
+        log.info("Deleting payment with id={}", id);
+        PaymentDTO deletedPayment = paymentService.deletePayment(id);
+        log.debug("Deleted payment: {}", deletedPayment);
+        return ResponseEntity.ok(deletedPayment);
     }
 
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<String> handleNotFound(NotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
 }
