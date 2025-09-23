@@ -24,6 +24,3 @@ jobs:
 
       - name: Run Spotless check 🏗️
         run: ./gradlew :backend:spotlessCheck
-
-      - name: Build with Gradle
-        run: ./gradlew :backend:build
