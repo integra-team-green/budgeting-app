@@ -1,49 +1,50 @@
 package cloudflight.integra.backend.service;
 
-import cloudflight.integra.backend.dto.ExpenseDTO;
+import cloudflight.integra.backend.entity.Expense;
+
 import java.util.List;
 
+/**
+ * Service interface for managing Expense entities.
+ */
 public interface ExpenseService {
-  /**
-   * Create a new expense after validating input fields.
-   *
-   * @param expenseDto the expense to create
-   * @return the created expense
-   */
-  ExpenseDTO createExpense(ExpenseDTO expenseDto);
 
-  /**
-   * Get all expenses for a specific user.
-   *
-   * @param userId the user ID
-   * @return a list of expenses for the user
-   */
-  List<ExpenseDTO> findAllByUserId(Long userId);
+    /**
+     * Create a new expense after validation.
+     *
+     * @param expense the expense to create
+     * @return the created expense
+     */
+    Expense createExpense(Expense expense);
 
-  /**
-   * Finds an expense by its ID.
-   *
-   * @param id the ID of the expense to find
-   * @return the object with the given ID
-   * @throws RuntimeException if no expense with the given ID is found
-   */
-  ExpenseDTO findById(Long id);
+    /**
+     * Find an expense by its ID.
+     *
+     * @param id the ID of the expense
+     * @return the expense
+     */
+    Expense getExpense(Long id);
 
-  /**
-   * Update an existing expense by ID.
-   *
-   * @param id the ID of the expense to update
-   * @param updatedExpense the expense object containing updated fields
-   * @return the updated object after saving
-   * @throws RuntimeException if no expense with the given ID exists
-   * @throws IllegalArgumentException if the updated expense fails validation
-   */
-  ExpenseDTO updateExpense(Long id, ExpenseDTO updatedExpense);
+    /**
+     * Find all expenses for a specific user.
+     *
+     * @param userId the user ID
+     * @return list of expenses
+     */
+    List<Expense> getAllExpensesByUser(Long userId);
 
-  /**
-   * Delete an expense by its ID.
-   *
-   * @param id the expense ID to delete
-   */
-  void deleteExpense(Long id);
+    /**
+     * Update an existing expense.
+     *
+     * @param expense the expense with updated fields
+     * @return the updated expense
+     */
+    Expense updateExpense(Expense expense);
+
+    /**
+     * Delete an expense by ID.
+     *
+     * @param id the expense ID
+     */
+    void deleteExpense(Long id);
 }

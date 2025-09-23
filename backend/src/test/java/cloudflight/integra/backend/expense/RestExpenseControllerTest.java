@@ -9,7 +9,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import cloudflight.integra.backend.controller.ExpenseController;
 import cloudflight.integra.backend.dto.ExpenseDTO;
 import cloudflight.integra.backend.entity.validation.ExpenseValidator;
-import cloudflight.integra.backend.repository.inMemoryImpl.InMemoryExpenseRepositoryImpl;
 import cloudflight.integra.backend.service.ExpenseService;
 import cloudflight.integra.backend.service.impl.ExpenseServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
