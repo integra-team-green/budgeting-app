@@ -133,5 +133,50 @@ public class PaymentRestControllerTest {
         mockMvc.perform(delete("/api/v1/payments/" + payment2.getId()))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    void testDeletePaymentInvalidId() throws Exception {
+        // ID inexistent
+        mockMvc.perform(delete("/api/v1/payments/9999"))
+                .andExpect(status().isNotFound());
+
+        // ID negativ
+        mockMvc.perform(delete("/api/v1/payments/-1"))
+                .andExpect(status().isBadRequest());
+    }
+
+
+    @Test
+    void testCreatePaymentWithNegativeAmount() throws Exception {
+        PaymentDTO dto = new PaymentDTO();
+        dto.setName("Invalid Payment");
+        dto.setAmount(BigDecimal.valueOf(-100)); // sumă negativă
+        dto.setPaymentDate(LocalDate.of(2025, 11, 1));
+        dto.setStatus(Payment.StatusEnum.PENDING);
+        dto.setExpense(expense);
+
+        mockMvc.perform(post("/api/v1/payments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest());
+    }
+
+
+    @Test
+    void testUpdatePaymentWithNegativeAmount() throws Exception {
+        PaymentDTO dto = new PaymentDTO();
+        dto.setId(payment1.getId());
+        dto.setName("Invalid Update");
+        dto.setAmount(BigDecimal.valueOf(-500)); //sumă negativă
+        dto.setPaymentDate(LocalDate.of(2025, 10, 1));
+        dto.setStatus(Payment.StatusEnum.PAID);
+        dto.setExpense(expense);
+
+        mockMvc.perform(put("/api/v1/payments/" + payment1.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest());
+    }
+
 }
 

@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 @SpringBootTest
@@ -116,4 +117,56 @@ public class PaymentServiceTest {
         assertThat(updated.getAmount()).isEqualByComparingTo(new BigDecimal("550"));
         assertThat(updated.getStatus()).isEqualTo(Payment.StatusEnum.PAID);
     }
+
+    @Test
+    void testAddPaymentWithNegativeAmount() {
+        PaymentDTO invalidPayment = new PaymentDTO();
+        invalidPayment.setName("Invalid Payment");
+        invalidPayment.setExpense(expense);
+        invalidPayment.setAmount(BigDecimal.valueOf(-100)); //sumă negativă
+        invalidPayment.setStatus(Payment.StatusEnum.PENDING);
+        invalidPayment.setPaymentDate(LocalDate.of(2025, 11, 1));
+        try {
+            paymentService.addPayment(invalidPayment);
+        } catch (IllegalArgumentException e) {
+            assertThat(e.getMessage()).contains("amount must be positive");
+        }
+    }
+
+    @Test
+    void testUpdatePaymentWithNegativeAmount() {
+        PaymentDTO saved = paymentService.addPayment(payment1);
+
+        saved.setAmount(BigDecimal.valueOf(-200)); //sumă negativă
+
+        try {
+            paymentService.updatePayment(saved);
+        } catch (IllegalArgumentException e) {
+            assertThat(e.getMessage()).contains("amount must be positive");
+        }
+    }
+
+    @Test
+    void testDeleteNonExistingPayment() {
+        Long nonExistingId = 9999L;
+
+        try {
+            paymentService.deletePayment(nonExistingId);
+        } catch (IllegalArgumentException e) {
+            assertThat(e.getMessage()).contains("Payment not found");
+        }
+    }
+
+    @Test
+    void shouldThrowExceptionForNegativeAmount() {
+        PaymentDTO invalidPayment = new PaymentDTO();
+        invalidPayment.setName("Invalid Payment");
+        invalidPayment.setExpense(expense);
+        invalidPayment.setAmount(BigDecimal.valueOf(-100)); //sumă negativă
+        invalidPayment.setStatus(Payment.StatusEnum.PENDING);
+        invalidPayment.setPaymentDate(LocalDate.now());
+
+        assertThrows(IllegalArgumentException.class, () -> paymentService.addPayment(invalidPayment));
+    }
+
 }

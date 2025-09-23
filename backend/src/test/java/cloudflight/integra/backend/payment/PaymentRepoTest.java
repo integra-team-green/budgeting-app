@@ -9,11 +9,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.dao.DataIntegrityViolationException;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 @DataJpaTest
@@ -107,5 +109,17 @@ public class PaymentRepoTest {
         Payment updated = paymentRepository.findById(saved.getId()).get();
         assertEquals(new BigDecimal("550"), updated.getAmount());
         assertEquals(Payment.StatusEnum.PAID, updated.getStatus());
+    }
+
+    @Test
+    void shouldNotAllowNegativeAmount() {
+        Payment invalidPayment = new Payment();
+        invalidPayment.setName("Invalid");
+        invalidPayment.setExpense(expense);
+        invalidPayment.setAmount(new BigDecimal("-100")); //sumă negativă
+        invalidPayment.setStatus(Payment.StatusEnum.PENDING);
+        invalidPayment.setPaymentDate(LocalDate.now());
+
+        assertThrows(DataIntegrityViolationException.class, () -> paymentRepository.saveAndFlush(invalidPayment));
     }
 }
