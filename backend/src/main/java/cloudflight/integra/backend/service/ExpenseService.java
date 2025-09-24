@@ -2,49 +2,45 @@ package cloudflight.integra.backend.service;
 
 import cloudflight.integra.backend.dto.ExpenseDTO;
 
-import java.util.List;
-
 /**
- * Service interface for managing Expense DTOs.
+ * Service interface for managing expenses.
  */
 public interface ExpenseService {
 
     /**
-     * Create a new expense after validation.
+     * Creates a new Expense.
      *
-     * @param expenseDTO the expense DTO to create
-     * @return the created expense DTO
+     * @param expenseDTO the expense to be created
+     * @return the created Expense
      */
     ExpenseDTO createExpense(ExpenseDTO expenseDTO);
 
     /**
-     * Find an expense by its ID.
+     * Returns all Expenses.
      *
-     * @param id the ID of the expense
-     * @return the expense DTO
+     * @return an Iterable of all Expenses
+     */
+    Iterable<ExpenseDTO> getAllExpenses();
+
+    /**
+     * Returns an Expense by its ID.
+     *
+     * @param id the identifier of the Expense
+     * @return Expense with the given id
      */
     ExpenseDTO getExpense(Long id);
 
     /**
-     * Find all expenses for a specific user.
+     * Updates an Expense.
      *
-     * @param userId the user ID
-     * @return list of expense DTOs
+     * @param expenseDTO the expense to be updated
      */
-    List<ExpenseDTO> getAllExpensesByUser(Long userId);
+    void updateExpense(ExpenseDTO expenseDTO);
 
     /**
-     * Update an existing expense.
+     * Deletes an Expense by its ID.
      *
-     * @param expenseDTO the expense DTO with updated fields
-     * @return the updated expense DTO
-     */
-    ExpenseDTO updateExpense(ExpenseDTO expenseDTO);
-
-    /**
-     * Delete an expense by ID.
-     *
-     * @param id the expense ID
+     * @param id the identifier of the Expense
      */
     void deleteExpense(Long id);
 }

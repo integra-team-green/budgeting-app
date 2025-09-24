@@ -1,5 +1,6 @@
 package cloudflight.integra.backend.entity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.PositiveOrZero;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -14,7 +15,7 @@ public class Payment {
     private Long id;
 
     @OneToOne(optional = false)
-    @JoinColumn(name = "expense_id", nullable = false) //asigură că fiecare Payment trebuie să aibă un Expense
+    @JoinColumn(name = "expense_id", nullable = false) // Asigură că fiecare Payment trebuie să aibă un Expense
     private Expense expense;
 
     @Column(nullable = false)
@@ -25,6 +26,7 @@ public class Payment {
 
     private LocalDate paymentDate;
 
+    @PositiveOrZero
     @Column(nullable = false)
     private BigDecimal amount;
 
