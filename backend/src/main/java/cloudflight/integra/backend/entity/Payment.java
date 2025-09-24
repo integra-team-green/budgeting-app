@@ -1,14 +1,5 @@
 package cloudflight.integra.backend.entity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Column;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.EnumType;
+import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -22,7 +13,7 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
+    @OneToOne(optional = false)
     @JoinColumn(name = "expense_id", nullable = false) //asigură că fiecare Payment trebuie să aibă un Expense
     private Expense expense;
 

@@ -10,8 +10,6 @@ import cloudflight.integra.backend.service.ExpenseService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 public class ExpenseServiceImpl implements ExpenseService {
 
@@ -34,6 +32,12 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     @Transactional(readOnly = true)
+    public Iterable<ExpenseDTO> getAllExpenses() {
+        return ExpenseMapper.getExpenseDtoFromExpense(expenseRepository.findAll());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public ExpenseDTO getExpense(Long id) {
         Expense expense = expenseRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Expense with id " + id + " not found"));
@@ -41,14 +45,8 @@ public class ExpenseServiceImpl implements ExpenseService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<ExpenseDTO> getAllExpensesByUser(Long userId) {
-        return ExpenseMapper.getExpenseDtoFromExpense(expenseRepository.findAllByUserId(userId));
-    }
-
-    @Override
     @Transactional
-    public ExpenseDTO updateExpense(ExpenseDTO expenseDTO) {
+    public void updateExpense(ExpenseDTO expenseDTO) {
         if (expenseDTO.getId() == null) {
             throw new IllegalArgumentException("Expense ID must not be null for update");
         }
@@ -59,9 +57,7 @@ public class ExpenseServiceImpl implements ExpenseService {
 
         Expense expense = ExpenseMapper.getFromDto(expenseDTO);
         expenseValidator.validate(expense);
-
-        Expense updated = expenseRepository.save(expense);
-        return ExpenseMapper.getDto(updated);
+        expenseRepository.save(expense);
     }
 
     @Override

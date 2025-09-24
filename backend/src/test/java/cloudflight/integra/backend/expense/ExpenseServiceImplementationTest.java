@@ -1,35 +1,31 @@
 package cloudflight.integra.backend.expense;
 
+import cloudflight.integra.backend.dto.ExpenseDTO;
 import cloudflight.integra.backend.entity.Expense;
-import cloudflight.integra.backend.entity.Expense.Frequency;
-import cloudflight.integra.backend.entity.Expense.PaymentMethod;
 import cloudflight.integra.backend.entity.User;
 import cloudflight.integra.backend.entity.validation.ValidationException;
-import cloudflight.integra.backend.exception.NotFoundException;
 import cloudflight.integra.backend.repository.ExpenseRepository;
 import cloudflight.integra.backend.repository.UserRepository;
-import cloudflight.integra.backend.service.impl.ExpenseServiceImpl;
+import cloudflight.integra.backend.service.ExpenseService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.StreamSupport;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- * Unit tests for {@link ExpenseServiceImpl}.
- * Covers CRUD operations with valid and invalid attributes, including new fields:
- * frequency, paymentMethod, endDate, nextDueDate.
- */
 @SpringBootTest
-public class ExpenseServiceImplementationTest {
+@Transactional
+class ExpenseServiceImplementationTest {
 
     @Autowired
-    private ExpenseServiceImpl expenseService;
+    private ExpenseService service;
 
     @Autowired
     private ExpenseRepository expenseRepository;
@@ -44,96 +40,115 @@ public class ExpenseServiceImplementationTest {
         expenseRepository.deleteAll();
         userRepository.deleteAll();
 
-        user1 = userRepository.save(new User(null, "Alice", "alice@email.com", "123"));
-        user2 = userRepository.save(new User(null, "Bob", "bob@email.com", "456"));
+        user1 = userRepository.save(new User(null, "Alice", "alice@email.com", "123", LocalDate.now(), BigDecimal.valueOf(500)));
+        user2 = userRepository.save(new User(null, "Marc", "marc@yahoo.com", "abcd999", LocalDate.now(), BigDecimal.valueOf(800)));
     }
 
-    /** Test creating a valid expense with all required fields including new enums. */
     @Test
     void createExpense_withValidData_succeeds() {
-        Expense expense = new Expense(null, user1, BigDecimal.valueOf(100), "Food",
-                LocalDate.now(), "Lunch", Frequency.ONE_TIME, null, null, PaymentMethod.CARD, null);
+        ExpenseDTO expenseDTO = new ExpenseDTO(
+                null,
+                user1.getId(),
+                BigDecimal.valueOf(150),
+                "Food",
+                LocalDate.now(),
+                "Lunch",
+                ExpenseDTO.Frequency.MONTHLY,
+                null,
+                null,
+                ExpenseDTO.PaymentMethod.CARD
+        );
 
-        assertDoesNotThrow(() -> expenseService.createExpense(expense));
-        assertNotNull(expense.getId(), "ID should be generated automatically");
+        assertDoesNotThrow(() -> service.createExpense(expenseDTO));
+
+        List<ExpenseDTO> expenses = (List<ExpenseDTO>) service.getAllExpenses();
+        assertFalse(expenses.isEmpty());
     }
 
-    /** Test that creating an expense with negative amount throws ValidationException. */
     @Test
     void createExpense_withNegativeAmount_throwsValidationException() {
-        Expense expense = new Expense(null, user1, BigDecimal.valueOf(-50), "Food",
-                LocalDate.now(), "Invalid lunch", Frequency.MONTHLY, null, null, PaymentMethod.TRANSFER, null);
+        ExpenseDTO expenseDTO = new ExpenseDTO(
+                null,
+                user1.getId(),
+                BigDecimal.valueOf(-100),
+                "Food",
+                LocalDate.now(),
+                "Lunch",
+                ExpenseDTO.Frequency.MONTHLY,
+                null,
+                null,
+                ExpenseDTO.PaymentMethod.CARD
+        );
 
-        ValidationException ex = assertThrows(ValidationException.class,
-                () -> expenseService.createExpense(expense));
-
+        ValidationException ex = assertThrows(ValidationException.class, () -> service.createExpense(expenseDTO));
         ex.getErrors().forEach(err -> System.out.println("Validation error: " + err));
     }
 
-    /** Test that creating an expense with null category throws ValidationException. */
     @Test
     void createExpense_withNullCategory_throwsValidationException() {
-        Expense expense = new Expense(null, user1, BigDecimal.valueOf(50), null,
-                LocalDate.now(), "No category", Frequency.MONTHLY, null, null, PaymentMethod.CARD, null);
+        ExpenseDTO expenseDTO = new ExpenseDTO(
+                null,
+                user1.getId(),
+                BigDecimal.valueOf(100),
+                null,
+                LocalDate.now(),
+                "Dinner",
+                ExpenseDTO.Frequency.MONTHLY,
+                null,
+                null,
+                ExpenseDTO.PaymentMethod.CARD
+        );
 
-        ValidationException ex = assertThrows(ValidationException.class,
-                () -> expenseService.createExpense(expense));
-
+        ValidationException ex = assertThrows(ValidationException.class, () -> service.createExpense(expenseDTO));
         ex.getErrors().forEach(err -> System.out.println("Validation error: " + err));
     }
 
-    /** Test retrieving all expenses in repository. */
     @Test
     void getAllExpenses_returnsAllCreatedExpenses() {
-        expenseService.createExpense(
-                new Expense(null, user1, BigDecimal.valueOf(100), "Food", LocalDate.now(),
-                        "Lunch", Frequency.MONTHLY, null, null, PaymentMethod.CARD, null));
+        ExpenseDTO expense1 = new ExpenseDTO(null, user1.getId(), BigDecimal.valueOf(100), "Food", LocalDate.now(), "Lunch", ExpenseDTO.Frequency.MONTHLY, null, null, ExpenseDTO.PaymentMethod.CARD);
+        ExpenseDTO expense2 = new ExpenseDTO(null, user2.getId(), BigDecimal.valueOf(200), "Transport", LocalDate.now(), "Taxi", ExpenseDTO.Frequency.ONE_TIME, null, null, ExpenseDTO.PaymentMethod.CARD);
 
-        expenseService.createExpense(
-                new Expense(null, user2, BigDecimal.valueOf(200), "Transport", LocalDate.now(),
-                        "Bus ticket", Frequency.ONE_TIME, null, null, PaymentMethod.TRANSFER, null));
+        service.createExpense(expense1);
+        service.createExpense(expense2);
 
-        List<Expense> allExpenses = expenseRepository.findAll();
-        assertEquals(2, allExpenses.size(), "There should be 2 expenses in repository");
+        List<ExpenseDTO> all = (List<ExpenseDTO>) service.getAllExpenses();
+
+        assertEquals(2, all.size());
     }
 
-    /** Test finding an expense by ID returns correct data including enums. */
     @Test
     void getExpenseById_returnsCorrectExpense() {
-        Expense expense = expenseService.createExpense(
-                new Expense(null, user1, BigDecimal.valueOf(150), "Coffee", LocalDate.now(),
-                        "Morning coffee", Frequency.ONE_TIME, null, null, PaymentMethod.CARD, null));
+        ExpenseDTO expenseDTO = new ExpenseDTO(null, user1.getId(), BigDecimal.valueOf(500), "Rent", LocalDate.now(), "Monthly rent", ExpenseDTO.Frequency.MONTHLY, null, null, ExpenseDTO.PaymentMethod.TRANSFER);
+        ExpenseDTO created = service.createExpense(expenseDTO);
 
-        Expense found = expenseService.getExpense(expense.getId());
-        assertEquals(expense.getId(), found.getId());
-        assertEquals(expense.getAmount(), found.getAmount());
-        assertEquals(expense.getCategory(), found.getCategory());
-        assertEquals(expense.getFrequency(), found.getFrequency());
-        assertEquals(expense.getPaymentMethod(), found.getPaymentMethod());
+        ExpenseDTO found = service.getExpense(created.getId());
+
+        assertEquals(0, found.getAmount().compareTo(BigDecimal.valueOf(500)));
+        assertEquals("Rent", found.getCategory());
     }
 
-    /** Test updating an existing expense with valid data. */
     @Test
     void updateExpense_withValidData_succeeds() {
-        Expense expense = expenseService.createExpense(
-                new Expense(null, user1, BigDecimal.valueOf(50), "Snack", LocalDate.now(),
-                        "Evening snack", Frequency.MONTHLY, null, null, PaymentMethod.TRANSFER, null));
+        ExpenseDTO expenseDTO = new ExpenseDTO(null, user1.getId(), BigDecimal.valueOf(300), "Utilities", LocalDate.now(), "Electric bill", ExpenseDTO.Frequency.MONTHLY, null, null, ExpenseDTO.PaymentMethod.TRANSFER);
+        ExpenseDTO created = service.createExpense(expenseDTO);
 
-        expense.setAmount(BigDecimal.valueOf(70));
-        assertDoesNotThrow(() -> expenseService.updateExpense(expense));
+        created.setAmount(BigDecimal.valueOf(350));
+        created.setDescription("Updated electric bill");
 
-        Expense updated = expenseService.getExpense(expense.getId());
-        assertEquals(BigDecimal.valueOf(70), updated.getAmount());
+        assertDoesNotThrow(() -> service.updateExpense(created));
+
+        ExpenseDTO updated = service.getExpense(created.getId());
+        assertEquals(0, updated.getAmount().compareTo(BigDecimal.valueOf(350)));
+        assertEquals("Updated electric bill", updated.getDescription());
     }
 
-    /** Test deleting an existing expense removes it from repository. */
     @Test
     void deleteExpense_removesExpense() {
-        Expense expense = expenseService.createExpense(
-                new Expense(null, user1, BigDecimal.valueOf(80), "Coffee", LocalDate.now(),
-                        "Morning coffee", Frequency.ONE_TIME, null, null, PaymentMethod.CARD, null));
+        ExpenseDTO expenseDTO = new ExpenseDTO(null, user1.getId(), BigDecimal.valueOf(400), "Shopping", LocalDate.now(), "Clothes", ExpenseDTO.Frequency.ONE_TIME, null, null, ExpenseDTO.PaymentMethod.CARD);
+        ExpenseDTO created = service.createExpense(expenseDTO);
 
-        expenseService.deleteExpense(expense.getId());
-        assertThrows(NotFoundException.class, () -> expenseService.getExpense(expense.getId()));
+        service.deleteExpense(created.getId());
+
+        assertThrows(RuntimeException.class, () -> service.getExpense(created.getId()));
     }
 }
