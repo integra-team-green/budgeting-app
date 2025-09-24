@@ -1,7 +1,9 @@
 package cloudflight.integra.backend.controller;
 
 import cloudflight.integra.backend.controller.problem.ExpenseApiErrorResponses;
+import cloudflight.integra.backend.dto.ExpenseDTO;
 import cloudflight.integra.backend.entity.Expense;
+import cloudflight.integra.backend.mapper.ExpenseMapper;
 import cloudflight.integra.backend.service.ExpenseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +38,8 @@ public class ExpenseController {
     @GetMapping("/{id}")
     public ResponseEntity<Expense> getExpense(@PathVariable Long id) {
         log.info("Fetching expense with id={}", id);
-        Expense expense = expenseService.getExpense(id);
+        ExpenseDTO expenseDTO = expenseService.getExpense(id);
+        Expense expense = ExpenseMapper.getFromDto(expenseDTO);
         log.info("Expense retrieved: {}", expense);
         return ResponseEntity.ok(expense);
     }
@@ -50,7 +53,8 @@ public class ExpenseController {
     @GetMapping
     public ResponseEntity<List<Expense>> getAllExpenses(@RequestParam Long userId) {
         log.info("Fetching all expenses for userId={}", userId);
-        List<Expense> expenses = expenseService.getAllExpensesByUser(userId);
+        List<ExpenseDTO> expenseDTOs = expenseService.getAllExpensesByUser(userId);
+        List<Expense> expenses = ExpenseMapper.getExpenseFromDto(expenseDTOs);
         log.info("Found {} expenses", expenses.size());
         return ResponseEntity.ok(expenses);
     }
@@ -64,7 +68,9 @@ public class ExpenseController {
     @PostMapping
     public ResponseEntity<Expense> addExpense(@RequestBody Expense expense) {
         log.info("Creating new expense for userId={}", expense.getUser().getId());
-        Expense created = expenseService.createExpense(expense);
+        ExpenseDTO expenseDTO = ExpenseMapper.getDto(expense);
+        ExpenseDTO createdDTO = expenseService.createExpense(expenseDTO);
+        Expense created = ExpenseMapper.getFromDto(createdDTO);
         log.info("Expense created: {}", created);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
@@ -83,7 +89,9 @@ public class ExpenseController {
         if (!id.equals(expense.getId())) {
             throw new IllegalArgumentException("ID in path and body do not match.");
         }
-        Expense updated = expenseService.updateExpense(expense);
+        ExpenseDTO expenseDTO = ExpenseMapper.getDto(expense);
+        ExpenseDTO updatedDTO = expenseService.updateExpense(expenseDTO);
+        Expense updated = ExpenseMapper.getFromDto(updatedDTO);
         log.info("Expense updated: {}", updated);
         return ResponseEntity.ok(updated);
     }

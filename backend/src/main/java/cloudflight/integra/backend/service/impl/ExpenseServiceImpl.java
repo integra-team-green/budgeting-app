@@ -1,8 +1,10 @@
 package cloudflight.integra.backend.service.impl;
 
+import cloudflight.integra.backend.dto.ExpenseDTO;
 import cloudflight.integra.backend.entity.Expense;
 import cloudflight.integra.backend.entity.validation.ExpenseValidator;
 import cloudflight.integra.backend.exception.NotFoundException;
+import cloudflight.integra.backend.mapper.ExpenseMapper;
 import cloudflight.integra.backend.repository.ExpenseRepository;
 import cloudflight.integra.backend.service.ExpenseService;
 import org.springframework.stereotype.Service;
@@ -23,38 +25,43 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     @Transactional
-    public Expense createExpense(Expense expense) {
+    public ExpenseDTO createExpense(ExpenseDTO expenseDTO) {
+        Expense expense = ExpenseMapper.getFromDto(expenseDTO);
         expenseValidator.validate(expense);
-        return expenseRepository.save(expense);
+        Expense saved = expenseRepository.save(expense);
+        return ExpenseMapper.getDto(saved);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Expense getExpense(Long id) {
-        return expenseRepository.findById(id)
+    public ExpenseDTO getExpense(Long id) {
+        Expense expense = expenseRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Expense with id " + id + " not found"));
+        return ExpenseMapper.getDto(expense);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Expense> getAllExpensesByUser(Long userId) {
-        return expenseRepository.findAllByUserId(userId);
+    public List<ExpenseDTO> getAllExpensesByUser(Long userId) {
+        return ExpenseMapper.getExpenseDtoFromExpense(expenseRepository.findAllByUserId(userId));
     }
 
     @Override
     @Transactional
-    public Expense updateExpense(Expense expense) {
-        if (expense.getId() == null) {
+    public ExpenseDTO updateExpense(ExpenseDTO expenseDTO) {
+        if (expenseDTO.getId() == null) {
             throw new IllegalArgumentException("Expense ID must not be null for update");
         }
 
-        expenseValidator.validate(expense);
-
-        if (!expenseRepository.existsById(expense.getId())) {
-            throw new NotFoundException("Expense with id " + expense.getId() + " not found");
+        if (!expenseRepository.existsById(expenseDTO.getId())) {
+            throw new NotFoundException("Expense with id " + expenseDTO.getId() + " not found");
         }
 
-        return expenseRepository.save(expense);
+        Expense expense = ExpenseMapper.getFromDto(expenseDTO);
+        expenseValidator.validate(expense);
+
+        Expense updated = expenseRepository.save(expense);
+        return ExpenseMapper.getDto(updated);
     }
 
     @Override

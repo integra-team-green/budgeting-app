@@ -1,45 +1,45 @@
 package cloudflight.integra.backend.service;
 
-import cloudflight.integra.backend.entity.Expense;
+import cloudflight.integra.backend.dto.ExpenseDTO;
 
 import java.util.List;
 
 /**
- * Service interface for managing Expense entities.
+ * Service interface for managing Expense DTOs.
  */
 public interface ExpenseService {
 
     /**
      * Create a new expense after validation.
      *
-     * @param expense the expense to create
-     * @return the created expense
+     * @param expenseDTO the expense DTO to create
+     * @return the created expense DTO
      */
-    Expense createExpense(Expense expense);
+    ExpenseDTO createExpense(ExpenseDTO expenseDTO);
 
     /**
      * Find an expense by its ID.
      *
      * @param id the ID of the expense
-     * @return the expense
+     * @return the expense DTO
      */
-    Expense getExpense(Long id);
+    ExpenseDTO getExpense(Long id);
 
     /**
      * Find all expenses for a specific user.
      *
      * @param userId the user ID
-     * @return list of expenses
+     * @return list of expense DTOs
      */
-    List<Expense> getAllExpensesByUser(Long userId);
+    List<ExpenseDTO> getAllExpensesByUser(Long userId);
 
     /**
      * Update an existing expense.
      *
-     * @param expense the expense with updated fields
-     * @return the updated expense
+     * @param expenseDTO the expense DTO with updated fields
+     * @return the updated expense DTO
      */
-    Expense updateExpense(Expense expense);
+    ExpenseDTO updateExpense(ExpenseDTO expenseDTO);
 
     /**
      * Delete an expense by ID.
