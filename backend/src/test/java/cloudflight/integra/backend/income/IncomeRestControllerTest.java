@@ -60,6 +60,8 @@ class IncomeRestControllerTest {
         dto.setDate(new Date());
         dto.setDescription("Bonus");
         dto.setUserId(user1.getId());
+        dto.setFrequency(Frequency.MONTHLY);
+        dto.setUserId(user1.getId());
 
         mockMvc.perform(post("/api/v1/incomes")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -77,8 +79,8 @@ class IncomeRestControllerTest {
 
     @Test
     void getAllIncomes_returnsList() throws Exception {
-        repository.save(new Income(null,user1,new BigDecimal("100"), "Job1", new Date(), "Desc1", Frequency.ONE_TIME,null));
-        repository.save(new Income(null, user2,new BigDecimal("200"), "Job2", new Date(), "Desc2",Frequency.ONE_TIME,null));
+        repository.save(new Income(null,user1.getId(),new BigDecimal("100"), "Job1", new Date(), "Desc1", Frequency.ONE_TIME,null));
+        repository.save(new Income(null, user2.getId(),new BigDecimal("200"), "Job2", new Date(), "Desc2",Frequency.ONE_TIME,null));
 
         mockMvc.perform(get("/api/v1/incomes"))
                 .andExpect(status().isOk())
@@ -91,29 +93,30 @@ class IncomeRestControllerTest {
     @Test
     void updateIncome_existingIncome_returns200() throws Exception {
         resetRepository();
-        Income income = new Income(null, user1,new BigDecimal("100"), "Job1", new Date(), "Desc1",Frequency.ONE_TIME,null);
+        Income income = new Income(null, user1.getId(),new BigDecimal("100"), "Job1", new Date(), "Desc1",Frequency.ONE_TIME,null);
         Income saved= repository.save(income);
 
         IncomeDTO dto = new IncomeDTO();
+        dto.setUserId(user1.getId());
         dto.setAmount(new BigDecimal("150"));
         dto.setSource("Job Updated");
         dto.setDate(new Date());
+        dto.setFrequency(Frequency.ONE_TIME);
         dto.setDescription("Desc Updated");
-        dto.setUserId(user2.getId());
 
         mockMvc.perform(put("/api/v1/incomes/"+saved.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.amount").value(150))
-                .andExpect(jsonPath("$.userId").value(user2.getId()))
-                .andExpect(jsonPath("$.source").value("Job Updated"));
+                .andExpect(jsonPath("$.source").value("Job Updated"))
+                .andExpect(jsonPath("$.userId").value(user1.getId()));
     }
 
     @Test
     void deleteIncome_existingIncome_returns204() throws Exception {
         resetRepository();
-        Income saved =repository.save(new Income(null, user1,new BigDecimal("100"), "Job1", new Date(), "Desc1",Frequency.ONE_TIME,null));
+        Income saved =repository.save(new Income(null, user1.getId(),new BigDecimal("100"), "Job1", new Date(), "Desc1",Frequency.ONE_TIME,null));
 
         mockMvc.perform(delete("/api/v1/incomes/"+saved.getId()))
                 .andExpect(status().isNoContent());

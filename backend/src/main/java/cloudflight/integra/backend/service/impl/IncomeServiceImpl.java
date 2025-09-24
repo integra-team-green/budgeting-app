@@ -10,17 +10,17 @@ import cloudflight.integra.backend.entity.validation.IncomeValidator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 @Service
 public class IncomeServiceImpl implements IncomeService {
 
     private final IncomeRepository incomeRepo;
-    private final UserRepository userRepository;
     private final IncomeValidator incomeValidator;
 
-    public IncomeServiceImpl(IncomeRepository incomeRepo, IncomeValidator incomeValidator, UserRepository userRepository) {
+    public IncomeServiceImpl(IncomeRepository incomeRepo, IncomeValidator incomeValidator) {
         this.incomeRepo = incomeRepo;
         this.incomeValidator = incomeValidator;
-        this.userRepository = userRepository;
+
 
     }
 
@@ -28,10 +28,11 @@ public class IncomeServiceImpl implements IncomeService {
     @Transactional
     public Income createIncome(Income income) {
         incomeValidator.validate(income);
-        User user=userRepository.findById(income.getUser().getId()).orElseThrow(
-                () -> new NotFoundException("There is no user with user id " + income.getUser().getId())
-        );
+
+        User user = new User();
+        user.setId(income.getUserId());
         income.setUser(user);
+
         return incomeRepo.save(income);
     }
 

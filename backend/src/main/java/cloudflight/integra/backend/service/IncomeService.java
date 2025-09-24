@@ -1,5 +1,6 @@
 package cloudflight.integra.backend.service;
 
+import cloudflight.integra.backend.dto.IncomeDTO;
 import cloudflight.integra.backend.entity.Income;
 
 

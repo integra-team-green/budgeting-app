@@ -1,5 +1,6 @@
 package cloudflight.integra.backend.income;
 
+import cloudflight.integra.backend.dto.IncomeDTO;
 import cloudflight.integra.backend.entity.Frequency;
 import cloudflight.integra.backend.entity.Income;
 import cloudflight.integra.backend.entity.User;
@@ -45,7 +46,7 @@ class IncomeServiceTest {
 
     @Test
     void createIncome_withValidData_succeeds() {
-        Income income = new Income(null, user1,BigDecimal.valueOf(1000), "Job", new Date(), "Salary", Frequency.ONE_TIME,null);
+        Income income = new Income(null,user1.getId(),BigDecimal.valueOf(1000), "Job", new Date(), "Salary", Frequency.ONE_TIME,null);
 
         assertDoesNotThrow(() -> service.createIncome(income));
         assertNotNull(income.getId(), "ID should be generated automatically");
@@ -55,7 +56,7 @@ class IncomeServiceTest {
     @Test
     void createIncome_withNegativeAmount_throwsValidationException() {
         // Arrange
-        Income income = new Income(null, user1,BigDecimal.valueOf(-100), "Job", new Date(), "Salary",Frequency.MONTHLY,null);
+        Income income = new Income(null, user1.getId() ,BigDecimal.valueOf(-100), "Job", new Date(), "Salary",Frequency.MONTHLY,null);
 
         // Act & Assert
         ValidationException ex = assertThrows(
@@ -71,7 +72,7 @@ class IncomeServiceTest {
     @Test
     void createIncome_withNullSource_throwsValidationException() {
         // Arrange
-        Income income = new Income(null, user1,BigDecimal.valueOf(100), null, new Date(), "Salary",Frequency.MONTHLY,null);
+        Income income = new Income(null, user1.getId(),BigDecimal.valueOf(100), null, new Date(), "Salary",Frequency.MONTHLY,null);
 
         // Act & Assert
         ValidationException ex = assertThrows(
@@ -84,11 +85,25 @@ class IncomeServiceTest {
         );
     }
 
+    @Test
+    void createIncome_withNonExistingUserId_throwsException() {
+        Income income = new Income();
+        income.setAmount(BigDecimal.valueOf(500));
+        income.setSource("Test Job");
+        income.setDate(new Date());
+        income.setDescription("Test Desc");
+        income.setFrequency(Frequency.ONE_TIME);
+
+        income.setUserId(9999L);
+
+        assertThrows(Exception.class, () -> service.createIncome(income));
+    }
+
 
     @Test
     void getAllIncomes_returnsAllCreatedIncomes() {
-        Income income1 = new Income(null, user1,BigDecimal.valueOf(100), "Job", new Date(), "Salary",Frequency.MONTHLY,null);
-        Income income2 = new Income(null, user2,BigDecimal.valueOf(200), "Gift", new Date(), "Birthday",Frequency.MONTHLY,null);
+        Income income1 = new Income(null, user1.getId(),BigDecimal.valueOf(100), "Job", new Date(), "Salary",Frequency.MONTHLY,null);
+        Income income2 = new Income(null, user2.getId(),BigDecimal.valueOf(200), "Gift", new Date(), "Birthday",Frequency.MONTHLY,null);
 
         service.createIncome(income1);
         service.createIncome(income2);
@@ -102,7 +117,7 @@ class IncomeServiceTest {
 
     @Test
     void getIncomeById_returnsCorrectIncome() {
-        Income income = new Income(null, user1,BigDecimal.valueOf(500), "Freelance", new Date(), "Project",Frequency.MONTHLY,null);
+        Income income = new Income(null, user1.getId(),BigDecimal.valueOf(500), "Freelance", new Date(), "Project",Frequency.MONTHLY,null);
         service.createIncome(income);
 
         Income found = service.getIncomeById(income.getId());
@@ -115,7 +130,7 @@ class IncomeServiceTest {
 
     @Test
     void updateIncome_withValidData_succeeds() {
-        Income income = new Income(null, user1,BigDecimal.valueOf(1000), "Job", new Date(), "Salary",Frequency.MONTHLY,null);
+        Income income = new Income(null, user1.getId(),BigDecimal.valueOf(1000), "Job", new Date(), "Salary",Frequency.MONTHLY,null);
         service.createIncome(income);
 
         income.setAmount(BigDecimal.valueOf(1200));
@@ -128,7 +143,7 @@ class IncomeServiceTest {
 
     @Test
     void updateIncome_withInvalidData_throwsValidationException() {
-        Income income = new Income(null, user1,BigDecimal.valueOf(1000), "Job", new Date(), "Salary",Frequency.MONTHLY,null);
+        Income income = new Income(null, user1.getId(),BigDecimal.valueOf(1000), "Job", new Date(), "Salary",Frequency.MONTHLY,null);
         service.createIncome(income);
 
         income.setAmount(BigDecimal.valueOf(-500));
@@ -144,7 +159,7 @@ class IncomeServiceTest {
 
     @Test
     void deleteIncome_removesIncome() {
-        Income income = new Income(null, user1,BigDecimal.valueOf(500), "Freelance", new Date(), "Project",Frequency.MONTHLY,null);
+        Income income = new Income(null, user1.getId(),BigDecimal.valueOf(500), "Freelance", new Date(), "Project",Frequency.MONTHLY,null);
         service.createIncome(income);
 
         service.deleteIncome(income.getId());

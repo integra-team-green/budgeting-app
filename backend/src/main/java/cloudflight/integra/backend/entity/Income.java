@@ -13,13 +13,21 @@ public class Income {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id",nullable=false)
     private User user;
+    @Column(name="user_id", updatable=false, insertable=false)
+    private Long userId;
+    @Column(name="amount",nullable=false)
     private BigDecimal amount;
+    @Column(name="source",nullable=false)
     private String source;
+    @Column(name="date",nullable=false)
     private Date date;
+    @Column(name="description")
     private String description;
+    @Enumerated(EnumType.STRING)
+    @Column(name="frequency",nullable=false)
     private Frequency frequency;
     @Column(name="end_date")
     private Date endDate;
@@ -32,9 +40,9 @@ public class Income {
      * @param date the date of the income
      * @param description the description of the income(can be optional)
      */
-    public Income(Long id ,User user,BigDecimal amount, String source, Date date, String description, Frequency frequency, Date endDate) {
+    public Income(Long id ,Long userId,BigDecimal amount, String source, Date date, String description, Frequency frequency, Date endDate) {
         this.id = id;
-        this.user = user;
+        this.userId = userId;
         this.amount = amount;
         this.source = source;
         this.date = date;
@@ -107,6 +115,11 @@ public class Income {
     public User getUser() { return user; }
 
     public void setUser(User user) { this.user = user; }
+
+    public Long getUserId() { return userId; }
+
+    public void setUserId(Long userId) { this.userId = userId; }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
