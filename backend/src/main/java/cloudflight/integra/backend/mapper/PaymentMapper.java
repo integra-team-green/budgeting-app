@@ -5,6 +5,7 @@ import cloudflight.integra.backend.dto.PaymentDTO;
 import cloudflight.integra.backend.entity.Payment;
 import cloudflight.integra.backend.repository.ExpenseRepository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.time.LocalDate;
 
@@ -22,6 +23,7 @@ public class PaymentMapper {
         String name = payment.getName();
         Payment.StatusEnum status = payment.getStatus();
         LocalDate paymentDate = payment.getPaymentDate();
+        BigDecimal amount = payment.getAmount(); // ✅ adăugat
 
         ExpenseDTO expenseDto = null;
         if (payment.getExpense() != null) {
@@ -33,8 +35,9 @@ public class PaymentMapper {
             expenseDto.setDate(expense.getDate());
         }
 
-        return new PaymentDTO(id, expenseDto, name, status, paymentDate);
+        return new PaymentDTO(id, expenseDto, name, amount, status,paymentDate);// ✅ amount setat
     }
+
 
     /**
      * Map PaymentDTO to Payment
@@ -50,13 +53,27 @@ public class PaymentMapper {
         payment.setStatus(paymentDTO.getStatus());
         payment.setPaymentDate(paymentDTO.getPaymentDate());
 
+        // ✅ Set amount, nu poate fi null
+        if (paymentDTO.getAmount() == null) {
+            throw new IllegalArgumentException("Payment amount cannot be null");
+        }
+        payment.setAmount(paymentDTO.getAmount());
+
         // map ExpenseDTO -> Expense entity
         if (paymentDTO.getExpense() != null && paymentDTO.getExpense().getId() != null) {
-            payment.setExpense(expenseRepo.getReferenceById(paymentDTO.getExpense().getId()));
+            payment.setExpense(
+                    expenseRepo.findById(paymentDTO.getExpense().getId())
+                            .orElseThrow(() -> new RuntimeException(
+                                    "Expense not found with id: " + paymentDTO.getExpense().getId()
+                            ))
+            );
+        } else {
+            throw new IllegalArgumentException("Payment must be linked to an Expense");
         }
 
         return payment;
     }
+
 
     /**
      * Map a list of PaymentDTOs into a list of Payments

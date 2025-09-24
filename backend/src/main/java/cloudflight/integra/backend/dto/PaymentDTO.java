@@ -14,10 +14,11 @@ public class PaymentDTO {
     public PaymentDTO() {
 
     }
-    public PaymentDTO(Long id, ExpenseDTO expense, String name, Payment.StatusEnum status, LocalDate paymentDate) {
+    public PaymentDTO(Long id, ExpenseDTO expense, String name, BigDecimal amount, Payment.StatusEnum status, LocalDate paymentDate) {
         this.id = id;
         this.expense = expense;
         this.name = name;
+        this.amount = amount;
         this.status = status;
         this.paymentDate = paymentDate;
     }
