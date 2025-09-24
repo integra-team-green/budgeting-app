@@ -1,5 +1,6 @@
 package cloudflight.integra.backend.entity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.PositiveOrZero;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -25,6 +26,7 @@ public class Payment {
 
     private LocalDate paymentDate;
 
+    @PositiveOrZero
     @Column(nullable = false)
     private BigDecimal amount;
 
