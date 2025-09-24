@@ -162,4 +162,38 @@ public class PaymentRestControllerTest {
                 .andExpect(jsonPath("$.id").value(payment2.getId()))
                 .andExpect(jsonPath("$.name").value("October Utilities"));
     }
+
+    @Test
+    void testCreatePaymentWithInvalidData() throws Exception {
+        // Creează PaymentDTO invalid (amount null, name gol)
+        PaymentDTO invalidDto = new PaymentDTO();
+        invalidDto.setName(""); // name gol
+        invalidDto.setAmount(null); // amount nul
+        invalidDto.setPaymentDate(null); // data nulă
+        invalidDto.setStatus(null); // status nul
+        invalidDto.setExpense(null); // expense nul
+
+        mockMvc.perform(post("/api/v1/payments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidDto)))
+                .andExpect(status().isBadRequest()); // se așteaptă cod 400
+    }
+
+    @Test
+    void testUpdatePaymentWithInvalidData() throws Exception {
+        // Creează PaymentDTO invalid pentru update
+        PaymentDTO invalidDto = new PaymentDTO();
+        invalidDto.setId(payment1.getId());
+        invalidDto.setName(""); // name gol
+        invalidDto.setAmount(BigDecimal.valueOf(-100)); // amount negativ
+        invalidDto.setPaymentDate(LocalDate.of(2025, 1, 1)); // data validă
+        invalidDto.setStatus(Payment.StatusEnum.PENDING);
+        invalidDto.setExpense(expense1);
+
+        mockMvc.perform(put("/api/v1/payments/" + payment1.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidDto)))
+                .andExpect(status().isBadRequest()); // se așteaptă cod 400
+    }
+
 }
