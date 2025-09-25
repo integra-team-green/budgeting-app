@@ -1,28 +1,30 @@
 package cloudflight.integra.backend.entity.validation;
 
-import cloudflight.integra.backend.entity.Frequency;
-import cloudflight.integra.backend.entity.Payment;
+import cloudflight.integra.backend.dto.PaymentDTO;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
+// varianta buna
 @Component
-public class PaymentValidator implements Validator<Payment> {
+public class PaymentValidator implements Validator<PaymentDTO> {
+
   /**
-   * Method that validates an object that will be saved
+   * Method that validates a PaymentDTO object before saving.
    *
-   * @param entity ,type Payment
-   * @throws ValidationException
+   * @param entity PaymentDTO object
+   * @throws ValidationException if validation fails
    */
   @Override
-  public void validate(Payment entity) throws ValidationException {
+  public void validate(PaymentDTO entity) throws ValidationException {
     List<String> errors = new ArrayList<>();
-    if (entity.getAmount().compareTo(BigDecimal.ZERO) <= 0)
+    if (entity.getAmount() == null) {
+      errors.add("Amount must not be null");
+    } else if (entity.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
       errors.add("Amount must be greater than 0");
-    if (entity.getFrequency() != Frequency.MONTHLY
-        && entity.getFrequency() != Frequency.YEARLY
-        && entity.getFrequency() != Frequency.ONE_TIME) errors.add("Invalid frequency");
+    }
+
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
     }

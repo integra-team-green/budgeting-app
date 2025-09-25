@@ -1,46 +1,18 @@
 package cloudflight.integra.backend.repository;
 
-import cloudflight.integra.backend.dto.ExpenseDTO;
+import cloudflight.integra.backend.entity.Expense;
 import java.util.List;
-import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface ExpenseRepository {
-  /**
-   * Add a new expense to the repository.
-   *
-   * @param expenseDto the expense to add (id should be null for new expenses)
-   * @return the created expense with generated id
-   */
-  ExpenseDTO addExpense(ExpenseDTO expenseDto);
+@Repository
+public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 
   /**
-   * Update an existing expense in the repository.
+   * Finds all expenses belonging to a specific user.
    *
-   * @param expenseDto the object containing updated data (id must not be null)
-   * @return the updated object
-   * @throws IllegalArgumentException if the expense ID is null or does not exist in the repository
+   * @param userId the ID of the user whose expenses should be retrieved
+   * @return a list of Expense objects associated with the given user ID
    */
-  ExpenseDTO updateExpense(ExpenseDTO expenseDto);
-
-  /**
-   * Find all expenses for a specific user.
-   *
-   * @param userId the user ID
-   * @return a list of expenses for the user
-   */
-  List<ExpenseDTO> findAllByUserId(Long userId);
-
-  /**
-   * Find an expense by its ID.
-   *
-   * @param id the expense ID
-   */
-  Optional<ExpenseDTO> findById(Long id);
-
-  /**
-   * Delete an expense by its ID.
-   *
-   * @param id the expense ID to delete
-   */
-  void deleteById(Long id);
+  List<Expense> findAllByUserId(Long userId);
 }

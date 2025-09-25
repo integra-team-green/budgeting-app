@@ -6,11 +6,13 @@ import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+// varianta buna
 /**
  * Data Transfer Object (DTO) for transferring expense information between the backend and clients
- * via the REST API. *
+ * via the REST API.
  */
 public class ExpenseDTO {
+
   private Long id;
 
   @NotNull private Long userId;
@@ -26,15 +28,27 @@ public class ExpenseDTO {
   @Size(max = 200)
   private String description;
 
+  @NotNull private Frequency frequency;
+
+  private LocalDate endDate;
+
+  private LocalDate nextDueDate;
+
+  @NotNull private PaymentMethod paymentMethod;
+
   /**
-   * Constructs an {@code ExpenseDto} object with all fields.
+   * Constructs an {@code ExpenseDTO} with all fields.
    *
-   * @param id the unique identifier of the expense
-   * @param userId the identifier of the user who owns it
-   * @param amount the monetary value
-   * @param category the category of the expense
-   * @param date the date when it occurred
-   * @param description an optional description
+   * @param id unique identifier of the expense
+   * @param userId ID of the user who owns this expense
+   * @param amount monetary value of the expense
+   * @param category category of the expense
+   * @param date date when the expense occurred
+   * @param description optional description of the expense
+   * @param frequency frequency of the expense (ONE_TIME, MONTHLY, YEARLY)
+   * @param endDate optional end date for recurring expenses
+   * @param nextDueDate next due date for recurring expenses
+   * @param paymentMethod payment method used (CARD, TRANSFER)
    */
   public ExpenseDTO(
       Long id,
@@ -42,14 +56,24 @@ public class ExpenseDTO {
       BigDecimal amount,
       String category,
       LocalDate date,
-      String description) {
+      String description,
+      Frequency frequency,
+      LocalDate endDate,
+      LocalDate nextDueDate,
+      PaymentMethod paymentMethod) {
     this.id = id;
     this.userId = userId;
     this.amount = amount;
     this.category = category;
     this.date = date;
     this.description = description;
+    this.frequency = frequency;
+    this.endDate = endDate;
+    this.nextDueDate = nextDueDate;
+    this.paymentMethod = paymentMethod;
   }
+
+  public ExpenseDTO() {}
 
   public Long getId() {
     return id;
@@ -97,5 +121,48 @@ public class ExpenseDTO {
 
   public void setDescription(String description) {
     this.description = description;
+  }
+
+  public Frequency getFrequency() {
+    return frequency;
+  }
+
+  public void setFrequency(Frequency frequency) {
+    this.frequency = frequency;
+  }
+
+  public LocalDate getEndDate() {
+    return endDate;
+  }
+
+  public void setEndDate(LocalDate endDate) {
+    this.endDate = endDate;
+  }
+
+  public LocalDate getNextDueDate() {
+    return nextDueDate;
+  }
+
+  public void setNextDueDate(LocalDate nextDueDate) {
+    this.nextDueDate = nextDueDate;
+  }
+
+  public PaymentMethod getPaymentMethod() {
+    return paymentMethod;
+  }
+
+  public void setPaymentMethod(PaymentMethod paymentMethod) {
+    this.paymentMethod = paymentMethod;
+  }
+
+  public enum Frequency {
+    ONE_TIME,
+    MONTHLY,
+    YEARLY
+  }
+
+  public enum PaymentMethod {
+    CARD,
+    TRANSFER
   }
 }

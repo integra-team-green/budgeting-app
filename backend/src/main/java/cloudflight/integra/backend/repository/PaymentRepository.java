@@ -1,44 +1,8 @@
 package cloudflight.integra.backend.repository;
 
 import cloudflight.integra.backend.entity.Payment;
-import java.util.List;
-import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface PaymentRepository {
-  /**
-   * Saves a new Payment
-   *
-   * @param payment
-   * @return the payment saved
-   */
-  Payment save(Payment payment);
-
-  /**
-   * @return all payments
-   */
-  List<Payment> findAll();
-
-  /**
-   * Deletes a payment by id
-   *
-   * @param id, type: Long
-   * @return the deleted payment
-   */
-  Optional<Payment> delete(Long id);
-
-  /**
-   * Find a payment by id
-   *
-   * @param id ,type: Long
-   * @return the payment with the id requested
-   */
-  Optional<Payment> findById(Long id);
-
-  /**
-   * Update a payment
-   *
-   * @param payment-new payment
-   * @return the updated payment
-   */
-  Optional<Payment> update(Payment payment);
-}
+@Repository
+public interface PaymentRepository extends JpaRepository<Payment, Long> {}

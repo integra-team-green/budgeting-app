@@ -1,60 +1,86 @@
 package cloudflight.integra.backend.service.impl;
 
+import cloudflight.integra.backend.dto.PaymentDTO;
 import cloudflight.integra.backend.entity.Payment;
 import cloudflight.integra.backend.entity.validation.PaymentValidator;
-import cloudflight.integra.backend.entity.validation.ValidationException;
 import cloudflight.integra.backend.exception.NotFoundException;
+import cloudflight.integra.backend.mapper.PaymentMapper;
+import cloudflight.integra.backend.repository.ExpenseRepository;
 import cloudflight.integra.backend.repository.PaymentRepository;
 import cloudflight.integra.backend.service.PaymentService;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+// varianta buna
 @Service
 public class PaymentServiceImpl implements PaymentService {
-  private final PaymentRepository IPaymentRepository;
+
+  private final PaymentRepository dbPaymentRepository;
+  private final ExpenseRepository expenseRepository;
   private final PaymentValidator paymentValidator;
 
   public PaymentServiceImpl(
-      PaymentRepository IPaymentRepository, PaymentValidator paymentValidator) {
-    this.IPaymentRepository = IPaymentRepository;
+      PaymentRepository dbPaymentRepository,
+      ExpenseRepository expenseRepository,
+      PaymentValidator paymentValidator) {
+    this.dbPaymentRepository = dbPaymentRepository;
+    this.expenseRepository = expenseRepository;
     this.paymentValidator = paymentValidator;
   }
 
   @Override
-  public Payment addPayment(Payment payment) {
-    try {
-      paymentValidator.validate(payment);
-    } catch (ValidationException e) {
-      throw new ValidationException(List.of(e.getMessage()));
+  @Transactional
+  public PaymentDTO addPayment(PaymentDTO paymentDTO) {
+    paymentValidator.validate(paymentDTO);
+
+    Payment payment = PaymentMapper.getFromDTO(paymentDTO, expenseRepository);
+    payment = dbPaymentRepository.save(payment);
+
+    return PaymentMapper.getDTO(payment);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public PaymentDTO getPaymentById(Long id) {
+    Payment payment =
+        dbPaymentRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException("Payment not found with id: " + id));
+    return PaymentMapper.getDTO(payment);
+  }
+
+  @Override
+  @Transactional
+  public PaymentDTO updatePayment(PaymentDTO paymentDTO) {
+    paymentValidator.validate(paymentDTO);
+
+    if (!dbPaymentRepository.existsById(paymentDTO.getId())) {
+      throw new NotFoundException("Payment not found with id: " + paymentDTO.getId());
     }
-    return IPaymentRepository.save(payment);
+
+    Payment payment = PaymentMapper.getFromDTO(paymentDTO, expenseRepository);
+    payment = dbPaymentRepository.save(payment);
+
+    return PaymentMapper.getDTO(payment);
   }
 
   @Override
-  public Payment getPayment(Long id) {
-    return IPaymentRepository.findById(id)
-        .orElseThrow(() -> new NotFoundException("Payment not found with id: " + id));
+  @Transactional
+  public PaymentDTO deletePayment(Long id) {
+    Payment payment =
+        dbPaymentRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException("Payment not found with id: " + id));
+
+    dbPaymentRepository.delete(payment);
+    return PaymentMapper.getDTO(payment);
   }
 
   @Override
-  public Payment updatePayment(Payment payment) {
-    try {
-      paymentValidator.validate(payment);
-    } catch (ValidationException e) {
-      throw new ValidationException(List.of(e.getMessage()));
-    }
-    return IPaymentRepository.update(payment)
-        .orElseThrow(() -> new NotFoundException("Payment not found with id: " + payment.getId()));
-  }
-
-  @Override
-  public Payment deletePayment(Long id) {
-    return IPaymentRepository.delete(id)
-        .orElseThrow(() -> new NotFoundException("Payment not found with id: " + id));
-  }
-
-  @Override
-  public List<Payment> getPayments() {
-    return IPaymentRepository.findAll();
+  @Transactional(readOnly = true)
+  public List<PaymentDTO> getAllPayments() {
+    List<Payment> payments = dbPaymentRepository.findAll();
+    return PaymentMapper.getPaymentDTOsFromPayments(payments);
   }
 }

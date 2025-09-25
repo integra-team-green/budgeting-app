@@ -5,6 +5,7 @@ import cloudflight.integra.backend.entity.Expense;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// varianta buna
 /**
  * Mapper utility class for converting between {@link Expense} and {@link ExpenseDTO}. All methods
  * are static, and the class should not be instantiated.
@@ -15,7 +16,7 @@ public class ExpenseMapper {
   private ExpenseMapper() {}
 
   /**
-   * Converts an Expense entity to ExpenseDto.
+   * Converts an Expense entity to ExpenseDTO.
    *
    * @param expense the entity to convert
    * @return the corresponding DTO
@@ -23,31 +24,40 @@ public class ExpenseMapper {
   public static ExpenseDTO getDto(Expense expense) {
     return new ExpenseDTO(
         expense.getId(),
-        expense.getUserId(),
+        expense.getUser().getId(),
         expense.getAmount(),
         expense.getCategory(),
         expense.getDate(),
-        expense.getDescription());
+        expense.getDescription(),
+        ExpenseDTO.Frequency.valueOf(expense.getFrequency().name()),
+        expense.getEndDate(),
+        expense.getNextDueDate(),
+        ExpenseDTO.PaymentMethod.valueOf(expense.getPaymentMethod().name()));
   }
 
   /**
-   * Converts an ExpenseDto to Expense entity.
+   * Converts an ExpenseDTO to Expense entity. Note: The User object should be set separately in
+   * service layer if needed.
    *
    * @param expenseDto the DTO to convert
    * @return the corresponding entity
    */
   public static Expense getFromDto(ExpenseDTO expenseDto) {
-    return new Expense(
-        expenseDto.getId(),
-        expenseDto.getUserId(),
-        expenseDto.getAmount(),
-        expenseDto.getCategory(),
-        expenseDto.getDate(),
-        expenseDto.getDescription());
+    Expense expense = new Expense();
+    expense.setId(expenseDto.getId());
+    expense.setAmount(expenseDto.getAmount());
+    expense.setCategory(expenseDto.getCategory());
+    expense.setDate(expenseDto.getDate());
+    expense.setDescription(expenseDto.getDescription());
+    expense.setFrequency(Expense.Frequency.valueOf(expenseDto.getFrequency().name()));
+    expense.setEndDate(expenseDto.getEndDate());
+    expense.setNextDueDate(expenseDto.getNextDueDate());
+    expense.setPaymentMethod(Expense.PaymentMethod.valueOf(expenseDto.getPaymentMethod().name()));
+    return expense;
   }
 
   /**
-   * Converts a list of ExpenseDto to a list of Expense entities.
+   * Converts a list of ExpenseDTOs to a list of Expense entities.
    *
    * @param expenseDtoList the list of DTOs
    * @return list of entities
@@ -57,7 +67,7 @@ public class ExpenseMapper {
   }
 
   /**
-   * Converts a list of Expense entities to a list of ExpenseDto.
+   * Converts a list of Expense entities to a list of ExpenseDTOs.
    *
    * @param expenseList the list of entities
    * @return list of DTOs
