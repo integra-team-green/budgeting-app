@@ -1,18 +1,19 @@
 package cloudflight.integra.backend.payment;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import cloudflight.integra.backend.dto.ExpenseDTO;
 import cloudflight.integra.backend.dto.PaymentDTO;
-import cloudflight.integra.backend.entity.Frequency;
 import cloudflight.integra.backend.entity.Payment;
-import cloudflight.integra.backend.repository.PaymentRepository;
+import cloudflight.integra.backend.entity.User;
+import cloudflight.integra.backend.service.ExpenseService;
+import cloudflight.integra.backend.service.PaymentService;
+import cloudflight.integra.backend.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,83 +22,182 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+// varianta buna
 @SpringBootTest
 @AutoConfigureMockMvc
 public class PaymentRestControllerTest {
+
   @Autowired private MockMvc mockMvc;
+
   @Autowired private ObjectMapper objectMapper;
-  @Autowired private PaymentRepository paymentRepository;
-  private Payment p1;
-  private Payment p2;
+
+  @Autowired private PaymentService paymentService;
+
+  @Autowired private ExpenseService expenseService;
+
+  @Autowired private UserService userService;
+
+  private User testUser;
+  private ExpenseDTO expense1;
+  private ExpenseDTO expense2;
+  private PaymentDTO payment1;
+  private PaymentDTO payment2;
 
   @BeforeEach
   void setUp() {
-    List<Long> paymentsIds = new ArrayList<>();
-    paymentRepository.findAll().forEach(p -> paymentsIds.add(p.getId()));
-    paymentsIds.forEach(paymentRepository::delete);
-    p1 = new Payment(1L, "Internet", BigDecimal.valueOf(50), Frequency.MONTHLY, new Date(), true);
-    p2 = new Payment(2L, "Gym", BigDecimal.valueOf(150), Frequency.MONTHLY, new Date(), true);
-    paymentRepository.save(p1);
-    paymentRepository.save(p2);
+    // Creează și salvează un user
+    testUser = new User();
+    testUser.setName("Test User");
+    testUser.setEmail("testuser+" + UUID.randomUUID() + "@example.com");
+    testUser.setPassword("password");
+    testUser = userService.addUser(testUser); // userul este acum persistat
+
+    // Creează Expense 1 asociat userului
+    expense1 = new ExpenseDTO();
+    expense1.setCategory("Rent");
+    expense1.setAmount(BigDecimal.valueOf(1000));
+    expense1.setDate(LocalDate.now());
+    expense1.setFrequency(ExpenseDTO.Frequency.MONTHLY);
+    expense1.setPaymentMethod(ExpenseDTO.PaymentMethod.CARD);
+    expense1.setUserId(testUser.getId());
+    expense1 = expenseService.createExpense(expense1);
+
+    // Creează Payment 1 pentru Expense 1
+    payment1 = new PaymentDTO();
+    payment1.setName("September Rent");
+    payment1.setAmount(BigDecimal.valueOf(500));
+    payment1.setStatus(Payment.StatusEnum.PENDING);
+    payment1.setPaymentDate(LocalDate.of(2025, 9, 22));
+    payment1.setExpense(expense1);
+    payment1 = paymentService.addPayment(payment1);
+
+    // Creează Expense 2 asociat userului
+    expense2 = new ExpenseDTO();
+    expense2.setCategory("Utilities");
+    expense2.setAmount(BigDecimal.valueOf(200));
+    expense2.setDate(LocalDate.now());
+    expense2.setFrequency(ExpenseDTO.Frequency.MONTHLY);
+    expense2.setPaymentMethod(ExpenseDTO.PaymentMethod.TRANSFER);
+    expense2.setUserId(testUser.getId());
+    expense2 = expenseService.createExpense(expense2);
+
+    // Creează Payment 2 pentru Expense 2
+    payment2 = new PaymentDTO();
+    payment2.setName("October Utilities");
+    payment2.setAmount(BigDecimal.valueOf(200));
+    payment2.setStatus(Payment.StatusEnum.PAID);
+    payment2.setPaymentDate(LocalDate.of(2025, 10, 1));
+    payment2.setExpense(expense2);
+    payment2 = paymentService.addPayment(payment2);
   }
 
   @Test
   void testGetPaymentById() throws Exception {
     mockMvc
-        .perform(get("/api/v1/payments/1"))
-        .andDo(print())
+        .perform(get("/api/v1/payments/" + payment1.getId()))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.id").value(p1.getId()))
-        .andExpect(jsonPath("$.name").value(p1.getName()))
-        .andExpect(jsonPath("$.amount").value(p1.getAmount()));
-  }
-
-  @Test
-  void testGetPaymentByIdNotFound() throws Exception {
-    mockMvc.perform(get("/api/v1/payments/100")).andDo(print()).andExpect(status().isNotFound());
+        .andExpect(jsonPath("$.id").value(payment1.getId()))
+        .andExpect(jsonPath("$.name").value("September Rent"))
+        .andExpect(jsonPath("$.amount").value(500))
+        .andExpect(jsonPath("$.status").value("PENDING"))
+        .andExpect(jsonPath("$.expense.category").value("Rent"));
   }
 
   @Test
   void testCreatePayment() throws Exception {
-    PaymentDTO paymentDTO = new PaymentDTO();
-    paymentDTO.setName("Netflix");
-    paymentDTO.setAmount(BigDecimal.valueOf(50));
-    paymentDTO.setFrequency(Frequency.MONTHLY);
-    paymentDTO.setIsActive(true);
-    paymentDTO.setNextDueDate(new Date());
+    ExpenseDTO newExpense = new ExpenseDTO();
+    newExpense.setCategory("Netflix");
+    newExpense.setAmount(BigDecimal.valueOf(50));
+    newExpense.setDate(LocalDate.now());
+    newExpense.setFrequency(ExpenseDTO.Frequency.MONTHLY);
+    newExpense.setPaymentMethod(ExpenseDTO.PaymentMethod.CARD);
+    newExpense.setUserId(testUser.getId());
+    newExpense = expenseService.createExpense(newExpense);
+
+    PaymentDTO dto = new PaymentDTO();
+    dto.setName("Netflix Payment");
+    dto.setAmount(BigDecimal.valueOf(50));
+    dto.setPaymentDate(LocalDate.of(2025, 11, 1));
+    dto.setStatus(Payment.StatusEnum.PENDING);
+    dto.setExpense(newExpense);
+
     mockMvc
         .perform(
             post("/api/v1/payments")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(paymentDTO)))
-        .andDo(print())
-        .andExpect(status().isOk())
+                .content(objectMapper.writeValueAsString(dto)))
+        .andExpect(status().isCreated())
         .andExpect(jsonPath("$.id").exists())
-        .andExpect(jsonPath("$.name").value("Netflix"));
+        .andExpect(jsonPath("$.name").value("Netflix Payment"))
+        .andExpect(jsonPath("$.status").value("PENDING"))
+        .andExpect(jsonPath("$.expense.category").value("Netflix"));
   }
 
   @Test
   void testUpdatePayment() throws Exception {
-    PaymentDTO paymentDTO = new PaymentDTO();
-    paymentDTO.setId(1L);
-    paymentDTO.setName("HBO");
-    paymentDTO.setAmount(BigDecimal.valueOf(50));
-    paymentDTO.setFrequency(Frequency.MONTHLY);
-    paymentDTO.setIsActive(true);
-    paymentDTO.setNextDueDate(new Date());
+    PaymentDTO dto = new PaymentDTO();
+    dto.setId(payment1.getId());
+    dto.setName("September Rent Updated");
+    dto.setAmount(BigDecimal.valueOf(550));
+    dto.setPaymentDate(LocalDate.of(2025, 9, 30));
+    dto.setStatus(Payment.StatusEnum.PAID);
+    dto.setExpense(expense1);
+
     mockMvc
         .perform(
-            put("/api/v1/payments/1")
+            put("/api/v1/payments/" + payment1.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(paymentDTO)))
-        .andDo(print())
+                .content(objectMapper.writeValueAsString(dto)))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.name").value("HBO"));
+        .andExpect(jsonPath("$.name").value("September Rent Updated"))
+        .andExpect(jsonPath("$.amount").value(550))
+        .andExpect(jsonPath("$.status").value("PAID"))
+        .andExpect(jsonPath("$.expense.category").value("Rent"));
   }
 
   @Test
   void testDeletePayment() throws Exception {
-    mockMvc.perform(delete("/api/v1/payments/2")).andDo(print()).andExpect(status().isOk());
-    mockMvc.perform(delete("/api/v1/payments/2")).andDo(print()).andExpect(status().isNotFound());
+    mockMvc
+        .perform(delete("/api/v1/payments/" + payment2.getId()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(payment2.getId()))
+        .andExpect(jsonPath("$.name").value("October Utilities"));
+  }
+
+  @Test
+  void testCreatePaymentWithInvalidData() throws Exception {
+    // Creează PaymentDTO invalid (amount null, name gol)
+    PaymentDTO invalidDto = new PaymentDTO();
+    invalidDto.setName(""); // name gol
+    invalidDto.setAmount(null); // amount nul
+    invalidDto.setPaymentDate(null); // data nulă
+    invalidDto.setStatus(null); // status nul
+    invalidDto.setExpense(null); // expense nul
+
+    mockMvc
+        .perform(
+            post("/api/v1/payments")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidDto)))
+        .andExpect(status().isBadRequest()); // se așteaptă cod 400
+  }
+
+  @Test
+  void testUpdatePaymentWithInvalidData() throws Exception {
+    // Creează PaymentDTO invalid pentru update
+    PaymentDTO invalidDto = new PaymentDTO();
+    invalidDto.setId(payment1.getId());
+    invalidDto.setName(""); // name gol
+    invalidDto.setAmount(BigDecimal.valueOf(-100)); // amount negativ
+    invalidDto.setPaymentDate(LocalDate.of(2025, 1, 1)); // data validă
+    invalidDto.setStatus(Payment.StatusEnum.PENDING);
+    invalidDto.setExpense(expense1);
+
+    mockMvc
+        .perform(
+            put("/api/v1/payments/" + payment1.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidDto)))
+        .andExpect(status().isBadRequest()); // se așteaptă cod 400
   }
 }

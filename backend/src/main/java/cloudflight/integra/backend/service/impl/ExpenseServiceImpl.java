@@ -1,63 +1,105 @@
 package cloudflight.integra.backend.service.impl;
 
+import static cloudflight.integra.backend.mapper.ExpenseMapper.getDto;
+
 import cloudflight.integra.backend.dto.ExpenseDTO;
+import cloudflight.integra.backend.entity.Expense;
+import cloudflight.integra.backend.entity.User;
 import cloudflight.integra.backend.entity.validation.ExpenseValidator;
 import cloudflight.integra.backend.exception.NotFoundException;
+import cloudflight.integra.backend.mapper.ExpenseMapper;
 import cloudflight.integra.backend.repository.ExpenseRepository;
+import cloudflight.integra.backend.repository.UserRepository;
 import cloudflight.integra.backend.service.ExpenseService;
-import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-/** Implementation of ExpenseService using in-memory repository. */
+// varianta buna
 @Service
 public class ExpenseServiceImpl implements ExpenseService {
+
   private final ExpenseRepository expenseRepository;
-  private final ExpenseValidator expenseValidation;
+  private final ExpenseValidator expenseValidator;
+
+  @Autowired private UserRepository userRepository;
 
   public ExpenseServiceImpl(
-      ExpenseRepository expenseRepository, ExpenseValidator expenseValidation) {
+      ExpenseRepository expenseRepository, ExpenseValidator expenseValidator) {
     this.expenseRepository = expenseRepository;
-    this.expenseValidation = expenseValidation;
+    this.expenseValidator = expenseValidator;
   }
 
   @Override
-  public ExpenseDTO createExpense(ExpenseDTO expenseDto) {
-    expenseValidation.validate(expenseDto);
-    return expenseRepository.addExpense(expenseDto);
+  @Transactional
+  public ExpenseDTO createExpense(ExpenseDTO dto) {
+    Expense expense = new Expense();
+    expense.setCategory(dto.getCategory());
+    expense.setAmount(dto.getAmount());
+    expense.setDate(dto.getDate());
+
+    expense.setFrequency(Expense.Frequency.valueOf(dto.getFrequency().name()));
+    expense.setPaymentMethod(Expense.PaymentMethod.valueOf(dto.getPaymentMethod().name()));
+
+    User user =
+        userRepository
+            .findById(dto.getUserId())
+            .orElseThrow(() -> new RuntimeException("User not found with id: " + dto.getUserId()));
+    expense.setUser(user);
+
+    Expense savedExpense = expenseRepository.save(expense);
+
+    ExpenseDTO savedDto = new ExpenseDTO();
+    savedDto.setId(savedExpense.getId());
+    savedDto.setCategory(savedExpense.getCategory());
+    savedDto.setAmount(savedExpense.getAmount());
+    savedDto.setDate(savedExpense.getDate());
+    savedDto.setFrequency(ExpenseDTO.Frequency.valueOf(savedExpense.getFrequency().name()));
+    savedDto.setPaymentMethod(
+        ExpenseDTO.PaymentMethod.valueOf(savedExpense.getPaymentMethod().name()));
+    savedDto.setUserId(savedExpense.getUser().getId());
+
+    return savedDto;
   }
 
   @Override
-  public ExpenseDTO updateExpense(Long id, ExpenseDTO updatedExpense) {
-    expenseValidation.validate(updatedExpense);
+  @Transactional(readOnly = true)
+  public Iterable<ExpenseDTO> getAllExpenses() {
+    return ExpenseMapper.getExpenseDtoFromExpense(expenseRepository.findAll());
+  }
 
-    if (updatedExpense.getId() == null || !id.equals(updatedExpense.getId())) {
-      throw new IllegalArgumentException("ID in path and DTO do not match");
+  @Override
+  @Transactional(readOnly = true)
+  public ExpenseDTO getExpense(Long id) {
+    Expense expense =
+        expenseRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException("Expense with id " + id + " not found"));
+    return getDto(expense);
+  }
+
+  @Override
+  @Transactional
+  public void updateExpense(ExpenseDTO expenseDTO) {
+    if (expenseDTO.getId() == null) {
+      throw new IllegalArgumentException("Expense ID must not be null for update");
     }
-    ExpenseDTO existingExpense =
-        expenseRepository
-            .findById(id)
-            .orElseThrow(() -> new NotFoundException("Expense with id " + id + " not found"));
-    return expenseRepository.updateExpense(updatedExpense);
+
+    if (!expenseRepository.existsById(expenseDTO.getId())) {
+      throw new NotFoundException("Expense with id " + expenseDTO.getId() + " not found");
+    }
+
+    Expense expense = ExpenseMapper.getFromDto(expenseDTO);
+    expenseValidator.validate(expense);
+    expenseRepository.save(expense);
   }
 
   @Override
-  public List<ExpenseDTO> findAllByUserId(Long userId) {
-
-    return expenseRepository.findAllByUserId(userId);
-  }
-
-  @Override
-  public ExpenseDTO findById(Long id) {
-    return expenseRepository
-        .findById(id)
-        .orElseThrow(() -> new NotFoundException("Expense with id: " + id + " not found"));
-  }
-
+  @Transactional
   public void deleteExpense(Long id) {
-    ExpenseDTO existing =
-        expenseRepository
-            .findById(id)
-            .orElseThrow(() -> new NotFoundException("Expense with id " + id + " not found"));
+    if (!expenseRepository.existsById(id)) {
+      throw new NotFoundException("Expense with id " + id + " not found");
+    }
     expenseRepository.deleteById(id);
   }
 }

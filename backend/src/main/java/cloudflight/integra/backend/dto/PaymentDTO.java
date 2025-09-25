@@ -1,32 +1,32 @@
 package cloudflight.integra.backend.dto;
 
-import cloudflight.integra.backend.entity.Frequency;
+import cloudflight.integra.backend.entity.Payment;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 
 public class PaymentDTO {
   private Long id;
+  private ExpenseDTO expense;
   private String name;
   private BigDecimal amount;
-  private Frequency frequency;
-  private Date nextDueDate;
-  private Boolean isActive;
+  private Payment.StatusEnum status;
+  private LocalDate paymentDate;
 
   public PaymentDTO() {}
 
   public PaymentDTO(
       Long id,
+      ExpenseDTO expense,
       String name,
       BigDecimal amount,
-      Frequency frequency,
-      Date nextDueDate,
-      Boolean isActive) {
+      Payment.StatusEnum status,
+      LocalDate paymentDate) {
     this.id = id;
+    this.expense = expense;
     this.name = name;
     this.amount = amount;
-    this.frequency = frequency;
-    this.nextDueDate = nextDueDate;
-    this.isActive = isActive;
+    this.status = status;
+    this.paymentDate = paymentDate;
   }
 
   public Long getId() {
@@ -53,27 +53,27 @@ public class PaymentDTO {
     this.amount = amount;
   }
 
-  public Frequency getFrequency() {
-    return frequency;
+  public Payment.StatusEnum getStatus() {
+    return status;
   }
 
-  public void setFrequency(Frequency frequency) {
-    this.frequency = frequency;
+  public void setStatus(Payment.StatusEnum status) {
+    this.status = status;
   }
 
-  public Date getNextDueDate() {
-    return nextDueDate;
+  public LocalDate getPaymentDate() {
+    return paymentDate;
   }
 
-  public void setNextDueDate(Date nextDueDate) {
-    this.nextDueDate = nextDueDate;
+  public void setPaymentDate(LocalDate paymentDate) {
+    this.paymentDate = paymentDate;
   }
 
-  public Boolean getIsActive() {
-    return isActive;
+  public ExpenseDTO getExpense() {
+    return expense;
   }
 
-  public void setIsActive(Boolean isActive) {
-    this.isActive = isActive;
+  public void setExpense(ExpenseDTO expense) {
+    this.expense = expense;
   }
 }

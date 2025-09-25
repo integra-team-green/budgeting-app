@@ -1,44 +1,69 @@
 package cloudflight.integra.backend.entity;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 
+@Entity
+@Table(name = "payment")
 public class Payment {
-  private Long id;
-  private String name;
-  private BigDecimal amount;
-  private Frequency frequency;
-  private Date nextDueDate;
-  private Boolean isActive;
 
-  public Payment(
-      Long id,
-      String name,
-      BigDecimal amount,
-      Frequency frequency,
-      Date nextDueDate,
-      Boolean isActive) {
-    this.id = id;
-    this.name = name;
-    this.amount = amount;
-    this.frequency = frequency;
-    this.nextDueDate = nextDueDate;
-    this.isActive = isActive;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  @OneToOne(optional = false)
+  @JoinColumn(
+      name = "expense_id",
+      nullable = false) // Asigură că fiecare Payment trebuie să aibă un Expense
+  private Expense expense;
+
+  @Column(nullable = false)
+  private String name;
+
+  @Enumerated(EnumType.STRING)
+  private StatusEnum status; // pending, paid, failed
+
+  private LocalDate paymentDate;
+
+  @PositiveOrZero
+  @Column(nullable = false)
+  private BigDecimal amount;
+
+  // Enum pentru status
+  public enum StatusEnum {
+    PENDING,
+    PAID,
+    FAILED
   }
 
+  public Payment(Expense expense, String name, StatusEnum status, LocalDate paymentDate) {
+    this.expense = expense;
+    this.name = name;
+    this.status = status;
+    this.paymentDate = paymentDate;
+  }
+
+  public Payment() {}
+
   public Long getId() {
+
     return id;
   }
 
   public void setId(Long id) {
+
     this.id = id;
   }
 
   public String getName() {
+
     return name;
   }
 
   public void setName(String name) {
+
     this.name = name;
   }
 
@@ -50,27 +75,27 @@ public class Payment {
     this.amount = amount;
   }
 
-  public Frequency getFrequency() {
-    return frequency;
+  public Expense getExpense() {
+    return expense;
   }
 
-  public void setFrequency(Frequency frequency) {
-    this.frequency = frequency;
+  public void setExpense(Expense expense) {
+    this.expense = expense;
   }
 
-  public Date getNextDueDate() {
-    return nextDueDate;
+  public StatusEnum getStatus() {
+    return status;
   }
 
-  public void setNextDueDate(Date nextDueDate) {
-    this.nextDueDate = nextDueDate;
+  public void setStatus(StatusEnum status) {
+    this.status = status;
   }
 
-  public Boolean getIsActive() {
-    return isActive;
+  public LocalDate getPaymentDate() {
+    return paymentDate;
   }
 
-  public void setIsActive(Boolean isActive) {
-    this.isActive = isActive;
+  public void setPaymentDate(LocalDate paymentDate) {
+    this.paymentDate = paymentDate;
   }
 }
