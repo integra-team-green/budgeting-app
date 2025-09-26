@@ -13,7 +13,7 @@ public interface IncomeService {
      *
      * @param income the income to add
      */
-    Income createIncome(Income income);
+    Income createIncome(IncomeDTO income);
 
     /**
      * Returns all Incomes
@@ -35,7 +35,7 @@ public interface IncomeService {
      *
      * @param income the income to be updated
      */
-    void updateIncome(Income income);
+    Income updateIncome(IncomeDTO income);
 
     /**
      * Deletes an Income by its ID

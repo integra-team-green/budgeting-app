@@ -31,8 +31,7 @@ public class IncomeController {
     @PostMapping
     public ResponseEntity<IncomeDTO> createIncome(@RequestBody IncomeDTO dto) {
         log.info("Creating income: {}", dto);
-        Income income = IncomeMapper.toEntity(dto);
-        Income saved = incomeService.createIncome(income);
+        Income saved = incomeService.createIncome(dto);
         return new ResponseEntity<>(IncomeMapper.toDTO(saved), HttpStatus.CREATED);
     }
 
@@ -56,9 +55,8 @@ public class IncomeController {
     @PutMapping("/{id}")
     public ResponseEntity<IncomeDTO> updateIncome(@PathVariable Long id, @RequestBody IncomeDTO dto) {
         log.info("Updating income with id {}", id);
-        Income income = IncomeMapper.toEntity(dto);
-        income.setId(id);
-        incomeService.updateIncome(income);
+        dto.setId(id);
+        Income income=incomeService.updateIncome(dto);
         return new ResponseEntity<>(IncomeMapper.toDTO(income), HttpStatus.OK);
     }
 
