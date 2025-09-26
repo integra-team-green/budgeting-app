@@ -2,14 +2,11 @@ package cloudflight.integra.backend.income;
 
 import cloudflight.integra.backend.dto.IncomeDTO;
 import cloudflight.integra.backend.entity.Frequency;
-import cloudflight.integra.backend.entity.Income;
 import cloudflight.integra.backend.entity.User;
 import cloudflight.integra.backend.exception.NotFoundException;
-import cloudflight.integra.backend.mapper.IncomeMapper;
 import cloudflight.integra.backend.repository.IncomeRepository;
 import cloudflight.integra.backend.repository.UserRepository;
 import cloudflight.integra.backend.service.impl.IncomeServiceImpl;
-import cloudflight.integra.backend.entity.validation.IncomeValidator;
 import cloudflight.integra.backend.entity.validation.ValidationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -59,7 +56,7 @@ class IncomeServiceTest {
         income.setUserId(user1.getId());
         income.setEndDate(null);
 
-        Income i=assertDoesNotThrow(() ->  service.createIncome(income));
+        IncomeDTO i=assertDoesNotThrow(() ->  service.createIncome(income));
         assertNotNull(i.getId(), "ID should be generated automatically");
         System.out.println("Created income ID: " + i.getId());
     }
@@ -155,7 +152,7 @@ class IncomeServiceTest {
         service.createIncome(income1);
         service.createIncome(income2);
 
-        Iterable<Income> all = service.getAllIncomes();
+        Iterable<IncomeDTO> all = service.getAllIncomes();
         long count = StreamSupport.stream(all.spliterator(), false).count();
 
         assertEquals(2, count);
@@ -173,9 +170,9 @@ class IncomeServiceTest {
         income.setDescription("Salary");
         income.setUserId(user1.getId());
         income.setEndDate(null);
-        Income saved= service.createIncome(income);
+        IncomeDTO saved= service.createIncome(income);
 
-        Income found = service.getIncomeById(saved.getId());
+        IncomeDTO found = service.getIncomeById(saved.getId());
         assertEquals(found.getId(), saved.getId());
         assertEquals(0,found.getAmount().compareTo(BigDecimal.valueOf(500)));
         assertEquals(saved.getSource(), found.getSource());
@@ -194,13 +191,13 @@ class IncomeServiceTest {
         income.setDescription("Salary");
         income.setUserId(user1.getId());
         income.setEndDate(null);
-        Income saved=service.createIncome(income);
+        IncomeDTO saved=service.createIncome(income);
 
 
         saved.setAmount(BigDecimal.valueOf(1200));
-        assertDoesNotThrow(() -> service.updateIncome(IncomeMapper.toDTO(saved)));
+        assertDoesNotThrow(() -> service.updateIncome(saved));
 
-        Income updated = service.getIncomeById(saved.getId());
+        IncomeDTO updated = service.getIncomeById(saved.getId());
         assertEquals(0, updated.getAmount().compareTo(BigDecimal.valueOf(1200)));
         System.out.println("Updated income amount: " + updated.getAmount());
     }
@@ -240,7 +237,7 @@ class IncomeServiceTest {
         income1.setDescription("Salary");
         income1.setUserId(user1.getId());
         income1.setEndDate(null);
-        Income saved=service.createIncome(income1);
+        IncomeDTO saved=service.createIncome(income1);
 
         service.deleteIncome(saved.getId());
 

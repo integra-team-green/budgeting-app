@@ -1,7 +1,7 @@
 package cloudflight.integra.backend.service;
 
 import cloudflight.integra.backend.dto.IncomeDTO;
-import cloudflight.integra.backend.entity.Income;
+
 
 
 /**
@@ -13,14 +13,14 @@ public interface IncomeService {
      *
      * @param income the income to add
      */
-    Income createIncome(IncomeDTO income);
+    IncomeDTO createIncome(IncomeDTO income);
 
     /**
      * Returns all Incomes
      *
      * @return an Iterable of all Incomes
      */
-    Iterable<Income> getAllIncomes();
+    Iterable<IncomeDTO> getAllIncomes();
 
     /**
      * Returns an Income by its ID
@@ -28,14 +28,14 @@ public interface IncomeService {
      * @param id the identifier of the Income
      * @return Income with the given id
      */
-    Income getIncomeById(Long id);
+    IncomeDTO getIncomeById(Long id);
 
     /**
      * Updates an Income
      *
      * @param income the income to be updated
      */
-    Income updateIncome(IncomeDTO income);
+    IncomeDTO updateIncome(IncomeDTO income);
 
     /**
      * Deletes an Income by its ID

@@ -12,6 +12,9 @@ import cloudflight.integra.backend.entity.validation.IncomeValidator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Service
 public class IncomeServiceImpl implements IncomeService {
@@ -29,37 +32,43 @@ public class IncomeServiceImpl implements IncomeService {
 
     @Override
     @Transactional
-    public Income createIncome(IncomeDTO incomeDTO) {
+    public IncomeDTO createIncome(IncomeDTO incomeDTO) {
         Income income = IncomeMapper.toEntity(incomeDTO);
         incomeValidator.validate(income);
         User user = userRepo.findById(incomeDTO.getUserId()).get();
         income.setUser(user);
-        return incomeRepo.save(income);
+        return IncomeMapper.toDTO(incomeRepo.save(income));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Iterable<Income> getAllIncomes() {
-        return incomeRepo.findAll();
+    public Iterable<IncomeDTO> getAllIncomes() {
+        List<IncomeDTO> dtos = new ArrayList<>();
+        for (Income income : incomeRepo.findAll()) {
+            dtos.add(IncomeMapper.toDTO(income));
+        }
+
+        return dtos;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Income getIncomeById(Long id) {
+    public IncomeDTO getIncomeById(Long id) {
         if (id == null)
             throw new IllegalArgumentException("Income id must not be null.");
-        return incomeRepo.findById(id).orElseThrow(() -> new NotFoundException("Income not found"));
+        return IncomeMapper.toDTO(incomeRepo.findById(id).orElseThrow(() -> new NotFoundException("Income not found")));
     }
 
     @Override
     @Transactional
-    public Income updateIncome(IncomeDTO incomeDTO) {
+    public IncomeDTO updateIncome(IncomeDTO incomeDTO) {
         Income income = IncomeMapper.toEntity(incomeDTO);
         incomeValidator.validate(income);
         if (incomeRepo.findById(income.getId()).isEmpty()) {
             throw new NotFoundException("Income with id " + income.getId() + " not found for update");
         }
-        return incomeRepo.save(income);
+
+        return IncomeMapper.toDTO(incomeRepo.save(income));
     }
 
     @Override
