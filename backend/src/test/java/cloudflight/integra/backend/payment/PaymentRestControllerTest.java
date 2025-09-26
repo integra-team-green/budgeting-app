@@ -68,7 +68,7 @@ public class PaymentRestControllerTest {
     payment1.setAmount(BigDecimal.valueOf(500));
     payment1.setStatus(Payment.StatusEnum.PENDING);
     payment1.setPaymentDate(LocalDate.of(2025, 9, 22));
-    payment1.setExpense(expense1);
+    payment1.setExpenseId(expense1.getId());
     payment1 = paymentService.addPayment(payment1);
 
     // Creează Expense 2 asociat userului
@@ -87,7 +87,7 @@ public class PaymentRestControllerTest {
     payment2.setAmount(BigDecimal.valueOf(200));
     payment2.setStatus(Payment.StatusEnum.PAID);
     payment2.setPaymentDate(LocalDate.of(2025, 10, 1));
-    payment2.setExpense(expense2);
+    payment2.setExpenseId(expense2.getId());
     payment2 = paymentService.addPayment(payment2);
   }
 
@@ -100,7 +100,7 @@ public class PaymentRestControllerTest {
         .andExpect(jsonPath("$.name").value("September Rent"))
         .andExpect(jsonPath("$.amount").value(500))
         .andExpect(jsonPath("$.status").value("PENDING"))
-        .andExpect(jsonPath("$.expense.category").value("Rent"));
+        .andExpect(jsonPath("$.expenseId").value(expense1.getId()));
   }
 
   @Test
@@ -119,7 +119,7 @@ public class PaymentRestControllerTest {
     dto.setAmount(BigDecimal.valueOf(50));
     dto.setPaymentDate(LocalDate.of(2025, 11, 1));
     dto.setStatus(Payment.StatusEnum.PENDING);
-    dto.setExpense(newExpense);
+    dto.setExpenseId(newExpense.getId());
 
     mockMvc
         .perform(
@@ -130,7 +130,7 @@ public class PaymentRestControllerTest {
         .andExpect(jsonPath("$.id").exists())
         .andExpect(jsonPath("$.name").value("Netflix Payment"))
         .andExpect(jsonPath("$.status").value("PENDING"))
-        .andExpect(jsonPath("$.expense.category").value("Netflix"));
+        .andExpect(jsonPath("$.expenseId").value(newExpense.getId()));
   }
 
   @Test
@@ -141,7 +141,7 @@ public class PaymentRestControllerTest {
     dto.setAmount(BigDecimal.valueOf(550));
     dto.setPaymentDate(LocalDate.of(2025, 9, 30));
     dto.setStatus(Payment.StatusEnum.PAID);
-    dto.setExpense(expense1);
+    dto.setExpenseId(expense1.getId());
 
     mockMvc
         .perform(
@@ -152,7 +152,7 @@ public class PaymentRestControllerTest {
         .andExpect(jsonPath("$.name").value("September Rent Updated"))
         .andExpect(jsonPath("$.amount").value(550))
         .andExpect(jsonPath("$.status").value("PAID"))
-        .andExpect(jsonPath("$.expense.category").value("Rent"));
+        .andExpect(jsonPath("$.expenseId").value(expense1.getId()));
   }
 
   @Test
@@ -166,13 +166,12 @@ public class PaymentRestControllerTest {
 
   @Test
   void testCreatePaymentWithInvalidData() throws Exception {
-    // Creează PaymentDTO invalid (amount null, name gol)
     PaymentDTO invalidDto = new PaymentDTO();
-    invalidDto.setName(""); // name gol
-    invalidDto.setAmount(null); // amount nul
-    invalidDto.setPaymentDate(null); // data nulă
-    invalidDto.setStatus(null); // status nul
-    invalidDto.setExpense(null); // expense nul
+    invalidDto.setName("");
+    invalidDto.setAmount(null);
+    invalidDto.setPaymentDate(null);
+    invalidDto.setStatus(null);
+    invalidDto.setExpenseId(null);
 
     mockMvc
         .perform(
@@ -184,14 +183,13 @@ public class PaymentRestControllerTest {
 
   @Test
   void testUpdatePaymentWithInvalidData() throws Exception {
-    // Creează PaymentDTO invalid pentru update
     PaymentDTO invalidDto = new PaymentDTO();
     invalidDto.setId(payment1.getId());
-    invalidDto.setName(""); // name gol
-    invalidDto.setAmount(BigDecimal.valueOf(-100)); // amount negativ
-    invalidDto.setPaymentDate(LocalDate.of(2025, 1, 1)); // data validă
+    invalidDto.setName("");
+    invalidDto.setAmount(BigDecimal.valueOf(-100));
+    invalidDto.setPaymentDate(LocalDate.of(2025, 1, 1));
     invalidDto.setStatus(Payment.StatusEnum.PENDING);
-    invalidDto.setExpense(expense1);
+    invalidDto.setExpenseId(expense1.getId());
 
     mockMvc
         .perform(

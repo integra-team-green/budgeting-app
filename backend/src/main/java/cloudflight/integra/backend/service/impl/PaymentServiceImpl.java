@@ -5,7 +5,6 @@ import cloudflight.integra.backend.entity.Payment;
 import cloudflight.integra.backend.entity.validation.PaymentValidator;
 import cloudflight.integra.backend.exception.NotFoundException;
 import cloudflight.integra.backend.mapper.PaymentMapper;
-import cloudflight.integra.backend.repository.ExpenseRepository;
 import cloudflight.integra.backend.repository.PaymentRepository;
 import cloudflight.integra.backend.service.PaymentService;
 import java.util.List;
@@ -17,15 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class PaymentServiceImpl implements PaymentService {
 
   private final PaymentRepository dbPaymentRepository;
-  private final ExpenseRepository expenseRepository;
   private final PaymentValidator paymentValidator;
 
   public PaymentServiceImpl(
-      PaymentRepository dbPaymentRepository,
-      ExpenseRepository expenseRepository,
-      PaymentValidator paymentValidator) {
+      PaymentRepository dbPaymentRepository, PaymentValidator paymentValidator) {
     this.dbPaymentRepository = dbPaymentRepository;
-    this.expenseRepository = expenseRepository;
     this.paymentValidator = paymentValidator;
   }
 
@@ -34,7 +29,7 @@ public class PaymentServiceImpl implements PaymentService {
   public PaymentDTO addPayment(PaymentDTO paymentDTO) {
     paymentValidator.validate(paymentDTO);
 
-    Payment payment = PaymentMapper.getFromDTO(paymentDTO, expenseRepository);
+    Payment payment = PaymentMapper.getFromDTO(paymentDTO);
     payment = dbPaymentRepository.save(payment);
 
     return PaymentMapper.getDTO(payment);
@@ -59,7 +54,7 @@ public class PaymentServiceImpl implements PaymentService {
       throw new NotFoundException("Payment not found with id: " + paymentDTO.getId());
     }
 
-    Payment payment = PaymentMapper.getFromDTO(paymentDTO, expenseRepository);
+    Payment payment = PaymentMapper.getFromDTO(paymentDTO);
     payment = dbPaymentRepository.save(payment);
 
     return PaymentMapper.getDTO(payment);
