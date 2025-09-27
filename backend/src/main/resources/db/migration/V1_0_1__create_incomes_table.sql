@@ -7,6 +7,6 @@ CREATE TABLE Incomes
     date        DATE         NOT NULL,
     description VARCHAR(255),
     frequency   VARCHAR(255) NOT NULL,
-    end_date    DATE
-   -- CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES Users (id)
+    end_date    DATE,
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES Users (id)
 )
