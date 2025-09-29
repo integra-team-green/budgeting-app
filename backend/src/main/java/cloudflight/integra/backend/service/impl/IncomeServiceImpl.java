@@ -65,7 +65,7 @@ public class IncomeServiceImpl implements IncomeService {
     if (incomeRepo.findById(income.getId()).isEmpty()) {
       throw new NotFoundException("Income with id " + income.getId() + " not found for update");
     }
-    User user = userRepo.findById(incomeDTO.getUserId()).get();
+    User user = userRepo.findById(incomeDTO.getUserId()).orElse(null);
     income.setUser(user);
 
     return IncomeMapper.toDTO(incomeRepo.save(income));
