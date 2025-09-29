@@ -2,9 +2,13 @@ package cloudflight.integra.backend.controller.problem;
 
 import cloudflight.integra.backend.entity.validation.ValidationException;
 import cloudflight.integra.backend.exception.NotFoundException;
+import java.util.List;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 @ControllerAdvice(annotations = UserApiErrorResponses.class)
@@ -49,5 +53,27 @@ public class UserRestExceptionHandler {
   public ResponseEntity<String> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
         .body("Data integrity violation: " + ex.getMessage());
+  }
+
+  @ExceptionHandler(BadCredentialsException.class)
+  public ResponseEntity<String> handleBadCredentials(BadCredentialsException ex) {
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        .body("Invalid credentials" + ex.getMessage());
+  }
+
+  @ExceptionHandler(AuthenticationException.class)
+  public ResponseEntity<String> handleAuthenticationException(AuthenticationException ex) {
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        .body("Authentication failed: " + ex.getMessage());
+  }
+
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  public ResponseEntity<String> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
+    List<String> errors =
+        ex.getBindingResult().getFieldErrors().stream()
+            .map(error -> error.getField() + ": " + error.getDefaultMessage())
+            .toList();
+
+    return ResponseEntity.badRequest().body(String.join(", ", errors));
   }
 }

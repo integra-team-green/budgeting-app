@@ -2,9 +2,10 @@ package cloudflight.integra.backend.service;
 
 import cloudflight.integra.backend.entity.User;
 import java.util.Collection;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 /** Service interface for managing User entities. */
-public interface UserService {
+public interface UserService extends UserDetailsService {
   /**
    * Adds a new user to the system.
    *
