@@ -42,4 +42,5 @@ public interface ExpenseService {
    * @param id the identifier of the Expense
    */
   void deleteExpense(Long id);
+
 }

@@ -21,58 +21,73 @@ public class ExpenseMapper {
    * @param expense the entity to convert
    * @return the corresponding DTO
    */
-  public static ExpenseDTO getDto(Expense expense) {
-    return new ExpenseDTO(
-        expense.getId(),
-        expense.getUser().getId(),
-        expense.getAmount(),
-        expense.getCategory(),
-        expense.getDate(),
-        expense.getDescription(),
-        ExpenseDTO.Frequency.valueOf(expense.getFrequency().name()),
-        expense.getEndDate(),
-        expense.getNextDueDate(),
-        ExpenseDTO.PaymentMethod.valueOf(expense.getPaymentMethod().name()));
+  public static ExpenseDTO toDTO(Expense expense) {
+    ExpenseDTO dto = new ExpenseDTO();
+    dto.setId(expense.getId());
+    dto.setUserId(expense.getUserId());
+    dto.setAmount(expense.getAmount());
+    dto.setCategory(expense.getCategory());
+    dto.setDate(expense.getDate());
+    dto.setDescription(expense.getDescription());
+
+    dto.setFrequency(ExpenseDTO.Frequency.valueOf(expense.getFrequency().name()));
+
+    dto.setPaymentMethod(ExpenseDTO.PaymentMethod.valueOf(expense.getPaymentMethod().name()));
+
+    dto.setEndDate(expense.getEndDate());
+    dto.setNextDueDate(expense.getNextDueDate());
+    return dto;
   }
 
   /**
    * Converts an ExpenseDTO to Expense entity. Note: The User object should be set separately in
    * service layer if needed.
    *
-   * @param expenseDto the DTO to convert
+   * @param dto the DTO to convert
    * @return the corresponding entity
    */
-  public static Expense getFromDto(ExpenseDTO expenseDto) {
+  public static Expense toEntity(ExpenseDTO dto) {
     Expense expense = new Expense();
-    expense.setId(expenseDto.getId());
-    expense.setAmount(expenseDto.getAmount());
-    expense.setCategory(expenseDto.getCategory());
-    expense.setDate(expenseDto.getDate());
-    expense.setDescription(expenseDto.getDescription());
-    expense.setFrequency(Expense.Frequency.valueOf(expenseDto.getFrequency().name()));
-    expense.setEndDate(expenseDto.getEndDate());
-    expense.setNextDueDate(expenseDto.getNextDueDate());
-    expense.setPaymentMethod(Expense.PaymentMethod.valueOf(expenseDto.getPaymentMethod().name()));
+    expense.setId(dto.getId());
+    expense.setUserId(dto.getUserId());
+    expense.setAmount(dto.getAmount());
+    expense.setCategory(dto.getCategory());
+    expense.setDate(dto.getDate());
+    expense.setDescription(dto.getDescription());
+
+    if (dto.getFrequency() != null) {
+      expense.setFrequency(Expense.Frequency.valueOf(dto.getFrequency().name()));
+    } else {
+      expense.setFrequency(null);
+    }
+
+    if (dto.getPaymentMethod() != null) {
+      expense.setPaymentMethod(Expense.PaymentMethod.valueOf(dto.getPaymentMethod().name()));
+    } else {
+      expense.setPaymentMethod(null);
+    }
+    expense.setEndDate(dto.getEndDate());
+    expense.setNextDueDate(dto.getNextDueDate());
     return expense;
   }
 
   /**
    * Converts a list of ExpenseDTOs to a list of Expense entities.
    *
-   * @param expenseDtoList the list of DTOs
+   * @param dtoList the list of DTOs
    * @return list of entities
    */
-  public static List<Expense> getExpenseFromDto(List<ExpenseDTO> expenseDtoList) {
-    return expenseDtoList.stream().map(ExpenseMapper::getFromDto).collect(Collectors.toList());
+  public static List<Expense> toEntityList(List<ExpenseDTO> dtoList) {
+    return dtoList.stream().map(ExpenseMapper::toEntity).collect(Collectors.toList());
   }
 
   /**
    * Converts a list of Expense entities to a list of ExpenseDTOs.
    *
-   * @param expenseList the list of entities
+   * @param entityList the list of entities
    * @return list of DTOs
    */
-  public static List<ExpenseDTO> getExpenseDtoFromExpense(List<Expense> expenseList) {
-    return expenseList.stream().map(ExpenseMapper::getDto).collect(Collectors.toList());
+  public static List<ExpenseDTO> toDTOList(List<Expense> entityList) {
+    return entityList.stream().map(ExpenseMapper::toDTO).collect(Collectors.toList());
   }
 }
