@@ -22,9 +22,9 @@ public class ExpenseServiceImpl implements ExpenseService {
   private final UserRepository userRepository;
 
   public ExpenseServiceImpl(
-          ExpenseRepository expenseRepository,
-          ExpenseValidator expenseValidator,
-          UserRepository userRepository) {
+      ExpenseRepository expenseRepository,
+      ExpenseValidator expenseValidator,
+      UserRepository userRepository) {
     this.expenseRepository = expenseRepository;
     this.expenseValidator = expenseValidator;
     this.userRepository = userRepository;
@@ -33,8 +33,11 @@ public class ExpenseServiceImpl implements ExpenseService {
   @Override
   @Transactional
   public ExpenseDTO createExpense(ExpenseDTO dto) {
-    User user = userRepository.findById(dto.getUserId())
-            .orElseThrow(() -> new NotFoundException("User with id " + dto.getUserId() + " not found"));
+    User user =
+        userRepository
+            .findById(dto.getUserId())
+            .orElseThrow(
+                () -> new NotFoundException("User with id " + dto.getUserId() + " not found"));
 
     Expense expense = ExpenseMapper.toEntity(dto);
     expense.setUser(user);
@@ -54,7 +57,9 @@ public class ExpenseServiceImpl implements ExpenseService {
   @Override
   @Transactional(readOnly = true)
   public ExpenseDTO getExpense(Long id) {
-    Expense expense = expenseRepository.findById(id)
+    Expense expense =
+        expenseRepository
+            .findById(id)
             .orElseThrow(() -> new NotFoundException("Expense with id " + id + " not found"));
     return toDTO(expense);
   }
@@ -62,11 +67,19 @@ public class ExpenseServiceImpl implements ExpenseService {
   @Override
   @Transactional
   public void updateExpense(ExpenseDTO expenseDTO) {
-    Expense existingExpense = expenseRepository.findById(expenseDTO.getId())
-            .orElseThrow(() -> new NotFoundException("Expense with id " + expenseDTO.getId() + " not found"));
+    Expense existingExpense =
+        expenseRepository
+            .findById(expenseDTO.getId())
+            .orElseThrow(
+                () ->
+                    new NotFoundException("Expense with id " + expenseDTO.getId() + " not found"));
 
-    User user = userRepository.findById(expenseDTO.getUserId())
-            .orElseThrow(() -> new NotFoundException("User with id " + expenseDTO.getUserId() + " not found"));
+    User user =
+        userRepository
+            .findById(expenseDTO.getUserId())
+            .orElseThrow(
+                () ->
+                    new NotFoundException("User with id " + expenseDTO.getUserId() + " not found"));
 
     Expense expense = ExpenseMapper.toEntity(expenseDTO);
     expense.setUser(user);
@@ -76,7 +89,6 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     expenseRepository.save(expense);
   }
-
 
   @Override
   @Transactional

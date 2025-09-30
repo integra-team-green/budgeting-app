@@ -19,7 +19,6 @@ public class Expense {
   @Column(name = "user_id", insertable = false, updatable = false)
   private Long userId;
 
-
   @Column(nullable = false, precision = 15, scale = 2)
   private BigDecimal amount;
 
@@ -53,17 +52,16 @@ public class Expense {
   private Payment payment;
 
   public Expense(
-          Long id,
-          Long userId,
-          BigDecimal amount,
-          String category,
-          LocalDate date,
-          String description,
-          Frequency frequency,
-          LocalDate endDate,
-          LocalDate nextDueDate,
-          PaymentMethod paymentMethod
-  ) {
+      Long id,
+      Long userId,
+      BigDecimal amount,
+      String category,
+      LocalDate date,
+      String description,
+      Frequency frequency,
+      LocalDate endDate,
+      LocalDate nextDueDate,
+      PaymentMethod paymentMethod) {
     this.id = id;
     this.userId = userId;
     this.amount = amount;
@@ -77,17 +75,16 @@ public class Expense {
   }
 
   public Expense(
-          Long id,
-          User user,
-          BigDecimal amount,
-          String category,
-          LocalDate date,
-          String description,
-          Frequency frequency,
-          LocalDate endDate,
-          LocalDate nextDueDate,
-          PaymentMethod paymentMethod
-  ) {
+      Long id,
+      User user,
+      BigDecimal amount,
+      String category,
+      LocalDate date,
+      String description,
+      Frequency frequency,
+      LocalDate endDate,
+      LocalDate nextDueDate,
+      PaymentMethod paymentMethod) {
     this.id = id;
     this.user = user;
     this.amount = amount;
@@ -200,17 +197,28 @@ public class Expense {
 
   @Override
   public String toString() {
-    return "Expense{" +
-            "id=" + id +
-            ", amount=" + amount +
-            ", category='" + category + '\'' +
-            ", date=" + date +
-            ", description='" + description + '\'' +
-            ", frequency=" + frequency +
-            ", endDate=" + endDate +
-            ", nextDueDate=" + nextDueDate +
-            ", paymentMethod=" + paymentMethod +
-            '}';
+    return "Expense{"
+        + "id="
+        + id
+        + ", amount="
+        + amount
+        + ", category='"
+        + category
+        + '\''
+        + ", date="
+        + date
+        + ", description='"
+        + description
+        + '\''
+        + ", frequency="
+        + frequency
+        + ", endDate="
+        + endDate
+        + ", nextDueDate="
+        + nextDueDate
+        + ", paymentMethod="
+        + paymentMethod
+        + '}';
   }
 
   public enum Frequency {

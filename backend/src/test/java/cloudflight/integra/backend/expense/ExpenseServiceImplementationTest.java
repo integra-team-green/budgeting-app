@@ -1,5 +1,10 @@
 package cloudflight.integra.backend.expense;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 import cloudflight.integra.backend.dto.ExpenseDTO;
 import cloudflight.integra.backend.entity.Expense;
 import cloudflight.integra.backend.entity.User;
@@ -9,6 +14,10 @@ import cloudflight.integra.backend.exception.NotFoundException;
 import cloudflight.integra.backend.repository.ExpenseRepository;
 import cloudflight.integra.backend.repository.UserRepository;
 import cloudflight.integra.backend.service.impl.ExpenseServiceImpl;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,30 +25,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 class ExpenseServiceImplementationTest {
 
-  @Mock
-  private ExpenseRepository expenseRepository;
+  @Mock private ExpenseRepository expenseRepository;
 
-  @Mock
-  private ExpenseValidator expenseValidator;
+  @Mock private ExpenseValidator expenseValidator;
 
-  @Mock
-  private UserRepository userRepository;
+  @Mock private UserRepository userRepository;
 
-  @InjectMocks
-  private ExpenseServiceImpl expenseService;
+  @InjectMocks private ExpenseServiceImpl expenseService;
 
   private User testUser;
   private ExpenseDTO testExpenseDTO;
@@ -51,7 +46,8 @@ class ExpenseServiceImplementationTest {
     testUser.setId(1L);
     testUser.setEmail("test@example.com");
 
-    testExpenseDTO = new ExpenseDTO(
+    testExpenseDTO =
+        new ExpenseDTO(
             null,
             1L,
             new BigDecimal("100.50"),
@@ -61,10 +57,10 @@ class ExpenseServiceImplementationTest {
             ExpenseDTO.Frequency.ONE_TIME,
             null,
             null,
-            ExpenseDTO.PaymentMethod.CARD
-    );
+            ExpenseDTO.PaymentMethod.CARD);
 
-    testExpense = new Expense(
+    testExpense =
+        new Expense(
             1L,
             testUser,
             new BigDecimal("100.50"),
@@ -74,14 +70,14 @@ class ExpenseServiceImplementationTest {
             Expense.Frequency.ONE_TIME,
             null,
             null,
-            Expense.PaymentMethod.CARD
-    );
+            Expense.PaymentMethod.CARD);
     testExpense.setUserId(1L); // Set userId for mapper
   }
 
   @Test
   void createExpense_Success() {
-    Expense savedExpense = new Expense(
+    Expense savedExpense =
+        new Expense(
             1L,
             testUser,
             new BigDecimal("100.50"),
@@ -91,8 +87,7 @@ class ExpenseServiceImplementationTest {
             Expense.Frequency.ONE_TIME,
             null,
             null,
-            Expense.PaymentMethod.CARD
-    );
+            Expense.PaymentMethod.CARD);
     savedExpense.setUserId(1L);
 
     when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
@@ -117,8 +112,8 @@ class ExpenseServiceImplementationTest {
     when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
     assertThatThrownBy(() -> expenseService.createExpense(testExpenseDTO))
-            .isInstanceOf(NotFoundException.class)
-            .hasMessage("User with id 1 not found");
+        .isInstanceOf(NotFoundException.class)
+        .hasMessage("User with id 1 not found");
 
     verify(userRepository, times(1)).findById(1L);
     verify(expenseRepository, never()).save(any(Expense.class));
@@ -129,11 +124,12 @@ class ExpenseServiceImplementationTest {
   void createExpense_ValidationFails() {
     when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
     doThrow(new ValidationException(List.of("Amount must be greater than 0")))
-            .when(expenseValidator).validate(any(Expense.class));
+        .when(expenseValidator)
+        .validate(any(Expense.class));
 
     assertThatThrownBy(() -> expenseService.createExpense(testExpenseDTO))
-            .isInstanceOf(ValidationException.class)
-            .hasMessageContaining("Amount must be greater than 0");
+        .isInstanceOf(ValidationException.class)
+        .hasMessageContaining("Amount must be greater than 0");
 
     verify(userRepository, times(1)).findById(1L);
     verify(expenseValidator, times(1)).validate(any(Expense.class));
@@ -159,15 +155,16 @@ class ExpenseServiceImplementationTest {
     when(expenseRepository.findById(99L)).thenReturn(Optional.empty());
 
     assertThatThrownBy(() -> expenseService.getExpense(99L))
-            .isInstanceOf(NotFoundException.class)
-            .hasMessage("Expense with id 99 not found");
+        .isInstanceOf(NotFoundException.class)
+        .hasMessage("Expense with id 99 not found");
 
     verify(expenseRepository, times(1)).findById(99L);
   }
 
   @Test
   void getAllExpenses_Success() {
-    Expense expense2 = new Expense(
+    Expense expense2 =
+        new Expense(
             2L,
             testUser,
             new BigDecimal("50.00"),
@@ -177,8 +174,7 @@ class ExpenseServiceImplementationTest {
             Expense.Frequency.ONE_TIME,
             null,
             null,
-            Expense.PaymentMethod.CARD
-    );
+            Expense.PaymentMethod.CARD);
 
     when(expenseRepository.findAll()).thenReturn(List.of(testExpense, expense2));
 
@@ -190,7 +186,8 @@ class ExpenseServiceImplementationTest {
 
   @Test
   void updateExpense_Success() {
-    ExpenseDTO updateDTO = new ExpenseDTO(
+    ExpenseDTO updateDTO =
+        new ExpenseDTO(
             1L,
             1L,
             new BigDecimal("200.00"),
@@ -200,8 +197,7 @@ class ExpenseServiceImplementationTest {
             ExpenseDTO.Frequency.MONTHLY,
             null,
             null,
-            ExpenseDTO.PaymentMethod.TRANSFER
-    );
+            ExpenseDTO.PaymentMethod.TRANSFER);
 
     when(expenseRepository.findById(1L)).thenReturn(Optional.of(testExpense));
     when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
@@ -222,8 +218,8 @@ class ExpenseServiceImplementationTest {
     when(expenseRepository.findById(99L)).thenReturn(Optional.empty());
 
     assertThatThrownBy(() -> expenseService.updateExpense(testExpenseDTO))
-            .isInstanceOf(NotFoundException.class)
-            .hasMessage("Expense with id 99 not found");
+        .isInstanceOf(NotFoundException.class)
+        .hasMessage("Expense with id 99 not found");
 
     verify(expenseRepository, times(1)).findById(99L);
     verify(expenseRepository, never()).save(any(Expense.class));
@@ -245,8 +241,8 @@ class ExpenseServiceImplementationTest {
     when(expenseRepository.existsById(99L)).thenReturn(false);
 
     assertThatThrownBy(() -> expenseService.deleteExpense(99L))
-            .isInstanceOf(NotFoundException.class)
-            .hasMessage("Expense with id 99 not found");
+        .isInstanceOf(NotFoundException.class)
+        .hasMessage("Expense with id 99 not found");
 
     verify(expenseRepository, times(1)).existsById(99L);
     verify(expenseRepository, never()).deleteById(anyLong());

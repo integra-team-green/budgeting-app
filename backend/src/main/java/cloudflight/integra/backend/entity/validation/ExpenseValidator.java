@@ -43,7 +43,6 @@ public class ExpenseValidator implements Validator<Expense> {
       errors.add("Next due date cannot be before the expense date");
     }
 
-
     if (!errors.isEmpty()) {
       throw new ValidationException(errors);
     }
