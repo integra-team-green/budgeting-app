@@ -3,7 +3,6 @@ package cloudflight.integra.backend.entity;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Objects;
 
 @Entity
 @Table(name = "Expense")
@@ -13,9 +12,12 @@ public class Expense {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @ManyToOne(optional = false, fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "user_id", nullable = false)
   private User user;
+
+  @Column(name = "user_id", insertable = false, updatable = false)
+  private Long userId;
 
   @Column(nullable = false, precision = 15, scale = 2)
   private BigDecimal amount;
@@ -51,6 +53,29 @@ public class Expense {
 
   public Expense(
       Long id,
+      Long userId,
+      BigDecimal amount,
+      String category,
+      LocalDate date,
+      String description,
+      Frequency frequency,
+      LocalDate endDate,
+      LocalDate nextDueDate,
+      PaymentMethod paymentMethod) {
+    this.id = id;
+    this.userId = userId;
+    this.amount = amount;
+    this.category = category;
+    this.date = date;
+    this.description = description;
+    this.frequency = frequency;
+    this.endDate = endDate;
+    this.nextDueDate = nextDueDate;
+    this.paymentMethod = paymentMethod;
+  }
+
+  public Expense(
+      Long id,
       User user,
       BigDecimal amount,
       String category,
@@ -59,8 +84,7 @@ public class Expense {
       Frequency frequency,
       LocalDate endDate,
       LocalDate nextDueDate,
-      PaymentMethod paymentMethod,
-      Payment payment) {
+      PaymentMethod paymentMethod) {
     this.id = id;
     this.user = user;
     this.amount = amount;
@@ -71,7 +95,6 @@ public class Expense {
     this.endDate = endDate;
     this.nextDueDate = nextDueDate;
     this.paymentMethod = paymentMethod;
-    this.payment = payment;
   }
 
   public Expense() {}
@@ -90,6 +113,14 @@ public class Expense {
 
   public void setUser(User user) {
     this.user = user;
+  }
+
+  public Long getUserId() {
+    return userId;
+  }
+
+  public void setUserId(Long userId) {
+    this.userId = userId;
   }
 
   public BigDecimal getAmount() {
@@ -116,14 +147,6 @@ public class Expense {
     this.date = date;
   }
 
-  public Frequency getFrequency() {
-    return frequency;
-  }
-
-  public void setFrequency(Frequency frequency) {
-    this.frequency = frequency;
-  }
-
   public String getDescription() {
     return description;
   }
@@ -132,12 +155,12 @@ public class Expense {
     this.description = description;
   }
 
-  public LocalDate getNextDueDate() {
-    return nextDueDate;
+  public Frequency getFrequency() {
+    return frequency;
   }
 
-  public void setNextDueDate(LocalDate nextDueDate) {
-    this.nextDueDate = nextDueDate;
+  public void setFrequency(Frequency frequency) {
+    this.frequency = frequency;
   }
 
   public LocalDate getEndDate() {
@@ -146,6 +169,14 @@ public class Expense {
 
   public void setEndDate(LocalDate endDate) {
     this.endDate = endDate;
+  }
+
+  public LocalDate getNextDueDate() {
+    return nextDueDate;
+  }
+
+  public void setNextDueDate(LocalDate nextDueDate) {
+    this.nextDueDate = nextDueDate;
   }
 
   public PaymentMethod getPaymentMethod() {
@@ -165,45 +196,10 @@ public class Expense {
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (o == null || getClass() != o.getClass()) return false;
-    Expense expense = (Expense) o;
-    return Objects.equals(id, expense.id)
-        && Objects.equals(user, expense.user)
-        && Objects.equals(amount, expense.amount)
-        && Objects.equals(category, expense.category)
-        && Objects.equals(date, expense.date)
-        && Objects.equals(description, expense.description)
-        && frequency == expense.frequency
-        && Objects.equals(endDate, expense.endDate)
-        && Objects.equals(nextDueDate, expense.nextDueDate)
-        && paymentMethod == expense.paymentMethod
-        && Objects.equals(payment, expense.payment);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(
-        id,
-        user,
-        amount,
-        category,
-        date,
-        description,
-        frequency,
-        endDate,
-        nextDueDate,
-        paymentMethod,
-        payment);
-  }
-
-  @Override
   public String toString() {
     return "Expense{"
         + "id="
         + id
-        + ", user="
-        + user
         + ", amount="
         + amount
         + ", category='"
@@ -222,8 +218,6 @@ public class Expense {
         + nextDueDate
         + ", paymentMethod="
         + paymentMethod
-        + ", payment="
-        + payment
         + '}';
   }
 
