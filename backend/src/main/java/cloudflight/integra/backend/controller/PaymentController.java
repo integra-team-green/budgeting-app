@@ -36,7 +36,7 @@ public class PaymentController {
 
   @PostMapping
   public ResponseEntity<PaymentDTO> createPayment(@Valid @RequestBody PaymentDTO paymentDto) {
-    Long expenseId = (paymentDto.getExpense() != null) ? paymentDto.getExpense().getId() : null;
+    Long expenseId = paymentDto.getExpenseId();
     log.info("Creating new payment for expenseId={}", expenseId);
 
     PaymentDTO created = paymentService.addPayment(paymentDto);

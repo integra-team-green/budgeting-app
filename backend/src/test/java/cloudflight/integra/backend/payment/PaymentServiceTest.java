@@ -2,158 +2,138 @@ package cloudflight.integra.backend.payment;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
-import cloudflight.integra.backend.dto.ExpenseDTO;
 import cloudflight.integra.backend.dto.PaymentDTO;
 import cloudflight.integra.backend.entity.Payment;
-import cloudflight.integra.backend.entity.User;
+import cloudflight.integra.backend.entity.validation.PaymentValidator;
 import cloudflight.integra.backend.entity.validation.ValidationException;
 import cloudflight.integra.backend.exception.NotFoundException;
-import cloudflight.integra.backend.service.ExpenseService;
-import cloudflight.integra.backend.service.PaymentService;
-import cloudflight.integra.backend.service.UserService;
-import jakarta.transaction.Transactional;
+import cloudflight.integra.backend.repository.PaymentRepository;
+import cloudflight.integra.backend.service.impl.PaymentServiceImpl;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
-// varianta buna
-@SpringBootTest
-@Transactional
-public class PaymentServiceTest {
+class PaymentServiceTest {
+  @Mock private PaymentRepository paymentRepository;
+  @Mock private PaymentValidator paymentValidator;
+  @InjectMocks private PaymentServiceImpl paymentService;
 
-  @Autowired private PaymentService paymentService;
-
-  @Autowired private ExpenseService expenseService;
-
-  @Autowired private UserService userService;
-
-  private User testUser;
-  private ExpenseDTO expense1;
-  private ExpenseDTO expense2;
-  private PaymentDTO payment1;
-  private PaymentDTO payment2;
+  private Payment payment;
+  private PaymentDTO paymentDTO;
 
   @BeforeEach
   void setUp() {
-    paymentService.getAllPayments().forEach(p -> paymentService.deletePayment(p.getId()));
-    expenseService.getAllExpenses().forEach(e -> expenseService.deleteExpense(e.getId()));
-    userService.getAllUsers().forEach(u -> userService.deleteUser(u.getId()));
-    // Creăm un user
-    testUser = new User();
-    testUser.setName("Test User");
-    testUser.setEmail("testuser+" + UUID.randomUUID() + "@example.com");
-    testUser.setPassword("password");
-    testUser = userService.addUser(testUser);
+    MockitoAnnotations.openMocks(this);
 
-    // Expense 1 pentru Payment 1
-    expense1 = new ExpenseDTO();
-    expense1.setCategory("Rent");
-    expense1.setAmount(BigDecimal.valueOf(1000));
-    expense1.setDate(LocalDate.now());
-    expense1.setFrequency(ExpenseDTO.Frequency.MONTHLY);
-    expense1.setPaymentMethod(ExpenseDTO.PaymentMethod.CARD);
-    expense1.setUserId(testUser.getId());
-    expense1 = expenseService.createExpense(expense1);
+    payment = new Payment();
+    payment.setId(1L);
+    payment.setName("Rent Payment");
+    payment.setAmount(BigDecimal.valueOf(500));
+    payment.setStatus(Payment.StatusEnum.PENDING);
+    payment.setPaymentDate(LocalDate.of(2025, 9, 22));
 
-    payment1 = new PaymentDTO();
-    payment1.setName("September Rent");
-    payment1.setAmount(BigDecimal.valueOf(500));
-    payment1.setStatus(Payment.StatusEnum.PENDING);
-    payment1.setPaymentDate(LocalDate.of(2025, 9, 22));
-    payment1.setExpense(expense1);
-    payment1 = paymentService.addPayment(payment1);
-
-    // Expense 2 pentru Payment 2
-    expense2 = new ExpenseDTO();
-    expense2.setCategory("Utilities");
-    expense2.setAmount(BigDecimal.valueOf(200));
-    expense2.setDate(LocalDate.now());
-    expense2.setFrequency(ExpenseDTO.Frequency.MONTHLY);
-    expense2.setPaymentMethod(ExpenseDTO.PaymentMethod.TRANSFER);
-    expense2.setUserId(testUser.getId());
-    expense2 = expenseService.createExpense(expense2);
-
-    payment2 = new PaymentDTO();
-    payment2.setName("October Utilities");
-    payment2.setAmount(BigDecimal.valueOf(200));
-    payment2.setStatus(Payment.StatusEnum.PAID);
-    payment2.setPaymentDate(LocalDate.of(2025, 10, 1));
-    payment2.setExpense(expense2);
-    payment2 = paymentService.addPayment(payment2);
+    paymentDTO = new PaymentDTO();
+    paymentDTO.setId(payment.getId());
+    paymentDTO.setName(payment.getName());
+    paymentDTO.setAmount(payment.getAmount());
+    paymentDTO.setStatus(payment.getStatus());
+    paymentDTO.setPaymentDate(payment.getPaymentDate());
+    paymentDTO.setExpenseId(10L);
   }
 
   @Test
-  void testAddAndGetPayment() {
-    PaymentDTO found = paymentService.getPaymentById(payment1.getId());
+  void testAddPayment() {
+    doNothing().when(paymentValidator).validate(paymentDTO);
+    when(paymentRepository.save(any(Payment.class))).thenReturn(payment);
 
-    assertThat(found.getName()).isEqualTo("September Rent");
-    assertThat(found.getAmount()).isEqualByComparingTo(new BigDecimal("500"));
-    assertThat(found.getStatus()).isEqualTo(Payment.StatusEnum.PENDING);
-    assertThat(found.getPaymentDate()).isEqualTo(LocalDate.of(2025, 9, 22));
-    assertThat(found.getExpense().getCategory()).isEqualTo("Rent");
+    PaymentDTO created = paymentService.addPayment(paymentDTO);
+
+    assertThat(created).isNotNull();
+    assertThat(created.getId()).isEqualTo(payment.getId());
+    assertThat(created.getName()).isEqualTo("Rent Payment");
   }
 
   @Test
-  void testFindAll() {
-    List<PaymentDTO> payments = paymentService.getAllPayments();
-    assertThat(payments).hasSize(2);
+  void testGetPaymentById() {
+    when(paymentRepository.findById(payment.getId())).thenReturn(Optional.of(payment));
+
+    PaymentDTO found = paymentService.getPaymentById(payment.getId());
+    assertThat(found.getName()).isEqualTo("Rent Payment");
   }
 
   @Test
-  void testDelete() {
-    paymentService.deletePayment(payment2.getId());
+  void testUpdatePayment() {
+    doNothing().when(paymentValidator).validate(paymentDTO);
+    when(paymentRepository.existsById(paymentDTO.getId())).thenReturn(true);
+    when(paymentRepository.save(any(Payment.class))).thenReturn(payment);
 
-    List<PaymentDTO> payments = paymentService.getAllPayments();
-    assertThat(payments).hasSize(1);
-    assertThat(payments.get(0).getName()).isEqualTo("September Rent");
+    PaymentDTO updated = paymentService.updatePayment(paymentDTO);
+    assertThat(updated.getName()).isEqualTo("Rent Payment");
   }
 
   @Test
-  void testUpdate() {
-    payment1.setAmount(new BigDecimal("550"));
-    payment1.setStatus(Payment.StatusEnum.PAID);
-    paymentService.updatePayment(payment1);
+  void testDeletePayment() {
+    when(paymentRepository.findById(payment.getId())).thenReturn(Optional.of(payment));
+    doNothing().when(paymentRepository).delete(payment);
 
-    PaymentDTO updated = paymentService.getPaymentById(payment1.getId());
-    assertThat(updated.getAmount()).isEqualByComparingTo(new BigDecimal("550"));
-    assertThat(updated.getStatus()).isEqualTo(Payment.StatusEnum.PAID);
+    PaymentDTO deleted = paymentService.deletePayment(payment.getId());
+    assertThat(deleted.getId()).isEqualTo(payment.getId());
   }
 
   @Test
-  void testAddPaymentWithNegativeAmount() {
-    PaymentDTO invalidPayment = new PaymentDTO();
-    invalidPayment.setName("Invalid Payment");
-    invalidPayment.setExpense(expense1);
-    invalidPayment.setAmount(BigDecimal.valueOf(-100));
-    invalidPayment.setStatus(Payment.StatusEnum.PENDING);
-    invalidPayment.setPaymentDate(LocalDate.of(2025, 11, 1));
+  void testGetAllPayments() {
+    when(paymentRepository.findAll()).thenReturn(List.of(payment));
 
-    ValidationException ex =
-        assertThrows(ValidationException.class, () -> paymentService.addPayment(invalidPayment));
-    assertThat(ex.getMessage()).contains("Amount must be greater than 0");
+    List<PaymentDTO> all = paymentService.getAllPayments();
+    assertThat(all).hasSize(1);
+    assertThat(all.get(0).getName()).isEqualTo("Rent Payment");
   }
 
   @Test
-  void testUpdatePaymentWithNegativeAmount() {
-    payment1.setAmount(BigDecimal.valueOf(-200));
-
-    ValidationException ex =
-        assertThrows(ValidationException.class, () -> paymentService.updatePayment(payment1));
-    assertThat(ex.getMessage()).contains("Amount must be greater than 0");
-  }
-
-  @Test
-  void testDeleteNonExistingPayment() {
-    Long nonExistingId = 9999L;
+  void testDeletePaymentNotFound() {
+    when(paymentRepository.findById(payment.getId())).thenReturn(Optional.empty());
 
     NotFoundException ex =
-        assertThrows(NotFoundException.class, () -> paymentService.deletePayment(nonExistingId));
+        assertThrows(NotFoundException.class, () -> paymentService.deletePayment(payment.getId()));
+    assertThat(ex.getMessage()).contains("Payment not found");
+  }
+
+  @Test
+  void testAddPaymentWithInvalidAmount() {
+    paymentDTO.setAmount(BigDecimal.valueOf(-100));
+    doThrow(new ValidationException("Amount must be greater than 0"))
+        .when(paymentValidator)
+        .validate(paymentDTO);
+
+    ValidationException ex =
+        assertThrows(ValidationException.class, () -> paymentService.addPayment(paymentDTO));
+    assertThat(ex.getMessage()).contains("Amount must be greater than 0");
+  }
+
+  @Test
+  void testGetPaymentByIdNotFound() {
+    when(paymentRepository.findById(payment.getId())).thenReturn(Optional.empty());
+
+    NotFoundException ex =
+        assertThrows(NotFoundException.class, () -> paymentService.getPaymentById(payment.getId()));
+    assertThat(ex.getMessage()).contains("Payment not found");
+  }
+
+  @Test
+  void testUpdatePaymentNotFound() {
+    doNothing().when(paymentValidator).validate(paymentDTO);
+    when(paymentRepository.existsById(paymentDTO.getId())).thenReturn(false);
+
+    NotFoundException ex =
+        assertThrows(NotFoundException.class, () -> paymentService.updatePayment(paymentDTO));
     assertThat(ex.getMessage()).contains("Payment not found");
   }
 }

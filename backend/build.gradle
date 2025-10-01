@@ -42,11 +42,6 @@ dependencies {
 
     // DB dependency
     implementation 'org.postgresql:postgresql:42.7.7'
-    runtimeOnly 'org.postgresql:postgresql'
-
-    // Flyway for DB migrations
-    implementation 'org.flywaydb:flyway-core'
-    implementation 'org.flywaydb:flyway-database-postgresql'
 
     // Test dependencies
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -66,7 +61,7 @@ dependencies {
     implementation 'org.mapstruct:mapstruct:1.6.2'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.1'
 
-
+    testImplementation 'com.h2database:h2'
 }
 
 tasks.named('test') {

@@ -6,7 +6,7 @@ import java.time.LocalDate;
 
 public class PaymentDTO {
   private Long id;
-  private ExpenseDTO expense;
+  private Long expenseId;
   private String name;
   private BigDecimal amount;
   private Payment.StatusEnum status;
@@ -16,13 +16,13 @@ public class PaymentDTO {
 
   public PaymentDTO(
       Long id,
-      ExpenseDTO expense,
+      Long expenseId,
       String name,
       BigDecimal amount,
       Payment.StatusEnum status,
       LocalDate paymentDate) {
     this.id = id;
-    this.expense = expense;
+    this.expenseId = expenseId;
     this.name = name;
     this.amount = amount;
     this.status = status;
@@ -69,11 +69,11 @@ public class PaymentDTO {
     this.paymentDate = paymentDate;
   }
 
-  public ExpenseDTO getExpense() {
-    return expense;
+  public Long getExpenseId() {
+    return expenseId;
   }
 
-  public void setExpense(ExpenseDTO expense) {
-    this.expense = expense;
+  public void setExpenseId(Long expenseId) {
+    this.expenseId = expenseId;
   }
 }
