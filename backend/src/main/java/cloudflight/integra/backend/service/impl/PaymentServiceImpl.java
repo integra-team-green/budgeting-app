@@ -15,67 +15,64 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class PaymentServiceImpl implements PaymentService {
 
-  private final PaymentRepository dbPaymentRepository;
-  private final PaymentValidator paymentValidator;
+    private final PaymentRepository dbPaymentRepository;
+    private final PaymentValidator paymentValidator;
 
-  public PaymentServiceImpl(
-      PaymentRepository dbPaymentRepository, PaymentValidator paymentValidator) {
-    this.dbPaymentRepository = dbPaymentRepository;
-    this.paymentValidator = paymentValidator;
-  }
-
-  @Override
-  @Transactional
-  public PaymentDTO addPayment(PaymentDTO paymentDTO) {
-    paymentValidator.validate(paymentDTO);
-
-    Payment payment = PaymentMapper.getFromDTO(paymentDTO);
-    payment = dbPaymentRepository.save(payment);
-
-    return PaymentMapper.getDTO(payment);
-  }
-
-  @Override
-  @Transactional(readOnly = true)
-  public PaymentDTO getPaymentById(Long id) {
-    Payment payment =
-        dbPaymentRepository
-            .findById(id)
-            .orElseThrow(() -> new NotFoundException("Payment not found with id: " + id));
-    return PaymentMapper.getDTO(payment);
-  }
-
-  @Override
-  @Transactional
-  public PaymentDTO updatePayment(PaymentDTO paymentDTO) {
-    paymentValidator.validate(paymentDTO);
-
-    if (!dbPaymentRepository.existsById(paymentDTO.getId())) {
-      throw new NotFoundException("Payment not found with id: " + paymentDTO.getId());
+    public PaymentServiceImpl(PaymentRepository dbPaymentRepository, PaymentValidator paymentValidator) {
+        this.dbPaymentRepository = dbPaymentRepository;
+        this.paymentValidator = paymentValidator;
     }
 
-    Payment payment = PaymentMapper.getFromDTO(paymentDTO);
-    payment = dbPaymentRepository.save(payment);
+    @Override
+    @Transactional
+    public PaymentDTO addPayment(PaymentDTO paymentDTO) {
+        paymentValidator.validate(paymentDTO);
 
-    return PaymentMapper.getDTO(payment);
-  }
+        Payment payment = PaymentMapper.getFromDTO(paymentDTO);
+        payment = dbPaymentRepository.save(payment);
 
-  @Override
-  @Transactional
-  public PaymentDTO deletePayment(Long id) {
-    Payment payment =
-        dbPaymentRepository
-            .findById(id)
-            .orElseThrow(() -> new NotFoundException("Payment not found with id: " + id));
+        return PaymentMapper.getDTO(payment);
+    }
 
-    dbPaymentRepository.delete(payment);
-    return PaymentMapper.getDTO(payment);
-  }
+    @Override
+    @Transactional(readOnly = true)
+    public PaymentDTO getPaymentById(Long id) {
+        Payment payment = dbPaymentRepository
+                .findById(id)
+                .orElseThrow(() -> new NotFoundException("Payment not found with id: " + id));
+        return PaymentMapper.getDTO(payment);
+    }
 
-  @Override
-  @Transactional(readOnly = true)
-  public List<PaymentDTO> getAllPayments() {
-    List<Payment> payments = dbPaymentRepository.findAll();
-    return PaymentMapper.getPaymentDTOsFromPayments(payments);
-  }
+    @Override
+    @Transactional
+    public PaymentDTO updatePayment(PaymentDTO paymentDTO) {
+        paymentValidator.validate(paymentDTO);
+
+        if (!dbPaymentRepository.existsById(paymentDTO.getId())) {
+            throw new NotFoundException("Payment not found with id: " + paymentDTO.getId());
+        }
+
+        Payment payment = PaymentMapper.getFromDTO(paymentDTO);
+        payment = dbPaymentRepository.save(payment);
+
+        return PaymentMapper.getDTO(payment);
+    }
+
+    @Override
+    @Transactional
+    public PaymentDTO deletePayment(Long id) {
+        Payment payment = dbPaymentRepository
+                .findById(id)
+                .orElseThrow(() -> new NotFoundException("Payment not found with id: " + id));
+
+        dbPaymentRepository.delete(payment);
+        return PaymentMapper.getDTO(payment);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PaymentDTO> getAllPayments() {
+        List<Payment> payments = dbPaymentRepository.findAll();
+        return PaymentMapper.getPaymentDTOsFromPayments(payments);
+    }
 }

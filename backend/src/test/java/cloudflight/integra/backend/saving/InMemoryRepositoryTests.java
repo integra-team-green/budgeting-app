@@ -19,280 +19,263 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 class InMemoryRepositoryTests {
-  private SavingRepository<Long, Saving> TESTsavingRepository;
-  private SavingService TESTsavingService;
+    private SavingRepository<Long, Saving> TESTsavingRepository;
+    private SavingService TESTsavingService;
 
-  @BeforeEach
-  void setUp() {
-    Saving saving =
-        new Saving(
-            1L,
-            new BigDecimal("10000.00"),
-            new Date(),
-            "Apartament",
-            "I wish to have my owm apartament");
-    Saving saving2 = new Saving(2L, new BigDecimal("2500.00"), new Date(), "Golf 5", "dream car");
-    Saving saving3 = new Saving(4L, new BigDecimal("5000.00"), new Date(), "Sicily trip");
+    @BeforeEach
+    void setUp() {
+        Saving saving = new Saving(
+                1L, new BigDecimal("10000.00"), new Date(), "Apartament", "I wish to have my owm apartament");
+        Saving saving2 = new Saving(2L, new BigDecimal("2500.00"), new Date(), "Golf 5", "dream car");
+        Saving saving3 = new Saving(4L, new BigDecimal("5000.00"), new Date(), "Sicily trip");
 
-    TESTsavingRepository = new InMemorySavingRepositoryImpl();
+        TESTsavingRepository = new InMemorySavingRepositoryImpl();
 
-    TESTsavingRepository.save(saving);
-    TESTsavingRepository.save(saving2);
-    TESTsavingRepository.save(saving3);
+        TESTsavingRepository.save(saving);
+        TESTsavingRepository.save(saving2);
+        TESTsavingRepository.save(saving3);
 
-    SavingValidator TESTsavingValidator = new SavingValidator();
-    TESTsavingService = new SavingServiceImpl(TESTsavingRepository, TESTsavingValidator);
-  }
-
-  /// Repo Tests
-  @Test
-  void testSavingRepoFindOne() {
-    Saving found = TESTsavingRepository.findOne(1L);
-
-    assert (found.getId().equals(1L));
-    assert (found.getGoal().equals("Apartament"));
-
-    System.out.println(found);
-    System.out.println("testSavingRepoFindOne PASSED\n");
-  }
-
-  @Test
-  void tetsSavingRepoFindAll() {
-    Iterable<Saving> all = TESTsavingRepository.findAll();
-
-    int count = 0;
-    for (Saving s : all) {
-      System.out.println(s.toString());
-      count++;
+        SavingValidator TESTsavingValidator = new SavingValidator();
+        TESTsavingService = new SavingServiceImpl(TESTsavingRepository, TESTsavingValidator);
     }
 
-    assert (count == 3);
+    /// Repo Tests
+    @Test
+    void testSavingRepoFindOne() {
+        Saving found = TESTsavingRepository.findOne(1L);
 
-    System.out.println("tetsSavingRepoFindAll PASSED\n");
-  }
+        assert (found.getId().equals(1L));
+        assert (found.getGoal().equals("Apartament"));
 
-  @Test
-  void testSavingRepoSave() {
-    Saving newSaving =
-        new Saving(
-            5L,
-            new BigDecimal("3000.00"),
-            new Date(),
-            "New Laptop",
-            "I need a new laptop for work");
-
-    TESTsavingRepository.save(newSaving);
-
-    Saving found = TESTsavingRepository.findOne(5L);
-
-    assert (found.getId().equals(5L));
-    assert (found.getGoal().equals("New Laptop"));
-
-    System.out.println(found);
-    System.out.println("testSavingRepoSave PASSED\n");
-  }
-
-  @Test
-  void testSavingRepoDelete() {
-
-    Iterable<Saving> all = TESTsavingRepository.findAll();
-
-    for (Saving s : all) {
-      System.out.println(s.toString());
+        System.out.println(found);
+        System.out.println("testSavingRepoFindOne PASSED\n");
     }
 
-    TESTsavingRepository.delete(2L);
+    @Test
+    void tetsSavingRepoFindAll() {
+        Iterable<Saving> all = TESTsavingRepository.findAll();
 
-    System.out.println("after delete:");
+        int count = 0;
+        for (Saving s : all) {
+            System.out.println(s.toString());
+            count++;
+        }
 
-    int count = 0;
-    for (Saving s : all) {
-      System.out.println(s.toString());
-      count++;
+        assert (count == 3);
+
+        System.out.println("tetsSavingRepoFindAll PASSED\n");
     }
 
-    assert (count == 2);
+    @Test
+    void testSavingRepoSave() {
+        Saving newSaving =
+                new Saving(5L, new BigDecimal("3000.00"), new Date(), "New Laptop", "I need a new laptop for work");
 
-    System.out.println("testSavingRepoDelete PASSED\n");
-  }
+        TESTsavingRepository.save(newSaving);
 
-  @Test
-  void testSavingRepoUpdate() {
-    Saving toUpdate = TESTsavingRepository.findOne(4L);
+        Saving found = TESTsavingRepository.findOne(5L);
 
-    System.out.println(toUpdate.toString());
+        assert (found.getId().equals(5L));
+        assert (found.getGoal().equals("New Laptop"));
 
-    toUpdate.setGoal("Sicily trip - updated");
-    toUpdate.setAmount(new BigDecimal("6000.00"));
-    toUpdate.setDescription("Mafia description");
-
-    TESTsavingRepository.update(toUpdate);
-
-    Saving found = TESTsavingRepository.findOne(4L);
-
-    System.out.println("after update:");
-    System.out.println(found.toString());
-
-    assert (found.getGoal().equals("Sicily trip - updated"));
-    assert (found.getAmount().equals(new BigDecimal("6000.00")));
-
-    System.out.println("testSavingRepoUpdate PASSED\n");
-  }
-
-  ///  Service Tests
-
-  @Test
-  void testSavingServiceFindOne() {
-    Saving found = TESTsavingService.getSavingById(1L);
-
-    assert (found.getId().equals(1L));
-
-    assertEquals("Apartament", found.getGoal(), "Goal should be Apartament");
-
-    System.out.println(found);
-    System.out.println("testSavingServiceFindOne PASSED\n");
-  }
-
-  @Test
-  void tetsSavingServiceFindAll() {
-    Iterable<Saving> all = TESTsavingService.getAllSavings();
-
-    int count = 0;
-    for (Saving s : all) {
-      System.out.println(s.toString());
-      count++;
+        System.out.println(found);
+        System.out.println("testSavingRepoSave PASSED\n");
     }
 
-    assertEquals(3, count, "There should be 3 savings in the service");
+    @Test
+    void testSavingRepoDelete() {
 
-    System.out.println("tetsSavingServiceFindAll PASSED\n");
-  }
+        Iterable<Saving> all = TESTsavingRepository.findAll();
 
-  @Test
-  void testSavingServiceSave() {
-    Saving newSaving =
-        new Saving(
-            5L,
-            new BigDecimal("3000.00"),
-            new Date(),
-            "New Laptop",
-            "I need a new laptop for work");
+        for (Saving s : all) {
+            System.out.println(s.toString());
+        }
 
-    TESTsavingService.addSaving(newSaving);
+        TESTsavingRepository.delete(2L);
 
-    Saving found = TESTsavingService.getSavingById(5L);
+        System.out.println("after delete:");
 
-    assert (found.getId().equals(5L));
-    //		assert (found.getGoal().equals("New Laptop"));
+        int count = 0;
+        for (Saving s : all) {
+            System.out.println(s.toString());
+            count++;
+        }
 
-    assertEquals("New Laptop", found.getGoal(), "Goal should be New Laptop");
+        assert (count == 2);
 
-    System.out.println(found);
-    System.out.println("testSavingServiceSave PASSED\n");
-  }
-
-  @Test
-  void testSavingService_BAD_Save() {
-
-    Calendar calendar = Calendar.getInstance();
-
-    //		System.out.println(calendar.get(Calendar.DAY_OF_YEAR));
-
-    calendar.add(Calendar.DAY_OF_YEAR, 30);
-
-    //		System.out.println(calendar.get(Calendar.DAY_OF_YEAR));
-
-    Date futureDate = calendar.getTime();
-
-    Saving badSaving =
-        new Saving(10L, new BigDecimal("-1500.00"), futureDate, "", "Wrong description");
-    //		Saving badSaving = new Saving(10L, new BigDecimal("-1500.00"), new Date(), "", "Wrong
-    // description");
-    //		Saving badSaving = new Saving(10L, new BigDecimal("-1500.00"), new Date(), "TestGoal",
-    // "Wrong description");
-    Saving goodSaving =
-        new Saving(10L, new BigDecimal("1500.00"), new Date(), "TestGoal", "Wrong description");
-
-    try {
-      try {
-        TESTsavingService.addSaving(badSaving);
-        fail("ValidationException was expected but not thrown");
-      } catch (ValidationException e) {
-        System.err.println(e.getMessage());
-      }
-
-      try {
-        TESTsavingService.addSaving(goodSaving);
-
-        System.out.println("saved");
-      } catch (ValidationException e) {
-        fail("ValidationException should not have been thrown for goodSaving");
-      }
-    } finally {
-      System.out.println("testSavingService_BAD_Save END\n");
-    }
-  }
-
-  @Test
-  void testSavingServiceDelete() {
-    Iterable<Saving> all = TESTsavingService.getAllSavings();
-
-    for (Saving s : all) {
-      System.out.println(s.toString());
+        System.out.println("testSavingRepoDelete PASSED\n");
     }
 
-    TESTsavingService.deleteSaving(2L);
+    @Test
+    void testSavingRepoUpdate() {
+        Saving toUpdate = TESTsavingRepository.findOne(4L);
 
-    System.out.println("after delete:");
+        System.out.println(toUpdate.toString());
 
-    int count = 0;
-    for (Saving s : all) {
-      System.out.println(s.toString());
-      count++;
+        toUpdate.setGoal("Sicily trip - updated");
+        toUpdate.setAmount(new BigDecimal("6000.00"));
+        toUpdate.setDescription("Mafia description");
+
+        TESTsavingRepository.update(toUpdate);
+
+        Saving found = TESTsavingRepository.findOne(4L);
+
+        System.out.println("after update:");
+        System.out.println(found.toString());
+
+        assert (found.getGoal().equals("Sicily trip - updated"));
+        assert (found.getAmount().equals(new BigDecimal("6000.00")));
+
+        System.out.println("testSavingRepoUpdate PASSED\n");
     }
 
-    assertEquals(2, count, "Should be 2 savings after delete");
+    ///  Service Tests
 
-    System.out.println("testSavingServiceDelete PASSED\n");
-  }
+    @Test
+    void testSavingServiceFindOne() {
+        Saving found = TESTsavingService.getSavingById(1L);
 
-  @Test
-  void testSavingServiceUpdate() {
-    Saving toUpdate = TESTsavingService.getSavingById(4L);
+        assert (found.getId().equals(1L));
 
-    System.out.println(toUpdate.toString());
+        assertEquals("Apartament", found.getGoal(), "Goal should be Apartament");
 
-    toUpdate.setAmount(new BigDecimal("6000.00"));
-    toUpdate.setGoal("Sicily trip - updated");
-    toUpdate.setDescription("Mafia description");
-
-    TESTsavingService.updateSaving(toUpdate);
-
-    assertEquals("Sicily trip - updated", toUpdate.getGoal(), "Goal should be updated");
-    assertEquals(new BigDecimal("6000.00"), toUpdate.getAmount(), "Amount should be updated");
-
-    System.out.println("after update:\n " + toUpdate);
-
-    System.out.println("testSavingServiceUpdate PASSED\n");
-  }
-
-  @Test
-  void testSavingService_BAD_Update() {
-    Saving toUpdate = TESTsavingService.getSavingById(4L);
-
-    System.out.println(toUpdate.toString());
-
-    toUpdate.setAmount(new BigDecimal("-6000.00"));
-    toUpdate.setGoal("");
-    toUpdate.setDescription("Mafia description");
-
-    try {
-      TESTsavingService.updateSaving(toUpdate);
-      fail("ValidationException was expected but not thrown");
-    } catch (ValidationException e) {
-      System.err.println(e.getMessage());
-    } finally {
-      System.out.println("testSavingService_BAD_Update END\n");
+        System.out.println(found);
+        System.out.println("testSavingServiceFindOne PASSED\n");
     }
-  }
+
+    @Test
+    void tetsSavingServiceFindAll() {
+        Iterable<Saving> all = TESTsavingService.getAllSavings();
+
+        int count = 0;
+        for (Saving s : all) {
+            System.out.println(s.toString());
+            count++;
+        }
+
+        assertEquals(3, count, "There should be 3 savings in the service");
+
+        System.out.println("tetsSavingServiceFindAll PASSED\n");
+    }
+
+    @Test
+    void testSavingServiceSave() {
+        Saving newSaving =
+                new Saving(5L, new BigDecimal("3000.00"), new Date(), "New Laptop", "I need a new laptop for work");
+
+        TESTsavingService.addSaving(newSaving);
+
+        Saving found = TESTsavingService.getSavingById(5L);
+
+        assert (found.getId().equals(5L));
+        //		assert (found.getGoal().equals("New Laptop"));
+
+        assertEquals("New Laptop", found.getGoal(), "Goal should be New Laptop");
+
+        System.out.println(found);
+        System.out.println("testSavingServiceSave PASSED\n");
+    }
+
+    @Test
+    void testSavingService_BAD_Save() {
+
+        Calendar calendar = Calendar.getInstance();
+
+        //		System.out.println(calendar.get(Calendar.DAY_OF_YEAR));
+
+        calendar.add(Calendar.DAY_OF_YEAR, 30);
+
+        //		System.out.println(calendar.get(Calendar.DAY_OF_YEAR));
+
+        Date futureDate = calendar.getTime();
+
+        Saving badSaving = new Saving(10L, new BigDecimal("-1500.00"), futureDate, "", "Wrong description");
+        //		Saving badSaving = new Saving(10L, new BigDecimal("-1500.00"), new Date(), "", "Wrong
+        // description");
+        //		Saving badSaving = new Saving(10L, new BigDecimal("-1500.00"), new Date(), "TestGoal",
+        // "Wrong description");
+        Saving goodSaving = new Saving(10L, new BigDecimal("1500.00"), new Date(), "TestGoal", "Wrong description");
+
+        try {
+            try {
+                TESTsavingService.addSaving(badSaving);
+                fail("ValidationException was expected but not thrown");
+            } catch (ValidationException e) {
+                System.err.println(e.getMessage());
+            }
+
+            try {
+                TESTsavingService.addSaving(goodSaving);
+
+                System.out.println("saved");
+            } catch (ValidationException e) {
+                fail("ValidationException should not have been thrown for goodSaving");
+            }
+        } finally {
+            System.out.println("testSavingService_BAD_Save END\n");
+        }
+    }
+
+    @Test
+    void testSavingServiceDelete() {
+        Iterable<Saving> all = TESTsavingService.getAllSavings();
+
+        for (Saving s : all) {
+            System.out.println(s.toString());
+        }
+
+        TESTsavingService.deleteSaving(2L);
+
+        System.out.println("after delete:");
+
+        int count = 0;
+        for (Saving s : all) {
+            System.out.println(s.toString());
+            count++;
+        }
+
+        assertEquals(2, count, "Should be 2 savings after delete");
+
+        System.out.println("testSavingServiceDelete PASSED\n");
+    }
+
+    @Test
+    void testSavingServiceUpdate() {
+        Saving toUpdate = TESTsavingService.getSavingById(4L);
+
+        System.out.println(toUpdate.toString());
+
+        toUpdate.setAmount(new BigDecimal("6000.00"));
+        toUpdate.setGoal("Sicily trip - updated");
+        toUpdate.setDescription("Mafia description");
+
+        TESTsavingService.updateSaving(toUpdate);
+
+        assertEquals("Sicily trip - updated", toUpdate.getGoal(), "Goal should be updated");
+        assertEquals(new BigDecimal("6000.00"), toUpdate.getAmount(), "Amount should be updated");
+
+        System.out.println("after update:\n " + toUpdate);
+
+        System.out.println("testSavingServiceUpdate PASSED\n");
+    }
+
+    @Test
+    void testSavingService_BAD_Update() {
+        Saving toUpdate = TESTsavingService.getSavingById(4L);
+
+        System.out.println(toUpdate.toString());
+
+        toUpdate.setAmount(new BigDecimal("-6000.00"));
+        toUpdate.setGoal("");
+        toUpdate.setDescription("Mafia description");
+
+        try {
+            TESTsavingService.updateSaving(toUpdate);
+            fail("ValidationException was expected but not thrown");
+        } catch (ValidationException e) {
+            System.err.println(e.getMessage());
+        } finally {
+            System.out.println("testSavingService_BAD_Update END\n");
+        }
+    }
 }

@@ -9,93 +9,91 @@ import java.time.LocalDate;
 @Table(name = "payment")
 public class Payment {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  @OneToOne(optional = false)
-  @JoinColumn(
-      name = "expense_id",
-      nullable = false) // Asigură că fiecare Payment trebuie să aibă un Expense
-  private Expense expense;
+    @OneToOne(optional = false)
+    @JoinColumn(name = "expense_id", nullable = false) // Asigură că fiecare Payment trebuie să aibă un Expense
+    private Expense expense;
 
-  @Column(nullable = false)
-  private String name;
+    @Column(nullable = false)
+    private String name;
 
-  @Enumerated(EnumType.STRING)
-  private StatusEnum status; // pending, paid, failed
+    @Enumerated(EnumType.STRING)
+    private StatusEnum status; // pending, paid, failed
 
-  private LocalDate paymentDate;
+    private LocalDate paymentDate;
 
-  @PositiveOrZero
-  @Column(nullable = false)
-  private BigDecimal amount;
+    @PositiveOrZero
+    @Column(nullable = false)
+    private BigDecimal amount;
 
-  // Enum pentru status
-  public enum StatusEnum {
-    PENDING,
-    PAID,
-    FAILED
-  }
+    // Enum pentru status
+    public enum StatusEnum {
+        PENDING,
+        PAID,
+        FAILED
+    }
 
-  public Payment(Expense expense, String name, StatusEnum status, LocalDate paymentDate) {
-    this.expense = expense;
-    this.name = name;
-    this.status = status;
-    this.paymentDate = paymentDate;
-  }
+    public Payment(Expense expense, String name, StatusEnum status, LocalDate paymentDate) {
+        this.expense = expense;
+        this.name = name;
+        this.status = status;
+        this.paymentDate = paymentDate;
+    }
 
-  public Payment() {}
+    public Payment() {}
 
-  public Long getId() {
+    public Long getId() {
 
-    return id;
-  }
+        return id;
+    }
 
-  public void setId(Long id) {
+    public void setId(Long id) {
 
-    this.id = id;
-  }
+        this.id = id;
+    }
 
-  public String getName() {
+    public String getName() {
 
-    return name;
-  }
+        return name;
+    }
 
-  public void setName(String name) {
+    public void setName(String name) {
 
-    this.name = name;
-  }
+        this.name = name;
+    }
 
-  public BigDecimal getAmount() {
-    return amount;
-  }
+    public BigDecimal getAmount() {
+        return amount;
+    }
 
-  public void setAmount(BigDecimal amount) {
-    this.amount = amount;
-  }
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
 
-  public Expense getExpense() {
-    return expense;
-  }
+    public Expense getExpense() {
+        return expense;
+    }
 
-  public void setExpense(Expense expense) {
-    this.expense = expense;
-  }
+    public void setExpense(Expense expense) {
+        this.expense = expense;
+    }
 
-  public StatusEnum getStatus() {
-    return status;
-  }
+    public StatusEnum getStatus() {
+        return status;
+    }
 
-  public void setStatus(StatusEnum status) {
-    this.status = status;
-  }
+    public void setStatus(StatusEnum status) {
+        this.status = status;
+    }
 
-  public LocalDate getPaymentDate() {
-    return paymentDate;
-  }
+    public LocalDate getPaymentDate() {
+        return paymentDate;
+    }
 
-  public void setPaymentDate(LocalDate paymentDate) {
-    this.paymentDate = paymentDate;
-  }
+    public void setPaymentDate(LocalDate paymentDate) {
+        this.paymentDate = paymentDate;
+    }
 }

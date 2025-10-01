@@ -30,126 +30,125 @@ import org.springframework.test.web.servlet.MockMvc;
 @ActiveProfiles("test")
 class IncomeRestControllerTest {
 
-  @Autowired private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-  @Autowired private IncomeRepository repository;
+    @Autowired
+    private IncomeRepository repository;
 
-  @Autowired private ObjectMapper objectMapper;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-  @Autowired private UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-  private User user1, user2;
+    private User user1, user2;
 
-  @BeforeEach
-  void resetRepository() {
-    repository.deleteAll();
-    userRepository.deleteAll();
-    user1 = userRepository.save(new User(null, "Alice", "alice@email.com", "123"));
-    user2 = userRepository.save(new User(null, "Marc", "marc@yahoo.com", "abcd999"));
-  }
+    @BeforeEach
+    void resetRepository() {
+        repository.deleteAll();
+        userRepository.deleteAll();
+        user1 = userRepository.save(new User(null, "Alice", "alice@email.com", "123"));
+        user2 = userRepository.save(new User(null, "Marc", "marc@yahoo.com", "abcd999"));
+    }
 
-  @Test
-  void createIncome_withValidData_returns201() throws Exception {
-    IncomeDTO dto = new IncomeDTO();
-    dto.setAmount(new BigDecimal("500"));
-    dto.setSource("Extra Job");
-    dto.setDate(new Date());
-    dto.setDescription("Bonus");
-    dto.setUserId(user1.getId());
-    dto.setFrequency(Frequency.MONTHLY);
-    dto.setUserId(user1.getId());
+    @Test
+    void createIncome_withValidData_returns201() throws Exception {
+        IncomeDTO dto = new IncomeDTO();
+        dto.setAmount(new BigDecimal("500"));
+        dto.setSource("Extra Job");
+        dto.setDate(new Date());
+        dto.setDescription("Bonus");
+        dto.setUserId(user1.getId());
+        dto.setFrequency(Frequency.MONTHLY);
+        dto.setUserId(user1.getId());
 
-    mockMvc
-        .perform(
-            post("/api/v1/incomes")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
-        .andExpect(status().isCreated())
-        .andExpect(jsonPath("$.source").value("Extra Job"))
-        .andExpect(jsonPath("$.amount").value(500));
-  }
+        mockMvc.perform(post("/api/v1/incomes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.source").value("Extra Job"))
+                .andExpect(jsonPath("$.amount").value(500));
+    }
 
-  @Test
-  void getIncome_withNonExistingId_returns404() throws Exception {
-    mockMvc.perform(get("/api/v1/incomes/999")).andExpect(status().isNotFound());
-  }
+    @Test
+    void getIncome_withNonExistingId_returns404() throws Exception {
+        mockMvc.perform(get("/api/v1/incomes/999")).andExpect(status().isNotFound());
+    }
 
-  @Test
-  void getAllIncomes_returnsList() throws Exception {
-    Income i1 = new Income();
-    i1.setAmount(new BigDecimal("100"));
-    i1.setSource("Job1");
-    i1.setDate(new Date());
-    i1.setDescription("Desc1");
-    i1.setFrequency(Frequency.ONE_TIME);
-    i1.setUser(user1);
+    @Test
+    void getAllIncomes_returnsList() throws Exception {
+        Income i1 = new Income();
+        i1.setAmount(new BigDecimal("100"));
+        i1.setSource("Job1");
+        i1.setDate(new Date());
+        i1.setDescription("Desc1");
+        i1.setFrequency(Frequency.ONE_TIME);
+        i1.setUser(user1);
 
-    Income i2 = new Income();
-    i2.setAmount(new BigDecimal("200"));
-    i2.setSource("Job2");
-    i2.setDate(new Date());
-    i2.setDescription("Desc2");
-    i2.setFrequency(Frequency.ONE_TIME);
-    i2.setUser(user2);
+        Income i2 = new Income();
+        i2.setAmount(new BigDecimal("200"));
+        i2.setSource("Job2");
+        i2.setDate(new Date());
+        i2.setDescription("Desc2");
+        i2.setFrequency(Frequency.ONE_TIME);
+        i2.setUser(user2);
 
-    repository.save(i1);
-    repository.save(i2);
-    mockMvc
-        .perform(get("/api/v1/incomes"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$[0].amount").value(100))
-        .andExpect(jsonPath("$[0].source").value("Job1"))
-        .andExpect(jsonPath("$[1].source").value("Job2"))
-        .andExpect(jsonPath("$[1].amount").value(200));
-  }
+        repository.save(i1);
+        repository.save(i2);
+        mockMvc.perform(get("/api/v1/incomes"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].amount").value(100))
+                .andExpect(jsonPath("$[0].source").value("Job1"))
+                .andExpect(jsonPath("$[1].source").value("Job2"))
+                .andExpect(jsonPath("$[1].amount").value(200));
+    }
 
-  @Test
-  void updateIncome_existingIncome_returns200() throws Exception {
-    resetRepository();
-    Income i1 = new Income();
-    i1.setAmount(new BigDecimal("100"));
-    i1.setSource("Job1");
-    i1.setDate(new Date());
-    i1.setDescription("Desc1");
-    i1.setFrequency(Frequency.ONE_TIME);
-    i1.setUser(user1);
-    Income saved = repository.save(i1);
+    @Test
+    void updateIncome_existingIncome_returns200() throws Exception {
+        resetRepository();
+        Income i1 = new Income();
+        i1.setAmount(new BigDecimal("100"));
+        i1.setSource("Job1");
+        i1.setDate(new Date());
+        i1.setDescription("Desc1");
+        i1.setFrequency(Frequency.ONE_TIME);
+        i1.setUser(user1);
+        Income saved = repository.save(i1);
 
-    IncomeDTO dto = new IncomeDTO();
-    dto.setUserId(user1.getId());
-    dto.setAmount(new BigDecimal("150"));
-    dto.setSource("Job Updated");
-    dto.setDate(new Date());
-    dto.setFrequency(Frequency.ONE_TIME);
-    dto.setDescription("Desc Updated");
+        IncomeDTO dto = new IncomeDTO();
+        dto.setUserId(user1.getId());
+        dto.setAmount(new BigDecimal("150"));
+        dto.setSource("Job Updated");
+        dto.setDate(new Date());
+        dto.setFrequency(Frequency.ONE_TIME);
+        dto.setDescription("Desc Updated");
 
-    mockMvc
-        .perform(
-            put("/api/v1/incomes/" + saved.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.amount").value(150))
-        .andExpect(jsonPath("$.source").value("Job Updated"))
-        .andExpect(jsonPath("$.userId").value(user1.getId()));
-  }
+        mockMvc.perform(put("/api/v1/incomes/" + saved.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.amount").value(150))
+                .andExpect(jsonPath("$.source").value("Job Updated"))
+                .andExpect(jsonPath("$.userId").value(user1.getId()));
+    }
 
-  @Test
-  void deleteIncome_existingIncome_returns204() throws Exception {
-    resetRepository();
-    Income i1 = new Income();
-    i1.setAmount(new BigDecimal("100"));
-    i1.setSource("Job1");
-    i1.setDate(new Date());
-    i1.setDescription("Desc1");
-    i1.setFrequency(Frequency.ONE_TIME);
-    i1.setUser(user1);
-    Income saved = repository.save(i1);
-    mockMvc.perform(delete("/api/v1/incomes/" + saved.getId())).andExpect(status().isNoContent());
-  }
+    @Test
+    void deleteIncome_existingIncome_returns204() throws Exception {
+        resetRepository();
+        Income i1 = new Income();
+        i1.setAmount(new BigDecimal("100"));
+        i1.setSource("Job1");
+        i1.setDate(new Date());
+        i1.setDescription("Desc1");
+        i1.setFrequency(Frequency.ONE_TIME);
+        i1.setUser(user1);
+        Income saved = repository.save(i1);
+        mockMvc.perform(delete("/api/v1/incomes/" + saved.getId())).andExpect(status().isNoContent());
+    }
 
-  @Test
-  void deleteIncome_nonExistingIncome_returns404() throws Exception {
-    mockMvc.perform(delete("/api/v1/incomes/999")).andExpect(status().isNotFound());
-  }
+    @Test
+    void deleteIncome_nonExistingIncome_returns404() throws Exception {
+        mockMvc.perform(delete("/api/v1/incomes/999")).andExpect(status().isNotFound());
+    }
 }

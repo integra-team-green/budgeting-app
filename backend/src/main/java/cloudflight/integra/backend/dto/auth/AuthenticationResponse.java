@@ -1,19 +1,19 @@
 package cloudflight.integra.backend.dto.auth;
 
 public class AuthenticationResponse {
-  private String token;
+    private String token;
 
-  public AuthenticationResponse() {}
+    public AuthenticationResponse() {}
 
-  public AuthenticationResponse(String token) {
-    this.token = token;
-  }
+    public AuthenticationResponse(String token) {
+        this.token = token;
+    }
 
-  public String getToken() {
-    return token;
-  }
+    public String getToken() {
+        return token;
+    }
 
-  public void setToken(String token) {
-    this.token = token;
-  }
+    public void setToken(String token) {
+        this.token = token;
+    }
 }

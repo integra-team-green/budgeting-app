@@ -16,48 +16,49 @@ import org.springframework.web.bind.annotation.*;
 @IncomeApiErrorResponses
 public class IncomeController {
 
-  private static final Logger log = LoggerFactory.getLogger(IncomeController.class);
+    private static final Logger log = LoggerFactory.getLogger(IncomeController.class);
 
-  private final IncomeService incomeService;
+    private final IncomeService incomeService;
 
-  public IncomeController(IncomeService incomeService) {
-    this.incomeService = incomeService;
-  }
+    public IncomeController(IncomeService incomeService) {
+        this.incomeService = incomeService;
+    }
 
-  @PostMapping
-  public ResponseEntity<IncomeDTO> createIncome(@RequestBody IncomeDTO dto) {
-    log.info("Creating income: {}", dto);
-    IncomeDTO saved = incomeService.createIncome(dto);
-    return new ResponseEntity<>(saved, HttpStatus.CREATED);
-  }
+    @PostMapping
+    public ResponseEntity<IncomeDTO> createIncome(@RequestBody IncomeDTO dto) {
+        log.info("Creating income: {}", dto);
+        IncomeDTO saved = incomeService.createIncome(dto);
+        return new ResponseEntity<>(saved, HttpStatus.CREATED);
+    }
 
-  @GetMapping("/{id}")
-  public ResponseEntity<IncomeDTO> getIncomeById(@PathVariable Long id) {
-    log.debug("Fetching income with id {}", id);
-    IncomeDTO income = incomeService.getIncomeById(id);
-    return new ResponseEntity<>(income, HttpStatus.OK);
-  }
+    @GetMapping("/{id}")
+    public ResponseEntity<IncomeDTO> getIncomeById(@PathVariable Long id) {
+        log.debug("Fetching income with id {}", id);
+        IncomeDTO income = incomeService.getIncomeById(id);
+        return new ResponseEntity<>(income, HttpStatus.OK);
+    }
 
-  @GetMapping
-  public ResponseEntity<List<IncomeDTO>> getAllIncomes() {
-    log.debug("Fetching all incomes");
-    List<IncomeDTO> incomes =
-        StreamSupport.stream(incomeService.getAllIncomes().spliterator(), false).toList();
-    return new ResponseEntity<>(incomes, HttpStatus.OK);
-  }
+    @GetMapping
+    public ResponseEntity<List<IncomeDTO>> getAllIncomes() {
+        log.debug("Fetching all incomes");
+        List<IncomeDTO> incomes = StreamSupport.stream(
+                        incomeService.getAllIncomes().spliterator(), false)
+                .toList();
+        return new ResponseEntity<>(incomes, HttpStatus.OK);
+    }
 
-  @PutMapping("/{id}")
-  public ResponseEntity<IncomeDTO> updateIncome(@PathVariable Long id, @RequestBody IncomeDTO dto) {
-    log.info("Updating income with id {}", id);
-    dto.setId(id);
-    IncomeDTO income = incomeService.updateIncome(dto);
-    return new ResponseEntity<>(income, HttpStatus.OK);
-  }
+    @PutMapping("/{id}")
+    public ResponseEntity<IncomeDTO> updateIncome(@PathVariable Long id, @RequestBody IncomeDTO dto) {
+        log.info("Updating income with id {}", id);
+        dto.setId(id);
+        IncomeDTO income = incomeService.updateIncome(dto);
+        return new ResponseEntity<>(income, HttpStatus.OK);
+    }
 
-  @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deleteIncome(@PathVariable Long id) {
-    log.warn("Deleting income with id {}", id);
-    incomeService.deleteIncome(id);
-    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-  }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteIncome(@PathVariable Long id) {
+        log.warn("Deleting income with id {}", id);
+        incomeService.deleteIncome(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

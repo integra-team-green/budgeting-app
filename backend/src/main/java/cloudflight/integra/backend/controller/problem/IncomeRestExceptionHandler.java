@@ -17,54 +17,52 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice(annotations = IncomeApiErrorResponses.class)
 public class IncomeRestExceptionHandler {
 
-  @ExceptionHandler(ValidationException.class)
-  public ResponseEntity<Object> handleValidation(ValidationException ex, HttpServletRequest req) {
-    return buildErrorResponse(HttpStatus.BAD_REQUEST, "Validation Failed", req, ex.getErrors());
-  }
-
-  @ExceptionHandler(IllegalArgumentException.class)
-  public ResponseEntity<Object> handleIllegalArgument(
-      IllegalArgumentException ex, HttpServletRequest req) {
-    return buildErrorResponse(HttpStatus.BAD_REQUEST, "Validation Failed", req, List.of());
-  }
-
-  @ExceptionHandler(NotFoundException.class)
-  public ResponseEntity<Object> handleNotFound(NotFoundException ex, HttpServletRequest req) {
-    return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), req, List.of());
-  }
-
-  @ExceptionHandler(Exception.class)
-  public ResponseEntity<Object> handleGeneric(Exception ex, HttpServletRequest req) {
-    return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), req, List.of());
-  }
-
-  @ExceptionHandler(HttpMessageNotReadableException.class)
-  public ResponseEntity<Object> handleInvalidEnum(
-      HttpMessageNotReadableException e, HttpServletRequest request) {
-    return buildErrorResponse(
-        HttpStatus.BAD_REQUEST,
-        "Invalid request body: " + e.getMostSpecificCause().getMessage(),
-        request,
-        List.of("Check if 'frequency' has a valid value"));
-  }
-
-  @ExceptionHandler(DataIntegrityViolationException.class)
-  public ResponseEntity<String> handleConstraintViolation(DataIntegrityViolationException ex) {
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-        .body("Invalid reference: " + ex.getMostSpecificCause().getMessage());
-  }
-
-  private ResponseEntity<Object> buildErrorResponse(
-      HttpStatus status, String message, HttpServletRequest req, List<?> errors) {
-    Map<String, Object> body = new LinkedHashMap<>();
-    body.put("timestamp", Instant.now().toString());
-    body.put("status", status.value());
-    body.put("error", status.getReasonPhrase());
-    body.put("path", req.getRequestURI());
-    body.put("message", message);
-    if (!errors.isEmpty()) {
-      body.put("details", errors);
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<Object> handleValidation(ValidationException ex, HttpServletRequest req) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Validation Failed", req, ex.getErrors());
     }
-    return ResponseEntity.status(status).body(body);
-  }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Object> handleIllegalArgument(IllegalArgumentException ex, HttpServletRequest req) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Validation Failed", req, List.of());
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<Object> handleNotFound(NotFoundException ex, HttpServletRequest req) {
+        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), req, List.of());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> handleGeneric(Exception ex, HttpServletRequest req) {
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), req, List.of());
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Object> handleInvalidEnum(HttpMessageNotReadableException e, HttpServletRequest request) {
+        return buildErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                "Invalid request body: " + e.getMostSpecificCause().getMessage(),
+                request,
+                List.of("Check if 'frequency' has a valid value"));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<String> handleConstraintViolation(DataIntegrityViolationException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("Invalid reference: " + ex.getMostSpecificCause().getMessage());
+    }
+
+    private ResponseEntity<Object> buildErrorResponse(
+            HttpStatus status, String message, HttpServletRequest req, List<?> errors) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", Instant.now().toString());
+        body.put("status", status.value());
+        body.put("error", status.getReasonPhrase());
+        body.put("path", req.getRequestURI());
+        body.put("message", message);
+        if (!errors.isEmpty()) {
+            body.put("details", errors);
+        }
+        return ResponseEntity.status(status).body(body);
+    }
 }

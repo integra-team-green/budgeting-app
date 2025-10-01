@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class TestController {
 
-  @GetMapping("/test")
-  public List<String> testEndpoint() {
-    return List.of("hello", "world");
-  }
+    @GetMapping("/test")
+    public List<String> testEndpoint() {
+        return List.of("hello", "world");
+    }
 }
