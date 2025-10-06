@@ -1,11 +1,17 @@
 package cloudflight.integra.backend.saving;
 
+import static org.hamcrest.Matchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 import cloudflight.integra.backend.dto.SavingDTO;
 import cloudflight.integra.backend.entity.Saving;
 import cloudflight.integra.backend.entity.User;
 import cloudflight.integra.backend.repository.SavingRepository;
 import cloudflight.integra.backend.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.math.BigDecimal;
+import java.util.Date;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,13 +20,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.math.BigDecimal;
-import java.util.Date;
-
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -49,7 +48,8 @@ class SavingRestControllerTest {
         testUser = new User(null, "Alice", "alice@email.com", "1234");
         testUser = userRepository.save(testUser);
 
-        Saving s1 = new Saving(testUser, new BigDecimal("10000.00"), new Date(), "Apartament", "I wish to have my own apartament");
+        Saving s1 = new Saving(
+                testUser, new BigDecimal("10000.00"), new Date(), "Apartament", "I wish to have my own apartament");
         Saving s2 = new Saving(testUser, new BigDecimal("2500.00"), new Date(), "Golf 5", "dream car");
         Saving s3 = new Saving(testUser, new BigDecimal("5000.00"), new Date(), "Sicily trip");
         savingRepository.save(s1);
@@ -67,7 +67,6 @@ class SavingRestControllerTest {
                 .andExpect(jsonPath("$.goal").value(saving.getGoal()));
     }
 
-
     @Test
     void testGetById_NotFound() throws Exception {
         mockMvc.perform(get("/api/v1/savings/999999"))
@@ -77,9 +76,7 @@ class SavingRestControllerTest {
 
     @Test
     void testGetAll() throws Exception {
-        mockMvc.perform(get("/api/v1/savings"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(3)));
+        mockMvc.perform(get("/api/v1/savings")).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(3)));
     }
 
     @Test
@@ -119,11 +116,9 @@ class SavingRestControllerTest {
     void testDeleteSaving() throws Exception {
         Saving saving = savingRepository.findAll().iterator().next();
 
-        mockMvc.perform(delete("/api/v1/savings/" + saving.getId()))
-                .andExpect(status().isNoContent());
+        mockMvc.perform(delete("/api/v1/savings/" + saving.getId())).andExpect(status().isNoContent());
 
-        mockMvc.perform(get("/api/v1/savings/" + saving.getId()))
-                .andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/v1/savings/" + saving.getId())).andExpect(status().isNotFound());
     }
 
     @Test
