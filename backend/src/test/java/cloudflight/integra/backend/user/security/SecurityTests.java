@@ -11,6 +11,7 @@ import cloudflight.integra.backend.dto.auth.RegisterRequest;
 import cloudflight.integra.backend.entity.User;
 import cloudflight.integra.backend.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,15 +38,22 @@ public class SecurityTests {
     @Autowired
     private UserRepository userRepo;
 
+    private String aliceEmail;
+
+    private String marcEmail;
+
     @BeforeEach
     public void setUp() throws Exception {
-        userRepo.deleteAll();
-        userRepo.save(new User(null, "Alice", "alice@email.com", "123"));
-        userRepo.save(new User(null, "Marc", "marc@yahoo.com", "abcd999"));
+
+        aliceEmail = "alice+" + UUID.randomUUID() + "@email.com";
+        userRepo.save(new User(null, "Alice", aliceEmail, "123"));
+        marcEmail = "marc+" + UUID.randomUUID() + "@email.com";
+        userRepo.save(new User(null, "Marc", marcEmail, "abcd999"));
 
         RegisterRequest registerRequest = new RegisterRequest();
         registerRequest.setName("Test User");
-        registerRequest.setEmail("test@example.com");
+        String email = "test+" + UUID.randomUUID() + "@example.com";
+        registerRequest.setEmail(email);
         registerRequest.setPassword("password123");
 
         mockMvc.perform(post("/api/auth/register")
@@ -54,7 +62,7 @@ public class SecurityTests {
                 .andExpect(status().isOk());
 
         AuthenticationRequest loginRequest = new AuthenticationRequest();
-        loginRequest.setEmail("test@example.com");
+        loginRequest.setEmail(email);
         loginRequest.setPassword("password123");
 
         MvcResult result = mockMvc.perform(post("/api/auth/login")

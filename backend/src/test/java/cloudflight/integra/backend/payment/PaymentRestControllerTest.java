@@ -1,10 +1,14 @@
 package cloudflight.integra.backend.payment;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import cloudflight.integra.backend.dto.ExpenseDTO;
 import cloudflight.integra.backend.dto.PaymentDTO;
+import cloudflight.integra.backend.dto.auth.AuthenticationRequest;
+import cloudflight.integra.backend.dto.auth.AuthenticationResponse;
+import cloudflight.integra.backend.dto.auth.RegisterRequest;
 import cloudflight.integra.backend.entity.Payment;
 import cloudflight.integra.backend.entity.User;
 import cloudflight.integra.backend.service.ExpenseService;
@@ -20,11 +24,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 // varianta buna
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 public class PaymentRestControllerTest {
 
     @Autowired
@@ -48,15 +55,37 @@ public class PaymentRestControllerTest {
     private PaymentDTO payment1;
     private PaymentDTO payment2;
 
-    @BeforeEach
-    void setUp() {
-        // Creează și salvează un user
-        testUser = new User();
-        testUser.setName("Test User");
-        testUser.setEmail("testuser+" + UUID.randomUUID() + "@example.com");
-        testUser.setPassword("password");
-        testUser = userService.addUser(testUser); // userul este acum persistat
+    private String testToken;
 
+    @BeforeEach
+    void setUp() throws Exception {
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setName("Test User");
+        String uniqueEmail = "test+" + UUID.randomUUID() + "@example.com";
+        registerRequest.setEmail(uniqueEmail);
+        registerRequest.setPassword("password123");
+
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(registerRequest)))
+                .andExpect(status().isOk());
+
+        AuthenticationRequest loginRequest = new AuthenticationRequest();
+        loginRequest.setEmail(uniqueEmail);
+        loginRequest.setPassword("password123");
+
+        MvcResult result = mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andReturn();
+
+        String response = result.getResponse().getContentAsString();
+        testToken =
+                objectMapper.readValue(response, AuthenticationResponse.class).getToken();
+
+        testUser = userService.getUserByEmail(uniqueEmail);
         // Creează Expense 1 asociat userului
         expense1 = new ExpenseDTO();
         expense1.setCategory("Rent");
@@ -98,7 +127,7 @@ public class PaymentRestControllerTest {
 
     @Test
     void testGetPaymentById() throws Exception {
-        mockMvc.perform(get("/api/v1/payments/" + payment1.getId()))
+        mockMvc.perform(get("/api/v1/payments/" + payment1.getId()).header("Authorization", "Bearer " + testToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(payment1.getId()))
                 .andExpect(jsonPath("$.name").value("September Rent"))
@@ -126,6 +155,7 @@ public class PaymentRestControllerTest {
         dto.setExpenseId(newExpense.getId());
 
         mockMvc.perform(post("/api/v1/payments")
+                        .header("Authorization", "Bearer " + testToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated())
@@ -146,6 +176,7 @@ public class PaymentRestControllerTest {
         dto.setExpenseId(expense1.getId());
 
         mockMvc.perform(put("/api/v1/payments/" + payment1.getId())
+                        .header("Authorization", "Bearer " + testToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
@@ -157,7 +188,7 @@ public class PaymentRestControllerTest {
 
     @Test
     void testDeletePayment() throws Exception {
-        mockMvc.perform(delete("/api/v1/payments/" + payment2.getId()))
+        mockMvc.perform(delete("/api/v1/payments/" + payment2.getId()).header("Authorization", "Bearer " + testToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(payment2.getId()))
                 .andExpect(jsonPath("$.name").value("October Utilities"));
@@ -173,6 +204,7 @@ public class PaymentRestControllerTest {
         invalidDto.setExpenseId(null);
 
         mockMvc.perform(post("/api/v1/payments")
+                        .header("Authorization", "Bearer " + testToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidDto)))
                 .andExpect(status().isBadRequest()); // se așteaptă cod 400
@@ -189,6 +221,7 @@ public class PaymentRestControllerTest {
         invalidDto.setExpenseId(expense1.getId());
 
         mockMvc.perform(put("/api/v1/payments/" + payment1.getId())
+                        .header("Authorization", "Bearer " + testToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidDto)))
                 .andExpect(status().isBadRequest()); // se așteaptă cod 400

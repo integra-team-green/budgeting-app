@@ -3,9 +3,13 @@ package cloudflight.integra.backend.expense;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import cloudflight.integra.backend.dto.ExpenseDTO;
+import cloudflight.integra.backend.dto.auth.AuthenticationRequest;
+import cloudflight.integra.backend.dto.auth.AuthenticationResponse;
+import cloudflight.integra.backend.dto.auth.RegisterRequest;
 import cloudflight.integra.backend.entity.Expense;
 import cloudflight.integra.backend.entity.User;
 import cloudflight.integra.backend.repository.ExpenseRepository;
@@ -22,6 +26,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
@@ -53,16 +58,38 @@ class RestExpenseControllerTest {
     private User testUser;
     private Expense testExpense;
 
+    private String testToken;
+
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         expenseRepository.deleteAll();
         userRepository.deleteAll();
 
-        testUser = new User();
-        testUser.setEmail("test@example.com");
-        testUser.setPassword("password123");
-        testUser = userRepository.save(testUser);
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setName("Test User");
+        registerRequest.setEmail("test@example.com");
+        registerRequest.setPassword("password123");
 
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(registerRequest)))
+                .andExpect(status().isOk());
+
+        AuthenticationRequest loginRequest = new AuthenticationRequest();
+        loginRequest.setEmail("test@example.com");
+        loginRequest.setPassword("password123");
+
+        MvcResult result = mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andReturn();
+
+        String response = result.getResponse().getContentAsString();
+        testToken =
+                objectMapper.readValue(response, AuthenticationResponse.class).getToken();
+        testUser = userRepository.findByEmail("test@example.com").orElseThrow();
         testExpense = new Expense();
         testExpense.setUser(testUser);
         testExpense.setUserId(testUser.getId());
@@ -100,6 +127,7 @@ class RestExpenseControllerTest {
 
         // When & Then
         mockMvc.perform(post("/api/v1/expenses")
+                        .header("Authorization", "Bearer " + testToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newExpenseDTO)))
                 .andExpect(status().isCreated())
@@ -129,6 +157,7 @@ class RestExpenseControllerTest {
                 ExpenseDTO.PaymentMethod.CARD);
 
         mockMvc.perform(post("/api/v1/expenses")
+                        .header("Authorization", "Bearer " + testToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidExpenseDTO)))
                 .andExpect(status().isNotFound());
@@ -138,7 +167,8 @@ class RestExpenseControllerTest {
 
     @Test
     void getExpenseById_Success() throws Exception {
-        mockMvc.perform(get("/api/v1/expenses/{id}", testExpense.getId()))
+        mockMvc.perform(get("/api/v1/expenses/{id}", testExpense.getId())
+                        .header("Authorization", "Bearer " + testToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(testExpense.getId()))
                 .andExpect(jsonPath("$.userId").value(testUser.getId()))
@@ -151,7 +181,8 @@ class RestExpenseControllerTest {
 
     @Test
     void getExpenseById_NotFound() throws Exception {
-        mockMvc.perform(get("/api/v1/expenses/{id}", 999L)).andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/v1/expenses/{id}", 999L).header("Authorization", "Bearer " + testToken))
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -167,7 +198,7 @@ class RestExpenseControllerTest {
         expense2.setPaymentMethod(Expense.PaymentMethod.CARD);
         expenseRepository.save(expense2);
 
-        mockMvc.perform(get("/api/v1/expenses"))
+        mockMvc.perform(get("/api/v1/expenses").header("Authorization", "Bearer " + testToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].category", is(oneOf("Groceries", "Entertainment"))))
@@ -190,6 +221,7 @@ class RestExpenseControllerTest {
                 ExpenseDTO.PaymentMethod.TRANSFER);
 
         mockMvc.perform(put("/api/v1/expenses/{id}", testExpense.getId())
+                        .header("Authorization", "Bearer " + testToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateDTO)))
                 .andExpect(status().isOk())
@@ -219,6 +251,7 @@ class RestExpenseControllerTest {
                 ExpenseDTO.PaymentMethod.CARD);
 
         mockMvc.perform(put("/api/v1/expenses/{id}", 999L)
+                        .header("Authorization", "Bearer " + testToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateDTO)))
                 .andExpect(status().isNotFound());
@@ -226,7 +259,9 @@ class RestExpenseControllerTest {
 
     @Test
     void deleteExpense_Success() throws Exception {
-        mockMvc.perform(delete("/api/v1/expenses/{id}", testExpense.getId())).andExpect(status().isNoContent());
+        mockMvc.perform(delete("/api/v1/expenses/{id}", testExpense.getId())
+                        .header("Authorization", "Bearer " + testToken))
+                .andExpect(status().isNoContent());
 
         assertThat(expenseRepository.findById(testExpense.getId())).isEmpty();
         assertThat(expenseRepository.count()).isEqualTo(0);
@@ -234,7 +269,8 @@ class RestExpenseControllerTest {
 
     @Test
     void deleteExpense_NotFound() throws Exception {
-        mockMvc.perform(delete("/api/v1/expenses/{id}", 999L)).andExpect(status().isNotFound());
+        mockMvc.perform(delete("/api/v1/expenses/{id}", 999L).header("Authorization", "Bearer " + testToken))
+                .andExpect(status().isNotFound());
 
         assertThat(expenseRepository.count()).isEqualTo(1);
     }

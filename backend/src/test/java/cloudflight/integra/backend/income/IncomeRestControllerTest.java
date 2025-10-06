@@ -4,10 +4,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import cloudflight.integra.backend.dto.IncomeDTO;
+import cloudflight.integra.backend.dto.auth.AuthenticationRequest;
+import cloudflight.integra.backend.dto.auth.AuthenticationResponse;
+import cloudflight.integra.backend.dto.auth.RegisterRequest;
 import cloudflight.integra.backend.entity.Frequency;
 import cloudflight.integra.backend.entity.Income;
 import cloudflight.integra.backend.entity.User;
@@ -24,6 +28,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -44,12 +49,38 @@ class IncomeRestControllerTest {
 
     private User user1, user2;
 
+    private String testToken;
+
     @BeforeEach
-    void resetRepository() {
+    void resetRepository() throws Exception {
         repository.deleteAll();
         userRepository.deleteAll();
         user1 = userRepository.save(new User(null, "Alice", "alice@email.com", "123"));
         user2 = userRepository.save(new User(null, "Marc", "marc@yahoo.com", "abcd999"));
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setName("Test User");
+        registerRequest.setEmail("test@example.com");
+        registerRequest.setPassword("password123");
+
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(registerRequest)))
+                .andExpect(status().isOk());
+
+        AuthenticationRequest loginRequest = new AuthenticationRequest();
+        loginRequest.setEmail("test@example.com");
+        loginRequest.setPassword("password123");
+
+        MvcResult result = mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andReturn();
+
+        String response = result.getResponse().getContentAsString();
+        testToken =
+                objectMapper.readValue(response, AuthenticationResponse.class).getToken();
     }
 
     @Test
@@ -64,6 +95,7 @@ class IncomeRestControllerTest {
         dto.setUserId(user1.getId());
 
         mockMvc.perform(post("/api/v1/incomes")
+                        .header("Authorization", "Bearer " + testToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated())
@@ -73,7 +105,8 @@ class IncomeRestControllerTest {
 
     @Test
     void getIncome_withNonExistingId_returns404() throws Exception {
-        mockMvc.perform(get("/api/v1/incomes/999")).andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/v1/incomes/999").header("Authorization", "Bearer " + testToken))
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -96,7 +129,7 @@ class IncomeRestControllerTest {
 
         repository.save(i1);
         repository.save(i2);
-        mockMvc.perform(get("/api/v1/incomes"))
+        mockMvc.perform(get("/api/v1/incomes").header("Authorization", "Bearer " + testToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].amount").value(100))
                 .andExpect(jsonPath("$[0].source").value("Job1"))
@@ -125,6 +158,7 @@ class IncomeRestControllerTest {
         dto.setDescription("Desc Updated");
 
         mockMvc.perform(put("/api/v1/incomes/" + saved.getId())
+                        .header("Authorization", "Bearer " + testToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
@@ -144,11 +178,13 @@ class IncomeRestControllerTest {
         i1.setFrequency(Frequency.ONE_TIME);
         i1.setUser(user1);
         Income saved = repository.save(i1);
-        mockMvc.perform(delete("/api/v1/incomes/" + saved.getId())).andExpect(status().isNoContent());
+        mockMvc.perform(delete("/api/v1/incomes/" + saved.getId()).header("Authorization", "Bearer " + testToken))
+                .andExpect(status().isNoContent());
     }
 
     @Test
     void deleteIncome_nonExistingIncome_returns404() throws Exception {
-        mockMvc.perform(delete("/api/v1/incomes/999")).andExpect(status().isNotFound());
+        mockMvc.perform(delete("/api/v1/incomes/999").header("Authorization", "Bearer " + testToken))
+                .andExpect(status().isNotFound());
     }
 }
