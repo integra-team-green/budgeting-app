@@ -14,6 +14,7 @@ module.exports = tseslint.config(
     ],
     processor: angular.processInlineTemplates,
     rules: {
+      // Angular-specific rules
       "@angular-eslint/directive-selector": [
         "error",
         {
@@ -30,6 +31,32 @@ module.exports = tseslint.config(
           style: "kebab-case",
         },
       ],
+
+      // Code quality rules
+      "semi": ["warn", "always"],
+      "quotes": ["warn", "single", { "avoidEscape": true }],
+      "no-console": "warn",
+      "no-debugger": "error",
+      "no-var": "error",
+      "prefer-const": "warn",
+
+      // TypeScript rules
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          "argsIgnorePattern": "^_",
+          "varsIgnorePattern": "^_"
+        }
+      ],
+      "@typescript-eslint/explicit-function-return-type": "off",
+      "@typescript-eslint/no-explicit-any": "warn",
+
+      // Code style
+      "indent": ["warn", 2],
+      "max-len": ["warn", { "code": 120 }],
+      "comma-dangle": ["warn", "always-multiline"],
+      "object-curly-spacing": ["warn", "always"],
+      "array-bracket-spacing": ["warn", "never"],
     },
   },
   {
@@ -38,6 +65,8 @@ module.exports = tseslint.config(
       ...angular.configs.templateRecommended,
       ...angular.configs.templateAccessibility,
     ],
-    rules: {},
+    rules: {
+      "@angular-eslint/template/no-negated-async": "error",
+    },
   }
 );
