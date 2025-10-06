@@ -1,14 +1,27 @@
 package cloudflight.integra.backend.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+@Schema(description = "User DTO")
 public class UserDTO {
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;
+
+    @Schema(description = "Full name", example = "Andrei")
     private String name;
+
+    @Schema(description = "Email address", example = "andrei@gmail.com")
     private String email;
+
+    @Schema(description = "Password", example = "password")
     private String password;
+
+    @Schema(description = "Account creation timestamp ", example = "2025-09-24T14:35:00")
     private LocalDateTime createdAt;
+
+    @Schema(description = "Account balance", example = "1500.75")
     private BigDecimal balance;
 
     public UserDTO() {}

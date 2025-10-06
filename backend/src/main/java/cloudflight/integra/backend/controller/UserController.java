@@ -5,6 +5,10 @@ import cloudflight.integra.backend.dto.UserDTO;
 import cloudflight.integra.backend.entity.User;
 import cloudflight.integra.backend.mapper.UserMapper;
 import cloudflight.integra.backend.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import java.util.Collection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +32,18 @@ public class UserController {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Operation(
+            summary = "Get users",
+            operationId = "getUsers",
+            responses = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "OK",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = UserDTO.class))),
+            })
     @GetMapping()
     public ResponseEntity<Collection<UserDTO>> getAllUsers() {
         logger.info("Received GET request for all users");
@@ -38,6 +54,19 @@ public class UserController {
         return ResponseEntity.ok(userDTOs);
     }
 
+    @Operation(
+            summary = "Get user by id",
+            operationId = "getUserById",
+            responses = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "OK",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = UserDTO.class))),
+                @ApiResponse(responseCode = "404", description = "Not found")
+            })
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getUser(@PathVariable Long id) {
         logger.info("Received GET request for user with id: {}", id);
@@ -47,6 +76,18 @@ public class UserController {
         return ResponseEntity.ok(UserMapper.toDto(user));
     }
 
+    @Operation(
+            summary = "Create user",
+            operationId = "createUser",
+            responses = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Created",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = UserDTO.class)))
+            })
     @PostMapping
     public ResponseEntity<UserDTO> addUser(@RequestBody UserDTO userDto) {
         logger.info("Received POST request to add user: {}", userDto);
@@ -57,6 +98,19 @@ public class UserController {
         return ResponseEntity.ok(UserMapper.toDto(createdUser));
     }
 
+    @Operation(
+            summary = "Update user",
+            operationId = "updateUser",
+            responses = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Updated",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = UserDTO.class))),
+                @ApiResponse(responseCode = "404", description = "Not found")
+            })
     @PutMapping("/{id}")
     public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO userDto) {
         logger.info("Received PUT request to update user with id: {}. Data: {}", id, userDto);
@@ -70,6 +124,19 @@ public class UserController {
         return ResponseEntity.ok(UserMapper.toDto(updatedUser));
     }
 
+    @Operation(
+            summary = "Delete user",
+            operationId = "deleteUser",
+            responses = {
+                @ApiResponse(
+                        responseCode = "204",
+                        description = "deleted",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = UserDTO.class))),
+                @ApiResponse(responseCode = "404", description = "Not found")
+            })
     @DeleteMapping("/{id}")
     public ResponseEntity<UserDTO> delete(@PathVariable Long id) {
         logger.info("Received DELETE request for user with id: {}", id);
@@ -78,6 +145,19 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(
+            summary = "Get user by email",
+            operationId = "getUserByEmail",
+            responses = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "OK",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = UserDTO.class))),
+                @ApiResponse(responseCode = "404", description = "Not found")
+            })
     @GetMapping("/by-email")
     public ResponseEntity<UserDTO> getUserByEmail(@RequestParam String email) {
         logger.info("Received GET request for user with email: {}", email);

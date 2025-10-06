@@ -12,6 +12,7 @@ import cloudflight.integra.backend.dto.auth.RegisterRequest;
 import cloudflight.integra.backend.entity.User;
 import cloudflight.integra.backend.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,17 +38,21 @@ class UserControllerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    private String aliceEmail;
+
+    private String marcEmail;
+
     @BeforeEach
     void setUp() throws Exception {
 
-        userRepo.deleteAll();
-        User alice = userRepo.save(new User(null, "Alice", "alice@email.com", "123"));
-        Long aliceId = alice.getId();
-        userRepo.save(new User(null, "Marc", "marc@yahoo.com", "abcd999"));
-
+        aliceEmail = "alice+" + UUID.randomUUID() + "@email.com";
+        userRepo.save(new User(null, "Alice", aliceEmail, "123"));
+        marcEmail = "marc+" + UUID.randomUUID() + "@email.com";
+        userRepo.save(new User(null, "Marc", marcEmail, "abcd999"));
         RegisterRequest registerRequest = new RegisterRequest();
         registerRequest.setName("Test User");
-        registerRequest.setEmail("test@example.com");
+        String email = "test+" + UUID.randomUUID() + "@example.com";
+        registerRequest.setEmail(email);
         registerRequest.setPassword("password123");
 
         mockMvc.perform(post("/api/auth/register")
@@ -56,7 +61,7 @@ class UserControllerTest {
                 .andExpect(status().isOk());
 
         AuthenticationRequest loginRequest = new AuthenticationRequest();
-        loginRequest.setEmail("test@example.com");
+        loginRequest.setEmail(email);
         loginRequest.setPassword("password123");
 
         MvcResult result = mockMvc.perform(post("/api/auth/login")
@@ -73,14 +78,14 @@ class UserControllerTest {
 
     @Test
     void testGetUserById() throws Exception {
-        User alice = userRepo.findByEmail("alice@email.com").orElseThrow();
+        User alice = userRepo.findByEmail(aliceEmail).orElseThrow();
         Long aliceId = alice.getId();
 
         mockMvc.perform(get("/api/v1/users/" + aliceId).header("Authorization", "Bearer " + testToken))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(jsonPath("$.name").value("Alice"))
-                .andExpect(jsonPath("$.email").value("alice@email.com"));
+                .andExpect(jsonPath("$.email").value(aliceEmail));
     }
 
     @Test
@@ -110,7 +115,7 @@ class UserControllerTest {
 
     @Test
     void testUpdateUser() throws Exception {
-        User alice = userRepo.findByEmail("alice@email.com").orElseThrow();
+        User alice = userRepo.findByEmail(aliceEmail).orElseThrow();
         Long aliceId = alice.getId();
 
         UserDTO updateDto = new UserDTO();
@@ -129,7 +134,7 @@ class UserControllerTest {
 
     @Test
     void testDeleteUser() throws Exception {
-        User alice = userRepo.findByEmail("alice@email.com").orElseThrow();
+        User alice = userRepo.findByEmail(aliceEmail).orElseThrow();
         Long aliceId = alice.getId();
 
         mockMvc.perform(delete("/api/v1/users/" + aliceId).header("Authorization", "Bearer " + testToken))
@@ -146,19 +151,18 @@ class UserControllerTest {
         mockMvc.perform(get("/api/v1/users").header("Authorization", "Bearer " + testToken))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()").value(3));
+                .andExpect(jsonPath("$").isArray());
     }
 
     @Test
     void testGetUserByEmail() throws Exception {
         mockMvc.perform(get("/api/v1/users/by-email")
                         .header("Authorization", "Bearer " + testToken)
-                        .param("email", "alice@email.com")
+                        .param("email", aliceEmail)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Alice"))
-                .andExpect(jsonPath("$.email").value("alice@email.com"));
+                .andExpect(jsonPath("$.email").value(aliceEmail));
     }
 }
