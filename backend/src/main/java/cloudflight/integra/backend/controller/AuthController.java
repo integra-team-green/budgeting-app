@@ -60,11 +60,11 @@ public class AuthController {
 
     User savedUser = userService.addUser(user);
 
-        Map<String, String> response = new HashMap<>();
+    Map<String, String> response = new HashMap<>();
 
-        response.put("message", "User " + savedUser.getEmail() + " registered successfully.");
-        return ResponseEntity.ok(response);
-    }
+    response.put("message", "User " + savedUser.getEmail() + " registered successfully.");
+    return ResponseEntity.ok(response);
+  }
 
   @PostMapping("/login")
   public ResponseEntity<?> login(@RequestBody AuthenticationRequest request) {
