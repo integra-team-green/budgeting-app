@@ -9,6 +9,9 @@ import cloudflight.integra.backend.security.JwtUtils;
 import cloudflight.integra.backend.service.UserService;
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -56,8 +59,11 @@ public class AuthController {
 
         User savedUser = userService.addUser(user);
 
-        return ResponseEntity.ok("User " + savedUser.getEmail() + " registered successfully");
-    }
+    Map<String, String> response = new HashMap<>();
+
+    response.put("message", "User " + savedUser.getEmail() + " registered successfully.");
+    return ResponseEntity.ok(response);
+  }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthenticationRequest request) {

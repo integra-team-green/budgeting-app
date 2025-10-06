@@ -1,0 +1,20 @@
+<div class="login-page">
+  <div class="login-box">
+    <h1>Money Mind</h1>
+    <h2>Welcome Back!</h2>
+    <p class="subtitle">Please login to your account</p>
+
+    <form (ngSubmit)="submit()">
+      <input [(ngModel)]="username" name="username" placeholder="Email" required type="text"/>
+      <input [(ngModel)]="password" name="password" placeholder="Password" required type="password"/>
+
+      <button class="login-btn" type="submit">Login</button>
+      <button class="reset-btn" type="button">Reset password</button>
+    </form>
+
+
+    <p class="register-text">Don't have an account? <a [routerLink]="['/register']">Register</a></p>
+
+    <div *ngIf="error" class="error-box">{{ error }}</div>
+  </div>
+</div>
