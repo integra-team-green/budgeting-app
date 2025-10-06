@@ -1,6 +1,8 @@
 package cloudflight.integra.backend.architecture;
+
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
+
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
@@ -42,6 +44,7 @@ public class ArchitectureRulesTest {
             .should()
             .dependOnClassesThat()
             .resideInAnyPackage("..service..", "..controller");
+
     @ArchTest
     static final ArchRule entities_should_reside_in_entity_package =
             classes().that().haveNameMatching(".*Repository").should().resideInAnyPackage("..repository..");
