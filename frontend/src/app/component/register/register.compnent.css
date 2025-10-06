@@ -2,17 +2,16 @@
 body, html {
   margin: 0;
   padding: 0;
-  height: 100vh;
+  height: 100%;
   font-family: 'Arial', sans-serif;
   background: linear-gradient(135deg, #F0E6FA, #E6CCF2);
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow: hidden;
 }
 
-/* Container login tip desktop */
-.login-page {
+/* Container register tip desktop */
+.register-page {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -20,12 +19,12 @@ body, html {
   height: 100%;
 }
 
-.login-box {
-  width: 480px; /* mai lat pentru desktop */
+.register-box {
+  width: 480px;
   background-color: white;
   border-radius: 12px;
   padding: 50px 40px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25); /* shadow mai pronuntat */
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -33,42 +32,34 @@ body, html {
 }
 
 /* Titlu */
-h1 {
+.register-box h2 {
   color: #4B0082;
   margin: 0;
-  text-decoration: underline;
-  font-size: 42px;
+  font-size: 32px;
 }
 
-.login-box h2 {
-  color: #4B0082;
-  margin: 0;
-  font-size: 30px;
-}
-
-.login-box .subtitle {
-  font-family: "Linux Biolinum G", serif;
+.register-box .subtitle {
   color: #6A0DAD;
   font-size: 18px;
   margin-bottom: 25px;
 }
 
 /* Form */
-.login-box form {
+.register-box form {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.login-box input {
+.register-box input {
   padding: 14px;
   border-radius: 8px;
   border: 1px solid #ccc;
   font-size: 16px;
 }
 
-/* Butoane mari pentru desktop */
-.login-box button {
+/* Butoane mari */
+.register-box button {
   padding: 14px;
   border-radius: 8px;
   border: none;
@@ -78,12 +69,12 @@ h1 {
   transition: 0.3s;
 }
 
-.login-btn {
+.register-btn {
   background-color: #6A0DAD;
   color: white;
 }
 
-.login-btn:hover {
+.register-btn:hover {
   background-color: #8B2DC7;
 }
 
@@ -96,24 +87,22 @@ h1 {
   background-color: #aaa;
 }
 
-/* Text pentru register */
-.login-box .register-text {
+/* Text pentru login */
+.register-box .login-text {
   font-size: 15px;
   margin-top: 20px;
 }
 
-.login-box .register-text a {
+.register-box .login-text a {
   color: #6A0DAD;
   text-decoration: none;
   font-weight: bold;
 }
 
-.login-box .register-text a:hover {
+.register-box .login-text a:hover {
   text-decoration: underline;
 }
 
-
-/* Error */
 .error-box {
   background-color: #ffebee;
   color: #c62828;
@@ -128,6 +117,25 @@ h1 {
 
 .error-box::before {
   content: "⚠️";
+  margin-right: 10px;
+  font-size: 18px;
+}
+
+
+.success-box {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #a5d6a7;
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin-top: 15px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+}
+
+.success-box::before {
+  content: "✓";
   margin-right: 10px;
   font-size: 18px;
 }
