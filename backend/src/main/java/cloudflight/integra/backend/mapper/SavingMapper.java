@@ -2,7 +2,6 @@ package cloudflight.integra.backend.mapper;
 
 import cloudflight.integra.backend.dto.SavingDTO;
 import cloudflight.integra.backend.entity.Saving;
-import cloudflight.integra.backend.entity.User;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +12,7 @@ public class SavingMapper {
         }
         SavingDTO dto = new SavingDTO();
         dto.setId(saving.getId());
-        dto.setUserId(saving.getUser() != null ? saving.getUser().getId() : null);
+        dto.setUserId(saving.getUserId()); // direct userId, nu din User
         dto.setAmount(saving.getAmount());
         dto.setDate(saving.getDate());
         dto.setGoal(saving.getGoal());
@@ -21,18 +20,17 @@ public class SavingMapper {
         return dto;
     }
 
-    public static Saving toEntity(SavingDTO savingDTO) {
-        if (savingDTO == null) {
+    public static Saving toEntity(SavingDTO dto) {
+        if (dto == null) {
             return null;
         }
-        User user = savingDTO.getUserId() != null ? new User(savingDTO.getUserId()) : null;
         Saving saving = new Saving();
-        saving.setId(savingDTO.getId());
-        saving.setUser(user);
-        saving.setAmount(savingDTO.getAmount());
-        saving.setDate(savingDTO.getDate());
-        saving.setGoal(savingDTO.getGoal());
-        saving.setDescription(savingDTO.getDescription());
+        saving.setId(dto.getId());
+        saving.setUserId(dto.getUserId());
+        saving.setAmount(dto.getAmount());
+        saving.setDate(dto.getDate());
+        saving.setGoal(dto.getGoal());
+        saving.setDescription(dto.getDescription());
         return saving;
     }
 

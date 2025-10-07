@@ -2,9 +2,6 @@ package cloudflight.integra.backend.controller;
 
 import cloudflight.integra.backend.controller.problem.SavingApiErrorResponses;
 import cloudflight.integra.backend.dto.SavingDTO;
-import cloudflight.integra.backend.entity.validation.ValidationException;
-import cloudflight.integra.backend.exception.MoneyMindRuntimeException;
-import cloudflight.integra.backend.exception.NotFoundException;
 import cloudflight.integra.backend.service.SavingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -45,14 +42,8 @@ public class SavingController {
             @Parameter(description = "ID of saving to return") @PathVariable Long savingId) {
         log.info("GET /savings/{} called, searching for saving with ID: {}", savingId, savingId);
 
-        try {
-            SavingDTO savingDTO = savingService.getSavingById(savingId);
-            return ResponseEntity.ok(savingDTO);
-        } catch (NotFoundException e) {
-            return ResponseEntity.status(404).body("Saving with ID " + savingId + " not found.");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error: " + e.getMessage());
-        }
+        SavingDTO savingDTO = savingService.getSavingById(savingId);
+        return ResponseEntity.ok(savingDTO);
     }
 
     @Operation(summary = "Get all savings", description = "Returns all available savings")
@@ -60,13 +51,8 @@ public class SavingController {
     public ResponseEntity<?> getAllSavings() {
 
         log.info("GET /savings called, returning all savings.");
-
-        try {
-            Iterable<SavingDTO> savingDTOS = savingService.getAllSavings();
-            return ResponseEntity.ok(savingDTOS);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error: " + e.getMessage());
-        }
+        Iterable<SavingDTO> savingDTOS = savingService.getAllSavings();
+        return ResponseEntity.ok(savingDTOS);
     }
 
     @Operation(summary = "Add a new saving")
@@ -97,17 +83,10 @@ public class SavingController {
                     SavingDTO savingDTO) {
         log.info("POST /savings called, adding new saving: {}", savingDTO);
 
-        try {
-            SavingDTO created = savingService.addSaving(savingDTO);
-            log.info("Saving added successfully: {}", created);
-            return ResponseEntity.ok(created);
-        } catch (IllegalArgumentException | ValidationException | MoneyMindRuntimeException e) {
-            log.error("Error adding saving: {}", e.getMessage());
-            return ResponseEntity.status(400).body("Error: " + e.getMessage());
-        } catch (Exception e) {
-            log.error("InternalError adding saving: {}", e.getMessage());
-            return ResponseEntity.status(500).body("Error: " + e.getMessage());
-        }
+        log.info("POST /savings called, adding new saving: {}", savingDTO);
+        SavingDTO created = savingService.addSaving(savingDTO);
+        log.info("Saving added successfully: {}", created);
+        return ResponseEntity.ok(created);
     }
 
     @Operation(summary = "Update an existing saving by ID")
@@ -125,24 +104,12 @@ public class SavingController {
                     SavingDTO savingDTO) {
         log.info("PUT /savings/{} called, updating saving with ID: {}", savingId, savingId);
 
-        try {
-            if (!savingId.equals(savingDTO.getId())) {
-                return ResponseEntity.status(400).body("ID in path and request body do not match.");
-            }
-
-            SavingDTO updated = savingService.updateSaving(savingDTO);
-            log.info("Saving updated successfully: {}", updated);
-            return ResponseEntity.ok(updated);
-        } catch (ValidationException e) {
-            log.error("Validation error updating saving with ID {}: {}", savingId, e.getMessage());
-            return ResponseEntity.status(400).body("Error: " + e.getMessage());
-        } catch (NotFoundException e) {
-            log.error("Saving not found with ID {}: {}", savingId, e.getMessage());
-            return ResponseEntity.status(404).body("Error: " + e.getMessage());
-        } catch (Exception e) {
-            log.error("Error updating saving with ID {}: {}", savingId, e.getMessage());
-            return ResponseEntity.status(500).body("Error: " + e.getMessage());
+        if (!savingId.equals(savingDTO.getId())) {
+            throw new IllegalArgumentException("ID in path and request body do not match.");
         }
+        SavingDTO updated = savingService.updateSaving(savingDTO);
+        log.info("Saving updated successfully: {}", updated);
+        return ResponseEntity.ok(updated);
     }
 
     @Operation(summary = "Delete a saving by ID")
@@ -156,18 +123,8 @@ public class SavingController {
             @Parameter(description = "ID of saving to delete") @PathVariable Long savingId) {
         log.info("DELETE /savings/{} called, deleting saving with ID: {}", savingId, savingId);
 
-        try {
-            savingService.deleteSaving(savingId);
-            log.info("Saving deleted successfully with ID: {}", savingId);
-            return ResponseEntity.noContent().build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (NotFoundException e) {
-            log.error("NotFound saving with ID {}: {}", savingId, e.getMessage());
-            return ResponseEntity.status(404).body("Error: " + e.getMessage());
-        } catch (Exception e) {
-            log.error("Error deleting saving with ID {}: {}", savingId, e.getMessage());
-            return ResponseEntity.status(500).body("Error: " + e.getMessage());
-        }
+        savingService.deleteSaving(savingId);
+        log.info("Saving deleted successfully with ID: {}", savingId);
+        return ResponseEntity.noContent().build();
     }
 }

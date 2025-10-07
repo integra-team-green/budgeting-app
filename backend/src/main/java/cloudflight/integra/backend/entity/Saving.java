@@ -123,4 +123,10 @@ public class Saving {
                 + goal + '\'' + ", description='"
                 + description + '\'' + '}';
     }
+
+    public void setUserId(Long userId) {}
+
+    public Long getUserId() {
+        return user != null ? user.getId() : null;
+    }
 }

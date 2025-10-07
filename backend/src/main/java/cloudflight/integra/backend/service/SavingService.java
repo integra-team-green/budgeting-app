@@ -1,6 +1,7 @@
 package cloudflight.integra.backend.service;
 
 import cloudflight.integra.backend.dto.SavingDTO;
+import java.util.List;
 
 public interface SavingService {
 
@@ -16,7 +17,7 @@ public interface SavingService {
      *
      * @return Iterable of all savings
      */
-    Iterable<SavingDTO> getAllSavings();
+    List<SavingDTO> getAllSavings();
 
     /**
      * Returns a saving by its id from the repository

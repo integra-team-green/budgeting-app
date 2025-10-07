@@ -48,8 +48,6 @@ public class User {
 
     public User() {}
 
-    public User(Long userId) {}
-
     // Getters and Setters
     public Long getId() {
         return id;

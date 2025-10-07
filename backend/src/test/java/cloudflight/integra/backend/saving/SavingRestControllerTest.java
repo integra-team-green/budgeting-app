@@ -109,7 +109,11 @@ class SavingRestControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(badDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("Error")));
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message").value("Validation Failed"))
+                .andExpect(jsonPath("$.details", hasItem("Amount must be non-negative.")))
+                .andExpect(
+                        jsonPath("$.details", hasItem("Please provide a goal, need to know what you are saving for!")));
     }
 
     @Test
@@ -156,6 +160,10 @@ class SavingRestControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(badDto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string(containsString("Error")));
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message").value("Validation Failed"))
+                .andExpect(jsonPath("$.details", hasItem("Amount must be non-negative.")))
+                .andExpect(
+                        jsonPath("$.details", hasItem("Please provide a goal, need to know what you are saving for!")));
     }
 }

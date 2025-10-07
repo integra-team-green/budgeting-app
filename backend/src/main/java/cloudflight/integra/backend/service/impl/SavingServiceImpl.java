@@ -47,7 +47,7 @@ public class SavingServiceImpl implements SavingService {
 
     @Override
     @Transactional(readOnly = true)
-    public Iterable<SavingDTO> getAllSavings() {
+    public List<SavingDTO> getAllSavings() {
         List<SavingDTO> dtos = new ArrayList<>();
         for (Saving saving : savingRepository.findAll()) {
             dtos.add(SavingMapper.toDTO(saving));
