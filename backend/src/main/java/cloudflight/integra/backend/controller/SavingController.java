@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/savings")
 @SavingApiErrorResponses
@@ -51,7 +53,7 @@ public class SavingController {
     public ResponseEntity<?> getAllSavings() {
 
         log.info("GET /savings called, returning all savings.");
-        Iterable<SavingDTO> savingDTOS = savingService.getAllSavings();
+        List<SavingDTO> savingDTOS = savingService.getAllSavings();
         return ResponseEntity.ok(savingDTOS);
     }
 
