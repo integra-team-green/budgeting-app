@@ -46,7 +46,7 @@ public class ArchitectureRulesTest {
             .resideInAnyPackage("..service..", "..controller");
 
     @ArchTest
-    static final ArchRule entities_should_reside_in_entity_package =
+    static final ArchRule repo_should_reside_in_repo_package =
             classes().that().haveNameMatching(".*Repository").should().resideInAnyPackage("..repository..");
 
     // DTO rules
