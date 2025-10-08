@@ -22,5 +22,8 @@ jobs:
       - name: Grant execute permission for gradlew 💾
         run: chmod +x gradlew
 
+      - name: Gradle build ️
+        run: ./gradlew :backend:build --no-daemon --stacktrace
+
       - name: Run Spotless check 🏗️
         run: ./gradlew :backend:spotlessCheck

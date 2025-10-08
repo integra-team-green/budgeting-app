@@ -11,6 +11,7 @@ import cloudflight.integra.backend.dto.auth.RegisterRequest;
 import cloudflight.integra.backend.entity.User;
 import cloudflight.integra.backend.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,60 +27,67 @@ import org.springframework.test.web.servlet.MvcResult;
 @AutoConfigureMockMvc
 public class SecurityTests {
 
-  private String testToken;
+    private String testToken;
 
-  @Autowired private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-  @Autowired private ObjectMapper objectMapper;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-  @Autowired private UserRepository userRepo;
+    @Autowired
+    private UserRepository userRepo;
 
-  @BeforeEach
-  public void setUp() throws Exception {
-    userRepo.deleteAll();
-    userRepo.save(new User(null, "Alice", "alice@email.com", "123"));
-    userRepo.save(new User(null, "Marc", "marc@yahoo.com", "abcd999"));
+    private String aliceEmail;
 
-    RegisterRequest registerRequest = new RegisterRequest();
-    registerRequest.setName("Test User");
-    registerRequest.setEmail("test@example.com");
-    registerRequest.setPassword("password123");
+    private String marcEmail;
 
-    mockMvc
-        .perform(
-            post("/api/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(registerRequest)))
-        .andExpect(status().isOk());
+    @BeforeEach
+    public void setUp() throws Exception {
 
-    AuthenticationRequest loginRequest = new AuthenticationRequest();
-    loginRequest.setEmail("test@example.com");
-    loginRequest.setPassword("password123");
+        aliceEmail = "alice+" + UUID.randomUUID() + "@email.com";
+        userRepo.save(new User(null, "Alice", aliceEmail, "123"));
+        marcEmail = "marc+" + UUID.randomUUID() + "@email.com";
+        userRepo.save(new User(null, "Marc", marcEmail, "abcd999"));
 
-    MvcResult result =
-        mockMvc
-            .perform(
-                post("/api/auth/login")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(loginRequest)))
-            .andExpect(status().isOk())
-            .andDo(print())
-            .andReturn();
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setName("Test User");
+        String email = "test+" + UUID.randomUUID() + "@example.com";
+        registerRequest.setEmail(email);
+        registerRequest.setPassword("password123");
 
-    String response = result.getResponse().getContentAsString();
-    testToken = objectMapper.readValue(response, AuthenticationResponse.class).getToken();
-  }
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(registerRequest)))
+                .andExpect(status().isOk());
 
-  @Test
-  public void testGetAll() throws Exception {
-    mockMvc
-        .perform(get("/api/v1/users").header("Authorization", "Bearer " + testToken))
-        .andExpect(status().isOk())
-        .andDo(print());
-  }
+        AuthenticationRequest loginRequest = new AuthenticationRequest();
+        loginRequest.setEmail(email);
+        loginRequest.setPassword("password123");
 
-  @Test
-  public void testGetAllWithoutToken() throws Exception {
-    mockMvc.perform(get("/api/v1/users")).andExpect(status().isUnauthorized()).andDo(print());
-  }
+        MvcResult result = mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andReturn();
+
+        String response = result.getResponse().getContentAsString();
+        testToken =
+                objectMapper.readValue(response, AuthenticationResponse.class).getToken();
+    }
+
+    @Test
+    public void testGetAll() throws Exception {
+        mockMvc.perform(get("/api/v1/users").header("Authorization", "Bearer " + testToken))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    public void testGetAllWithoutToken() throws Exception {
+        mockMvc.perform(get("/api/v1/users"))
+                .andExpect(status().isUnauthorized())
+                .andDo(print());
+    }
 }

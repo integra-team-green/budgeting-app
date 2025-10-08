@@ -17,72 +17,72 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/users")
 @UserApiErrorResponses
 public class UserController {
-  private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
-  private final UserService userService;
-  private final PasswordEncoder passwordEncoder;
+    private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
 
-  @Autowired
-  public UserController(UserService userService, PasswordEncoder passwordEncoder) {
-    this.userService = userService;
-    this.passwordEncoder = passwordEncoder;
-  }
-
-  @GetMapping()
-  public ResponseEntity<Collection<UserDTO>> getAllUsers() {
-    logger.info("Received GET request for all users");
-
-    Collection<User> users = userService.getAllUsers();
-    Collection<UserDTO> userDTOs = UserMapper.toDtoList(users);
-    logger.info("Users retrieved: {}", userDTOs);
-    return ResponseEntity.ok(userDTOs);
-  }
-
-  @GetMapping("/{id}")
-  public ResponseEntity<UserDTO> getUser(@PathVariable Long id) {
-    logger.info("Received GET request for user with id: {}", id);
-
-    User user = userService.getUser(id);
-    logger.info("User retrieved: {}", user);
-    return ResponseEntity.ok(UserMapper.toDto(user));
-  }
-
-  @PostMapping
-  public ResponseEntity<UserDTO> addUser(@RequestBody UserDTO userDto) {
-    logger.info("Received POST request to add user: {}", userDto);
-
-    User userToAdd = UserMapper.fromDto(userDto);
-    User createdUser = userService.addUser(userToAdd);
-    logger.info("User created: {}", createdUser);
-    return ResponseEntity.ok(UserMapper.toDto(createdUser));
-  }
-
-  @PutMapping("/{id}")
-  public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO userDto) {
-    logger.info("Received PUT request to update user with id: {}. Data: {}", id, userDto);
-    if (!id.equals(userDto.getId())) {
-      throw new IllegalArgumentException("ID in path and request body do not match.");
+    @Autowired
+    public UserController(UserService userService, PasswordEncoder passwordEncoder) {
+        this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
     }
-    User userToUpdate = UserMapper.fromDto(userDto);
-    userToUpdate.setPassword(passwordEncoder.encode(userToUpdate.getPassword()));
-    User updatedUser = userService.updateUser(userToUpdate);
-    logger.info("User updated: {}", updatedUser);
-    return ResponseEntity.ok(UserMapper.toDto(updatedUser));
-  }
 
-  @DeleteMapping("/{id}")
-  public ResponseEntity<UserDTO> delete(@PathVariable Long id) {
-    logger.info("Received DELETE request for user with id: {}", id);
-    userService.deleteUser(id);
-    logger.info("User with id {} deleted.", id);
-    return ResponseEntity.noContent().build();
-  }
+    @GetMapping()
+    public ResponseEntity<Collection<UserDTO>> getAllUsers() {
+        logger.info("Received GET request for all users");
 
-  @GetMapping("/by-email")
-  public ResponseEntity<UserDTO> getUserByEmail(@RequestParam String email) {
-    logger.info("Received GET request for user with email: {}", email);
-    User user = userService.getUserByEmail(email);
-    logger.info("User retrieved by email: {}", user);
-    return ResponseEntity.ok(UserMapper.toDto(user));
-  }
+        Collection<User> users = userService.getAllUsers();
+        Collection<UserDTO> userDTOs = UserMapper.toDtoList(users);
+        logger.info("Users retrieved: {}", userDTOs);
+        return ResponseEntity.ok(userDTOs);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDTO> getUser(@PathVariable Long id) {
+        logger.info("Received GET request for user with id: {}", id);
+
+        User user = userService.getUser(id);
+        logger.info("User retrieved: {}", user);
+        return ResponseEntity.ok(UserMapper.toDto(user));
+    }
+
+    @PostMapping
+    public ResponseEntity<UserDTO> addUser(@RequestBody UserDTO userDto) {
+        logger.info("Received POST request to add user: {}", userDto);
+
+        User userToAdd = UserMapper.fromDto(userDto);
+        User createdUser = userService.addUser(userToAdd);
+        logger.info("User created: {}", createdUser);
+        return ResponseEntity.ok(UserMapper.toDto(createdUser));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO userDto) {
+        logger.info("Received PUT request to update user with id: {}. Data: {}", id, userDto);
+        if (!id.equals(userDto.getId())) {
+            throw new IllegalArgumentException("ID in path and request body do not match.");
+        }
+        User userToUpdate = UserMapper.fromDto(userDto);
+        userToUpdate.setPassword(passwordEncoder.encode(userToUpdate.getPassword()));
+        User updatedUser = userService.updateUser(userToUpdate);
+        logger.info("User updated: {}", updatedUser);
+        return ResponseEntity.ok(UserMapper.toDto(updatedUser));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<UserDTO> delete(@PathVariable Long id) {
+        logger.info("Received DELETE request for user with id: {}", id);
+        userService.deleteUser(id);
+        logger.info("User with id {} deleted.", id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/by-email")
+    public ResponseEntity<UserDTO> getUserByEmail(@RequestParam String email) {
+        logger.info("Received GET request for user with email: {}", email);
+        User user = userService.getUserByEmail(email);
+        logger.info("User retrieved by email: {}", user);
+        return ResponseEntity.ok(UserMapper.toDto(user));
+    }
 }

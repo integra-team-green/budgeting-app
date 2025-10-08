@@ -1,79 +1,74 @@
 package cloudflight.integra.backend.dto;
 
-import cloudflight.integra.backend.entity.Frequency;
+import cloudflight.integra.backend.entity.Payment;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 
 public class PaymentDTO {
-  private Long id;
-  private String name;
-  private BigDecimal amount;
-  private Frequency frequency;
-  private Date nextDueDate;
-  private Boolean isActive;
+    private Long id;
+    private Long expenseId;
+    private String name;
+    private BigDecimal amount;
+    private Payment.StatusEnum status;
+    private LocalDate paymentDate;
 
-  public PaymentDTO() {}
+    public PaymentDTO() {}
 
-  public PaymentDTO(
-      Long id,
-      String name,
-      BigDecimal amount,
-      Frequency frequency,
-      Date nextDueDate,
-      Boolean isActive) {
-    this.id = id;
-    this.name = name;
-    this.amount = amount;
-    this.frequency = frequency;
-    this.nextDueDate = nextDueDate;
-    this.isActive = isActive;
-  }
+    public PaymentDTO(
+            Long id, Long expenseId, String name, BigDecimal amount, Payment.StatusEnum status, LocalDate paymentDate) {
+        this.id = id;
+        this.expenseId = expenseId;
+        this.name = name;
+        this.amount = amount;
+        this.status = status;
+        this.paymentDate = paymentDate;
+    }
 
-  public Long getId() {
-    return id;
-  }
+    public Long getId() {
+        return id;
+    }
 
-  public void setId(Long id) {
-    this.id = id;
-  }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public BigDecimal getAmount() {
-    return amount;
-  }
+    public BigDecimal getAmount() {
+        return amount;
+    }
 
-  public void setAmount(BigDecimal amount) {
-    this.amount = amount;
-  }
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
 
-  public Frequency getFrequency() {
-    return frequency;
-  }
+    public Payment.StatusEnum getStatus() {
+        return status;
+    }
 
-  public void setFrequency(Frequency frequency) {
-    this.frequency = frequency;
-  }
+    public void setStatus(Payment.StatusEnum status) {
+        this.status = status;
+    }
 
-  public Date getNextDueDate() {
-    return nextDueDate;
-  }
+    public LocalDate getPaymentDate() {
+        return paymentDate;
+    }
 
-  public void setNextDueDate(Date nextDueDate) {
-    this.nextDueDate = nextDueDate;
-  }
+    public void setPaymentDate(LocalDate paymentDate) {
+        this.paymentDate = paymentDate;
+    }
 
-  public Boolean getIsActive() {
-    return isActive;
-  }
+    public Long getExpenseId() {
+        return expenseId;
+    }
 
-  public void setIsActive(Boolean isActive) {
-    this.isActive = isActive;
-  }
+    public void setExpenseId(Long expenseId) {
+        this.expenseId = expenseId;
+    }
 }

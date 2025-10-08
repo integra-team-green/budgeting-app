@@ -1,76 +1,99 @@
 package cloudflight.integra.backend.entity;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 
+@Entity
+@Table(name = "payment")
 public class Payment {
-  private Long id;
-  private String name;
-  private BigDecimal amount;
-  private Frequency frequency;
-  private Date nextDueDate;
-  private Boolean isActive;
 
-  public Payment(
-      Long id,
-      String name,
-      BigDecimal amount,
-      Frequency frequency,
-      Date nextDueDate,
-      Boolean isActive) {
-    this.id = id;
-    this.name = name;
-    this.amount = amount;
-    this.frequency = frequency;
-    this.nextDueDate = nextDueDate;
-    this.isActive = isActive;
-  }
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  public Long getId() {
-    return id;
-  }
+    @OneToOne(optional = false)
+    @JoinColumn(name = "expense_id", nullable = false) // Asigură că fiecare Payment trebuie să aibă un Expense
+    private Expense expense;
 
-  public void setId(Long id) {
-    this.id = id;
-  }
+    @Column(nullable = false)
+    private String name;
 
-  public String getName() {
-    return name;
-  }
+    @Enumerated(EnumType.STRING)
+    private StatusEnum status; // pending, paid, failed
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    private LocalDate paymentDate;
 
-  public BigDecimal getAmount() {
-    return amount;
-  }
+    @PositiveOrZero
+    @Column(nullable = false)
+    private BigDecimal amount;
 
-  public void setAmount(BigDecimal amount) {
-    this.amount = amount;
-  }
+    // Enum pentru status
+    public enum StatusEnum {
+        PENDING,
+        PAID,
+        FAILED
+    }
 
-  public Frequency getFrequency() {
-    return frequency;
-  }
+    public Payment(Expense expense, String name, StatusEnum status, LocalDate paymentDate) {
+        this.expense = expense;
+        this.name = name;
+        this.status = status;
+        this.paymentDate = paymentDate;
+    }
 
-  public void setFrequency(Frequency frequency) {
-    this.frequency = frequency;
-  }
+    public Payment() {}
 
-  public Date getNextDueDate() {
-    return nextDueDate;
-  }
+    public Long getId() {
 
-  public void setNextDueDate(Date nextDueDate) {
-    this.nextDueDate = nextDueDate;
-  }
+        return id;
+    }
 
-  public Boolean getIsActive() {
-    return isActive;
-  }
+    public void setId(Long id) {
 
-  public void setIsActive(Boolean isActive) {
-    this.isActive = isActive;
-  }
+        this.id = id;
+    }
+
+    public String getName() {
+
+        return name;
+    }
+
+    public void setName(String name) {
+
+        this.name = name;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public Expense getExpense() {
+        return expense;
+    }
+
+    public void setExpense(Expense expense) {
+        this.expense = expense;
+    }
+
+    public StatusEnum getStatus() {
+        return status;
+    }
+
+    public void setStatus(StatusEnum status) {
+        this.status = status;
+    }
+
+    public LocalDate getPaymentDate() {
+        return paymentDate;
+    }
+
+    public void setPaymentDate(LocalDate paymentDate) {
+        this.paymentDate = paymentDate;
+    }
 }

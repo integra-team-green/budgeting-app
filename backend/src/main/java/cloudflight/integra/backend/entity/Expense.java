@@ -1,196 +1,231 @@
 package cloudflight.integra.backend.entity;
 
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Objects;
 
-/*As a user, I want to manage my expenses so that I can track all my spending.
-*
-* Fields:
-    id: Long
-    userId: Long (FK → User)
-    amount: BigDecimal
-    category: String
-    date: Date
-    description: String (optional)*/
-
-/** Represents a financial expense entry for a specific user.* */
+@Entity
+@Table(name = "Expense")
 public class Expense {
 
-  /** Unique identifier of the expense. */
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  /** Identifier of the user who created the expense. */
-  private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-  /** Monetary value of the expense. */
-  private BigDecimal amount;
+    @Column(name = "user_id", insertable = false, updatable = false)
+    private Long userId;
 
-  /** Category of the expense. */
-  private String category;
+    @Column(nullable = false, precision = 15, scale = 2)
+    private BigDecimal amount;
 
-  /** Date when the expense occurred. */
-  private LocalDate date;
+    @Column(nullable = false)
+    private String category;
 
-  /** Optional description with extra details about the expense. */
-  private String description;
+    @Column(nullable = false)
+    private LocalDate date;
 
-  /**
-   * Full constructor for creating an {@code Expense} instance.
-   *
-   * @param id unique identifier of the expense
-   * @param userId identifier of the user who created it
-   * @param amount monetary value of the expense
-   * @param category category of the expense
-   * @param date date when the expense occurred
-   * @param description optional description
-   */
-  public Expense(
-      Long id,
-      Long userId,
-      BigDecimal amount,
-      String category,
-      LocalDate date,
-      String description) {
-    this.id = id;
-    this.userId = userId;
-    this.amount = amount;
-    this.category = category;
-    this.date = date;
-    this.description = description;
-  }
+    @Column
+    private String description;
 
-  /**
-   * @return unique identifier of the expense
-   */
-  public Long getId() {
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Frequency frequency;
 
-    return id;
-  }
+    @Column(name = "end_date")
+    private LocalDate endDate;
 
-  /**
-   * @param id unique identifier of the expense
-   */
-  public void setId(Long id) {
+    @Column(name = "next_due_date")
+    private LocalDate nextDueDate;
 
-    this.id = id;
-  }
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_method", nullable = false)
+    private PaymentMethod paymentMethod;
 
-  /**
-   * @return user identifier
-   */
-  public Long getUserId() {
+    @OneToOne(mappedBy = "expense", cascade = CascadeType.ALL, optional = true, fetch = FetchType.LAZY)
+    private Payment payment;
 
-    return userId;
-  }
-
-  /**
-   * @param userId identifier of the user who created the expense
-   */
-  public void setUserId(Long userId) {
-
-    this.userId = userId;
-  }
-
-  /**
-   * @return monetary value of the expense
-   */
-  public BigDecimal getAmount() {
-
-    return amount;
-  }
-
-  /**
-   * @param amount monetary value of the expense
-   */
-  public void setAmount(BigDecimal amount) {
-
-    this.amount = amount;
-  }
-
-  /**
-   * @return category of the expense
-   */
-  public String getCategory() {
-
-    return category;
-  }
-
-  /**
-   * @param category category of the expense
-   */
-  public void setCategory(String category) {
-
-    this.category = category;
-  }
-
-  /**
-   * @return date when the expense occurred
-   */
-  public LocalDate getDate() {
-    return date;
-  }
-
-  /**
-   * @param date date when the expense occurred
-   */
-  public void setDate(LocalDate date) {
-
-    this.date = date;
-  }
-
-  /**
-   * @return optional description of the expense
-   */
-  public String getDescription() {
-
-    return description;
-  }
-
-  /**
-   * @param description optional description of the expense
-   */
-  public void setDescription(String description) {
-
-    this.description = description;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (o == null || getClass() != o.getClass()) {
-      return false;
+    public Expense(
+            Long id,
+            Long userId,
+            BigDecimal amount,
+            String category,
+            LocalDate date,
+            String description,
+            Frequency frequency,
+            LocalDate endDate,
+            LocalDate nextDueDate,
+            PaymentMethod paymentMethod) {
+        this.id = id;
+        this.userId = userId;
+        this.amount = amount;
+        this.category = category;
+        this.date = date;
+        this.description = description;
+        this.frequency = frequency;
+        this.endDate = endDate;
+        this.nextDueDate = nextDueDate;
+        this.paymentMethod = paymentMethod;
     }
-    Expense expense = (Expense) o;
-    return Objects.equals(id, expense.id)
-        && Objects.equals(userId, expense.userId)
-        && Objects.equals(amount, expense.amount)
-        && Objects.equals(category, expense.category)
-        && Objects.equals(date, expense.date)
-        && Objects.equals(description, expense.description);
-  }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(id, userId, amount, category, date, description);
-  }
+    public Expense(
+            Long id,
+            User user,
+            BigDecimal amount,
+            String category,
+            LocalDate date,
+            String description,
+            Frequency frequency,
+            LocalDate endDate,
+            LocalDate nextDueDate,
+            PaymentMethod paymentMethod) {
+        this.id = id;
+        this.user = user;
+        this.amount = amount;
+        this.category = category;
+        this.date = date;
+        this.description = description;
+        this.frequency = frequency;
+        this.endDate = endDate;
+        this.nextDueDate = nextDueDate;
+        this.paymentMethod = paymentMethod;
+    }
 
-  /**
-   * @return string representation of the expense for logging/debugging
-   */
-  @Override
-  public String toString() {
-    return "Expense {"
-        + "Id: "
-        + id
-        + "UserId: "
-        + userId
-        + "Amount: "
-        + amount
-        + "Category: "
-        + category
-        + "Date: "
-        + date
-        + "Description: "
-        + description;
-  }
+    public Expense() {}
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Frequency getFrequency() {
+        return frequency;
+    }
+
+    public void setFrequency(Frequency frequency) {
+        this.frequency = frequency;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public LocalDate getNextDueDate() {
+        return nextDueDate;
+    }
+
+    public void setNextDueDate(LocalDate nextDueDate) {
+        this.nextDueDate = nextDueDate;
+    }
+
+    public PaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public Payment getPayment() {
+        return payment;
+    }
+
+    public void setPayment(Payment payment) {
+        this.payment = payment;
+    }
+
+    @Override
+    public String toString() {
+        return "Expense{"
+                + "id="
+                + id
+                + ", amount="
+                + amount
+                + ", category='"
+                + category
+                + '\''
+                + ", date="
+                + date
+                + ", description='"
+                + description
+                + '\''
+                + ", frequency="
+                + frequency
+                + ", endDate="
+                + endDate
+                + ", nextDueDate="
+                + nextDueDate
+                + ", paymentMethod="
+                + paymentMethod
+                + '}';
+    }
+
+    public enum Frequency {
+        ONE_TIME,
+        MONTHLY,
+        YEARLY
+    }
+
+    public enum PaymentMethod {
+        CARD,
+        TRANSFER
+    }
 }
