@@ -21,6 +21,13 @@ export class RegisterComponent {
   isLoading = false;
   successMessage = '';
 
+  fieldErrors = {
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  };
+
   constructor(
     private auth: AuthService,
     private router: Router
@@ -29,15 +36,15 @@ export class RegisterComponent {
   }
 
   register() {
+    // Reset all errors
+    this.resetErrors();
 
     if (this.password !== this.confirm_password) {
-      this.error = 'Passwords do not match.';
+      this.fieldErrors.confirmPassword = 'Passwords do not match.';
       return;
     }
 
     this.isLoading = true;
-    this.error = '';
-    this.successMessage = '';
 
     this.auth.register(this.name, this.email, this.password).subscribe({
         next: (response) => {
@@ -52,17 +59,55 @@ export class RegisterComponent {
           this.isLoading = false;
 
           if (typeof err === 'string') {
-            this.error = err;
+            this.parseErrors(err);
           } else if (err.error && typeof err.error === 'string') {
-            this.error = err.error;
+            this.parseErrors(err.error);
           } else {
             this.error = err.message || 'Registration failed. Please try again.';
           }
 
           console.error('Register error:', err);
-
         }
       }
     );
+  }
+
+  private resetErrors() {
+    this.error = '';
+    this.fieldErrors = {
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: ''
+    };
+  }
+
+  private parseErrors(errorString: string) {
+    // Handle comma-separated field errors from backend
+    if (errorString.includes(': ')) {
+      const errorParts = errorString.split(', ');
+
+      errorParts.forEach(part => {
+        const [field, message] = part.split(': ');
+
+        switch(field.toLowerCase()) {
+          case 'name':
+            this.fieldErrors.name = message;
+            break;
+          case 'email':
+            this.fieldErrors.email = message;
+            break;
+          case 'password':
+            this.fieldErrors.password = message;
+            break;
+          default:
+            // For any other errors, add to general error message
+            this.error += (this.error ? ', ' : '') + part;
+        }
+      });
+    } else {
+      // If not in field: message format, treat as general error
+      this.error = errorString;
+    }
   }
 }
