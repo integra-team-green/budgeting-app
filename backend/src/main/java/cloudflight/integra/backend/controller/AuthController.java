@@ -27,37 +27,36 @@ import org.springframework.web.bind.annotation.RestController;
 @UserApiErrorResponses
 public class AuthController {
 
-  private final AuthenticationManager authenticationManager;
-  private final UserDetailsService userDetailsService;
-  private final UserService userService;
-  private final JwtUtils jwtUtils;
-  private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final UserDetailsService userDetailsService;
+    private final UserService userService;
+    private final JwtUtils jwtUtils;
+    private final PasswordEncoder passwordEncoder;
 
-  public AuthController(
-      AuthenticationManager authenticationManager,
-      UserDetailsService userDetailsService,
-      UserService userService,
-      JwtUtils jwtUtils,
-      PasswordEncoder passwordEncoder) {
-    this.authenticationManager = authenticationManager;
-    this.userDetailsService = userDetailsService;
-    this.userService = userService;
-    this.jwtUtils = jwtUtils;
-    this.passwordEncoder = passwordEncoder;
-  }
+    public AuthController(
+            AuthenticationManager authenticationManager,
+            UserDetailsService userDetailsService,
+            UserService userService,
+            JwtUtils jwtUtils,
+            PasswordEncoder passwordEncoder) {
+        this.authenticationManager = authenticationManager;
+        this.userDetailsService = userDetailsService;
+        this.userService = userService;
+        this.jwtUtils = jwtUtils;
+        this.passwordEncoder = passwordEncoder;
+    }
 
-  @PostMapping("/register")
-  public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
 
-    User user =
-        new User(
-            null,
-            request.getName(),
-            request.getEmail(),
-            passwordEncoder.encode(request.getPassword()),
-            BigDecimal.ZERO);
+        User user = new User(
+                null,
+                request.getName(),
+                request.getEmail(),
+                passwordEncoder.encode(request.getPassword()),
+                BigDecimal.ZERO);
 
-    User savedUser = userService.addUser(user);
+        User savedUser = userService.addUser(user);
 
         Map<String, String> response = new HashMap<>();
 
@@ -65,14 +64,14 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-  @PostMapping("/login")
-  public ResponseEntity<?> login(@RequestBody AuthenticationRequest request) {
-    authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody AuthenticationRequest request) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
-    final UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
-    final String token = jwtUtils.generateToken(userDetails);
+        final UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
+        final String token = jwtUtils.generateToken(userDetails);
 
-    return ResponseEntity.ok(new AuthenticationResponse(token));
-  }
+        return ResponseEntity.ok(new AuthenticationResponse(token));
+    }
 }
