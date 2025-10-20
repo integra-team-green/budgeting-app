@@ -82,7 +82,7 @@
               }
             ],
             "styles": [
-              "src/login-page.css"
+              "src/styles.css"
             ]
           }
         }
