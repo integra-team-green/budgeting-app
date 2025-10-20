@@ -1,7 +1,12 @@
 <div class="dashboard-container">
   <div class="dashboard-header">
     <h1>Dashboard</h1>
-    <button (click)="logout()" class="logout-btn">Logout</button>
+    <p-button
+      (onClick)="logout()"
+      label="Logout"
+      severity="danger"
+      class="logout-btn">
+    </p-button>
   </div>
 
   <div class="dashboard-content">

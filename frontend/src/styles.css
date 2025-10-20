@@ -1,3 +1,140 @@
 /* You can add global styles to this file, and also import other style files */
 @import "primeflex/primeflex.css";
 @import "primeicons/primeicons.css";
+
+/* Global Variables */
+:root {
+  --purple-primary: #6A0DAD;
+  --purple-hover: #8B2DC7;
+  --purple-dark: #4B0082;
+  --gradient-1: #F0E6FA;
+  --gradient-2: #E6CCF2;
+  --gray-light: #ccc;
+  --gray-hover: #aaa;
+  --border-color: #d0cfe9;
+  --error-bg: #ffebee;
+  --error-border: #ef9a9a;
+  --error-text: #c62828;
+  --success-bg: #e8f5e9;
+  --success-border: #a5d6a7;
+  --success-text: #2e7d32;
+}
+
+/* Reset */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+/* Global PrimeNG Input Styles */
+.p-inputtext {
+  padding: 14px !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--border-color) !important;
+  font-size: 16px !important;
+  transition: border-color 0.2s, box-shadow 0.2s !important;
+}
+
+.p-inputtext:focus {
+  border-color: var(--purple-primary) !important;
+  box-shadow: 0 0 0 0.2rem rgba(106, 13, 173, 0.25) !important;
+}
+
+/* Global PrimeNG Password Styles */
+.p-password {
+  width: 100%;
+}
+
+.p-password input {
+  padding: 14px !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--border-color) !important;
+  font-size: 16px !important;
+  width: 100% !important;
+  transition: border-color 0.2s, box-shadow 0.2s !important;
+}
+
+.p-password input:focus {
+  border-color: var(--purple-primary) !important;
+  box-shadow: 0 0 0 0.2rem rgba(106, 13, 173, 0.25) !important;
+}
+
+/* Global PrimeNG Button Styles */
+.p-button {
+  padding: 14px !important;
+  border-radius: 8px !important;
+  font-weight: bold !important;
+  font-size: 16px !important;
+  cursor: pointer !important;
+  transition: all 0.3s !important;
+  border: none !important;
+}
+
+/* Primary Button (Purple) */
+.p-button.p-button-primary,
+.p-button:not(.p-button-secondary):not(.p-button-danger) {
+  background-color: var(--purple-primary) !important;
+  border-color: var(--purple-primary) !important;
+  color: white !important;
+}
+
+.p-button.p-button-primary:hover,
+.p-button:not(.p-button-secondary):not(.p-button-danger):hover {
+  background-color: var(--purple-hover) !important;
+  border-color: var(--purple-hover) !important;
+}
+
+/* Secondary Button (Gray) */
+.p-button.p-button-secondary {
+  background-color: var(--gray-light) !important;
+  border-color: var(--gray-light) !important;
+  color: #333 !important;
+}
+
+.p-button.p-button-secondary:hover {
+  background-color: var(--gray-hover) !important;
+  border-color: var(--gray-hover) !important;
+}
+
+/* Danger Button (Red) */
+.p-button.p-button-danger {
+  background-color: #f44336 !important;
+  border-color: #f44336 !important;
+  color: white !important;
+}
+
+.p-button.p-button-danger:hover {
+  background-color: #da190b !important;
+  border-color: #da190b !important;
+}
+
+/* Global PrimeNG Message Styles */
+.p-message {
+  margin-top: 15px !important;
+  border-radius: 8px !important;
+  padding: 10px 15px !important;
+}
+
+.p-message.p-message-error {
+  background-color: var(--error-bg) !important;
+  border: 1px solid var(--error-border) !important;
+  color: var(--error-text) !important;
+}
+
+.p-message.p-message-success {
+  background-color: var(--success-bg) !important;
+  border: 1px solid var(--success-border) !important;
+  color: var(--success-text) !important;
+}
+
+.p-message .p-message-icon {
+  font-size: 18px !important;
+}

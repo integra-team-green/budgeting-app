@@ -1,5 +1,5 @@
-/* Login Component Styles */
-.login-page {
+/* Register Component Styles */
+.register-page {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -8,7 +8,7 @@
   background: linear-gradient(135deg, #F0E6FA, #E6CCF2);
 }
 
-.login-box {
+.register-box {
   width: 480px;
   max-width: 90%;
   background-color: white;
@@ -22,44 +22,50 @@
 }
 
 /* Titles */
-h1 {
-  color: #4B0082;
-  margin: 0;
-  text-decoration: underline;
-  font-size: 42px;
-}
-
-.login-box h2 {
+.register-box h2 {
   color: #4B0082;
   margin: 0;
   font-size: 30px;
 }
 
-.login-box .subtitle {
+.register-box .subtitle {
   color: #6A0DAD;
   font-size: 18px;
   margin-bottom: 25px;
 }
 
 /* Form */
-.login-box form {
+.register-box form {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-/* Register Link */
-.login-box .register-text {
+.form-field {
+  width: 100%;
+  margin-bottom: 0;
+}
+
+/* Field Errors */
+.field-error {
+  color: #e74c3c;
+  font-size: 16px;
+  margin-top: 4px;
+  text-align: center;
+}
+
+/* Login Link */
+.login-text {
   font-size: 15px;
   margin-top: 20px;
 }
 
-.login-box .register-text a {
+.login-text a {
   color: #6A0DAD;
   text-decoration: none;
   font-weight: bold;
 }
 
-.login-box .register-text a:hover {
+.login-text a:hover {
   text-decoration: underline;
 }

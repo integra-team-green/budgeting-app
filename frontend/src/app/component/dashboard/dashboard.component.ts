@@ -1,10 +1,12 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, OnDestroy} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {Router} from '@angular/router';
 import {AuthService} from '../../services/auth.service';
 import {User} from '../../models/user.model';
 import {Subscription} from 'rxjs';
 import {UserService} from '../../services/user.service';
+import {CardModule} from 'primeng/card';
+import {ButtonModule} from 'primeng/button';
 
 @Component({
   selector: 'app-dashboard',
@@ -12,10 +14,12 @@ import {UserService} from '../../services/user.service';
   styleUrls: ['./dashboard.component.css'],
   standalone: true,
   imports: [
-    CommonModule
+    CommonModule,
+    CardModule,
+    ButtonModule
   ]
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   currentUser: User | null = null;
   private subscription: Subscription = new Subscription();
 

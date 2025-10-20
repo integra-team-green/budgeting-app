@@ -5,16 +5,38 @@
     <p class="subtitle">Please login to your account</p>
 
     <form (ngSubmit)="submit()">
-      <input [(ngModel)]="username" name="username" placeholder="Email" required type="text"/>
-      <input [(ngModel)]="password" name="password" placeholder="Password" required type="password"/>
+      <input
+        [(ngModel)]="username"
+        name="username"
+        placeholder="Email"
+        required
+        type="text"
+        pInputText
+        class="w-full"/>
 
-      <button class="login-btn" type="submit">Login</button>
-      <button class="reset-btn" type="button">Reset password</button>
+      <p-password
+        [(ngModel)]="password"
+        name="password"
+        placeholder="Password"
+        [toggleMask]="true"
+        [feedback]="false"
+        styleClass="w-full"
+        inputStyleClass="w-full"
+        required>
+      </p-password>
+
+      <p-button
+        class="login-btn"
+        type="submit"
+        label="Login"
+        [loading]="isLoading"
+        styleClass="w-full">
+      </p-button>
+
     </form>
-
 
     <p class="register-text">Don't have an account? <a [routerLink]="['/register']">Register</a></p>
 
-    <div *ngIf="error" class="error-box">{{ error }}</div>
+    <p-message *ngIf="error" severity="error" [text]="error" styleClass="w-full"></p-message>
   </div>
 </div>
