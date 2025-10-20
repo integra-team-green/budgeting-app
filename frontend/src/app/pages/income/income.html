@@ -1,0 +1,121 @@
+<div class="app-container">
+  <div class="overview-header">
+    <h1>Income Overview</h1>
+    <p class="header-subtitle">Here's a snapshot of your incomes this month</p>
+  </div>
+  <div class="stats-grid">
+    <p-card class="stat-card">
+      <ng-template pTemplate="content">
+        <div class="stat-content">
+          <div class="stat-icon dollar-icon">$</div>
+          <div>
+            <p class="stat-label">Total income</p>
+            <p class="stat-value">${{ totalIncome }}</p>
+          </div>
+        </div>
+      </ng-template>
+    </p-card>
+
+    <p-card class="stat-card">
+      <ng-template pTemplate="content">
+        <div class="stat-content">
+          <div class="stat-icon salary-icon">
+            <i class="pi pi-briefcase"></i>
+          </div>
+          <div>
+            <p class="stat-label">Salary</p>
+            <p class="stat-value">${{ getSalaryAmount() }}</p>
+          </div>
+        </div>
+      </ng-template>
+    </p-card>
+
+
+    <p-card class="stat-card">
+      <ng-template pTemplate="content">
+        <div class="stat-content">
+          <div class="stat-icon freelance-icon">
+            <i class="pi pi-briefcase"></i>
+          </div>
+          <div>
+            <p class="stat-label">Freelance</p>
+            <p class="stat-value">${{ getFreelanceAmount() }}</p>
+          </div>
+        </div>
+      </ng-template>
+    </p-card>
+
+    <!-- Other -->
+    <p-card class="stat-card">
+      <ng-template pTemplate="content">
+        <div class="stat-content">
+          <div class="stat-icon other-icon">
+            <i class="pi pi-inbox"></i>
+          </div>
+          <div>
+            <p class="stat-label">Other</p>
+            <p class="stat-value">${{ getOtherAmount()}}</p>
+          </div>
+        </div>
+      </ng-template>
+    </p-card>
+  </div>
+
+  <div class="monthly-overview">
+    <h2 class="section-title">Monthly Overview</h2>
+    <div class="chart-wrapper">
+      <p-chart type="bar" [data]="chartData" [options]="chartOptions"></p-chart>
+    </div>
+
+    <div class="chart-labels">
+      <div class="label-item" *ngFor="let category of incomeByCategory">
+        <span class="label-color" [style.background-color]="category.color"></span>
+        <span class="label-text">{{ category.category }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <div class="transactions-section">
+      <h3 class="section-title">Recent Income Transactions</h3>
+
+      <div class="transactions-list">
+        <div class="transaction-item" *ngFor="let transaction of recentTransactions">
+          <div class="transaction-left">
+            <div class="transaction-icon">
+              <i [class]="transaction.icon"></i>
+            </div>
+            <div class="transaction-details">
+              <p class="transaction-source">{{ transaction.source }}</p>
+              <p class="transaction-timestamp">{{ transaction.timestamp }}</p>
+            </div>
+          </div>
+          <div class="transaction-actions">
+            <p-button label="Edit" class="action-btn edit-btn" [style]="{'background-color': '#a78bfa', 'border': 'none', 'font-size': '0.75rem'}" (onClick)="editTransaction(transaction)"></p-button>
+            <p-button label="Delete" class="action-btn delete-btn" [style]="{'background-color': '#f472b6', 'border': 'none', 'font-size': '0.75rem'}" (onClick)="deleteTransaction(transaction.id)"></p-button>
+          </div>
+        </div>
+      </div>
+
+      <p-button label="See All" class="see-all-btn" [routerLink]="['/income/list']" [style]="{'background-color': '#a78bfa', 'border': 'none', 'width': '100%'}"></p-button>
+    </div>
+
+    <!-- Income Tips -->
+    <div class="tips-section">
+      <h3 class="section-title">Income Tips</h3>
+
+      <div class="tips-list">
+        <div class="tip-item" *ngFor="let tip of incomeTips">
+          <div class="tip-icon">
+            <i [class]="tip.icon"></i>
+          </div>
+          <div class="tip-content">
+            <p class="tip-title">{{ tip.title }}</p>
+            <p class="tip-description">{{ tip.description }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

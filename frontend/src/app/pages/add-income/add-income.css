@@ -1,0 +1,92 @@
+.app-container {
+  padding: 2rem;
+  min-height: 100vh;
+  background-color: #faf5ff;
+  display: flex;
+
+}
+
+.form-wrapper {
+  width: 100%;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 1rem;
+
+}
+
+.header {
+
+  margin-bottom: 2rem;
+}
+
+.header h1 {
+  color: #6d28d9;
+  font-size: 1.75rem;
+  margin: 0;
+}
+
+.form-subtitle {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+label {
+  color: #7c3aed;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+
+:host ::ng-deep input[pinputtext] {
+  background-color: white !important;
+  color: #1f2937;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+:host ::ng-deep input[pinputtext]:focus {
+  border-color: #a78bfa;
+  box-shadow: 0 0 0 1px #a78bfa;
+  outline: none;
+}
+
+
+:host ::ng-deep .p-textarea,
+:host ::ng-deep .p-select {
+  background-color: #fff !important;
+  color: #1f2937;
+
+}
+:host ::ng-deep .p-select .p-select-label {
+  color: #1f2937 !important;
+}
+
+:host ::ng-deep .p-select-option {
+  background-color: #fff !important;
+  color: #1f2937 !important;
+}
+
+:host ::ng-deep .p-select-option.p-highlight {
+  color: #1f2937 !important;
+}
+
+:host ::ng-deep .p-select-item {
+  color: #1f2937 !important;
+}
+
+.form-actions {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+

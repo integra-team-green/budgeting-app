@@ -1,8 +1,8 @@
-import {ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection} from '@angular/core';
-import {provideRouter} from '@angular/router';
-
-import {routes} from './app.routes';
-import {providePrimeNG} from 'primeng/config';
+import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { provideRouter } from '@angular/router';
+import { routes } from './app.routes';
+import { providePrimeNG } from 'primeng/config';
+import { provideAnimations} from '@angular/platform-browser/animations';
 
 import LaraLightBlue from '@primeuix/themes/aura';
 import {provideHttpClient, withInterceptors} from '@angular/common/http';
@@ -14,7 +14,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     providePrimeNG({
       theme: {
-        preset: LaraLightBlue,
+        preset: LaraLightBlue, // theme can be changed
         options: {
           darkModeSelector: null,
         }
@@ -27,6 +27,7 @@ export const appConfig: ApplicationConfig = {
         AuthInterceptor,
         ErrorInterceptor
       ])
-    )
+    ),
+    provideAnimations()
   ]
 };

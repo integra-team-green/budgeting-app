@@ -1,0 +1,31 @@
+.app-container {
+  padding: 2rem;
+  background-color: #faf5ff;
+  min-height: 100vh;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.header-left,
+.header-center,
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
