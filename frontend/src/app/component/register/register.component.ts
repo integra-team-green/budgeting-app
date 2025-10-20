@@ -3,15 +3,26 @@ import {FormsModule} from '@angular/forms';
 import {CommonModule} from '@angular/common';
 import {AuthService} from '../../services/auth.service';
 import {Router, RouterLink} from '@angular/router';
+import {InputTextModule} from 'primeng/inputtext';
+import {PasswordModule} from 'primeng/password';
+import {ButtonModule} from 'primeng/button';
+import {MessageModule} from 'primeng/message';
 
 @Component({
-    selector: 'app-register',
-    templateUrl: 'register.component.html',
-    styleUrls: ["register.compnent.css"],
-    standalone: true,
-    imports: [FormsModule, CommonModule, RouterLink]
-  }
-)
+  selector: 'app-register',
+  templateUrl: 'register.component.html',
+  styleUrls: ["register.component.css"],
+  standalone: true,
+  imports: [
+    FormsModule,
+    CommonModule,
+    RouterLink,
+    InputTextModule,
+    PasswordModule,
+    ButtonModule,
+    MessageModule
+  ]
+})
 export class RegisterComponent {
   name = '';
   email = '';
@@ -47,29 +58,28 @@ export class RegisterComponent {
     this.isLoading = true;
 
     this.auth.register(this.name, this.email, this.password).subscribe({
-        next: (response) => {
-          this.isLoading = false;
-          this.successMessage = response.message || 'Registration successful!';
+      next: (response) => {
+        this.isLoading = false;
+        this.successMessage = response.message || 'Registration successful!';
 
-          setTimeout(() => {
-            this.router.navigate(['/login']);
-          }, 2000)
-        },
-        error: (err) => {
-          this.isLoading = false;
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 2000)
+      },
+      error: (err) => {
+        this.isLoading = false;
 
-          if (typeof err === 'string') {
-            this.parseErrors(err);
-          } else if (err.error && typeof err.error === 'string') {
-            this.parseErrors(err.error);
-          } else {
-            this.error = err.message || 'Registration failed. Please try again.';
-          }
-
-          console.error('Register error:', err);
+        if (typeof err === 'string') {
+          this.parseErrors(err);
+        } else if (err.error && typeof err.error === 'string') {
+          this.parseErrors(err.error);
+        } else {
+          this.error = err.message || 'Registration failed. Please try again.';
         }
+
+        console.error('Register error:', err);
       }
-    );
+    });
   }
 
   private resetErrors() {
