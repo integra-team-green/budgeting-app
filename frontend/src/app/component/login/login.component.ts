@@ -3,13 +3,26 @@ import {AuthService} from '../../services/auth.service';
 import {FormsModule} from '@angular/forms';
 import {CommonModule} from '@angular/common';
 import {Router, RouterModule} from '@angular/router';
+import {InputTextModule} from 'primeng/inputtext';
+import {PasswordModule} from 'primeng/password';
+import {ButtonModule} from 'primeng/button';
+import {MessageModule} from 'primeng/message';
+import {Checkbox} from 'primeng/checkbox';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
   standalone: true,
-  imports: [FormsModule, CommonModule, RouterModule]
+  imports: [
+    FormsModule,
+    CommonModule,
+    RouterModule,
+    InputTextModule,
+    PasswordModule,
+    ButtonModule,
+    MessageModule
+  ]
 })
 export class LoginComponent {
   username = '';
@@ -52,7 +65,6 @@ export class LoginComponent {
 
         console.error('Login error:', err);
       }
-
     });
   }
 }
