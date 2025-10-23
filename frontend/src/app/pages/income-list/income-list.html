@@ -30,7 +30,7 @@
         <td>{{ item.frequency }}</td>
         <td>{{ item.description }}</td>
         <td class="actions">
-          <p-button icon="pi pi-pencil" severity="secondary" class="p-button-rounded p-button-sm mr-2" [style]="{ backgroundColor: '#a78bfa', border: 'none' }"></p-button>
+          <p-button icon="pi pi-pencil" severity="secondary" class="p-button-rounded p-button-sm mr-2" [style]="{ backgroundColor: '#a78bfa', border: 'none' }"  [routerLink]="['/income', item.id]"></p-button>
 
           <p-button icon="pi pi-trash" severity="danger" class="p-button-rounded p-button-sm" [style]="{ backgroundColor: '#f472b6', border: 'none' }" (onClick)="deleteIncome(item.id)"></p-button>
           </td>

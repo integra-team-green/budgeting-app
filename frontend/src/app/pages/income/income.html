@@ -24,7 +24,7 @@
           </div>
           <div>
             <p class="stat-label">Salary</p>
-            <p class="stat-value">${{ getSalaryAmount() }}</p>
+
           </div>
         </div>
       </ng-template>
@@ -39,7 +39,6 @@
           </div>
           <div>
             <p class="stat-label">Freelance</p>
-            <p class="stat-value">${{ getFreelanceAmount() }}</p>
           </div>
         </div>
       </ng-template>
@@ -54,7 +53,7 @@
           </div>
           <div>
             <p class="stat-label">Other</p>
-            <p class="stat-value">${{ getOtherAmount()}}</p>
+
           </div>
         </div>
       </ng-template>
@@ -91,7 +90,7 @@
             </div>
           </div>
           <div class="transaction-actions">
-            <p-button label="Edit" class="action-btn edit-btn" [style]="{'background-color': '#a78bfa', 'border': 'none', 'font-size': '0.75rem'}" (onClick)="editTransaction(transaction)"></p-button>
+            <p-button label="Edit" class="action-btn edit-btn" [style]="{'background-color': '#a78bfa', 'border': 'none', 'font-size': '0.75rem'}" ></p-button>
             <p-button label="Delete" class="action-btn delete-btn" [style]="{'background-color': '#f472b6', 'border': 'none', 'font-size': '0.75rem'}" (onClick)="deleteTransaction(transaction.id)"></p-button>
           </div>
         </div>

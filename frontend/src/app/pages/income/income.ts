@@ -3,6 +3,9 @@ import {RouterLink} from '@angular/router';
 import { ChartModule } from 'primeng/chart';
 import {ButtonModule} from 'primeng/button';
 import { CardModule } from 'primeng/card';
+import {IncomeControllerService} from '../../api';
+import {IncomeDTO} from '../../api/model/incomeDTO';
+
 @Component({
   selector: 'app-income',
   imports: [
@@ -15,29 +18,19 @@ import { CardModule } from 'primeng/card';
   styleUrl: './income.css'
 })
 export class IncomeComponent implements OnInit {
+  incomes: IncomeDTO[] = [];
   totalIncome = 0;
-  incomeByCategory: { category: string; amount: number; color: string }[] = [];
+  incomeByCategory: { category: string; amount: number; }[] = [];
   recentTransactions: any[] = [];
   incomeTips: any[] = [];
 
   chartData: any;
   chartOptions: any;
 
+  constructor(private incomeService: IncomeControllerService) {}
+
   ngOnInit() {
-    // 🔹 Demo data
-    this.incomeByCategory = [
-      { category: 'Salary', amount: 3200, color: '#a78bfa' },
-      { category: 'Freelance', amount: 1400, color: '#c084fc' },
-      { category: 'Other', amount: 600, color: '#f472b6' },
-    ];
-
-    this.totalIncome = this.incomeByCategory.reduce((sum, c) => sum + c.amount, 0);
-
-    this.recentTransactions = [
-      { id: 1, source: 'Company Salary', timestamp: 'Oct 3, 2025', icon: 'pi pi-briefcase' },
-      { id: 2, source: 'Freelance Project', timestamp: 'Oct 10, 2025', icon: 'pi pi-desktop' },
-      { id: 3, source: 'Gift', timestamp: 'Oct 12, 2025', icon: 'pi pi-inbox' },
-    ];
+    this.loadIncomes();
 
     this.incomeTips = [
       {
@@ -56,15 +49,42 @@ export class IncomeComponent implements OnInit {
         description: 'Set reminders for recurring income and financial goals.'
       }
     ];
+  }
 
-    // 🔹 Setup chart
+  loadIncomes(): void {
+    this.incomeService.getAllIncomes().subscribe({
+      next: (data) => {
+        this.incomes = data;
+        this.totalIncome = data.reduce((sum, inc) => sum + (inc.amount ?? 0), 0);
+        const groups: Record<string, number> = {};
+        for (const inc of data) {
+          const key = inc.source ?? 'Other';
+          groups[key] = (groups[key] || 0) + (inc.amount ?? 0);
+        }
+
+
+        this.incomeByCategory = Object.keys(groups).map((key, index) => ({
+          category: key,
+          amount: groups[key],
+        }));
+
+        this.recentTransactions = [...data]
+          .sort((a, b) => new Date(b.date ?? '').getTime() - new Date(a.date ?? '').getTime())
+          .slice(0, 3);
+
+        this.setupChart();
+      },
+      error: (err) => console.error('Error loading incomes:', err)
+    });
+  }
+
+  private setupChart(): void {
     this.chartData = {
       labels: this.incomeByCategory.map(c => c.category),
       datasets: [
         {
           label: 'Income by Category',
           data: this.incomeByCategory.map(c => c.amount),
-          backgroundColor: this.incomeByCategory.map(c => c.color),
           borderRadius: 6,
         },
       ],
@@ -82,7 +102,7 @@ export class IncomeComponent implements OnInit {
         x: {
           ticks: {
             color: '#6b7280',
-            font: { weight: 500 },
+            font: {weight: 500},
           },
           grid: {
             color: 'transparent',
@@ -102,33 +122,12 @@ export class IncomeComponent implements OnInit {
       },
     };
   }
-
-  // 🔹 Helpers
-  getSalaryAmount(): number {
-    return this.getAmountByCategory('Salary');
-  }
-
-  getFreelanceAmount(): number {
-    return this.getAmountByCategory('Freelance');
-  }
-
-  getOtherAmount(): number {
-    return this.getAmountByCategory('Other');
-  }
-
-  private getAmountByCategory(category: string): number {
-    const item = this.incomeByCategory.find(c => c.category === category);
-    return item ? item.amount : 0;
-  }
-
-  // 🔹 Actions
-  editTransaction(transaction: any) {
-    alert(`Editing transaction: ${transaction.source}`);
-  }
-
-  deleteTransaction(id: number) {
-    this.recentTransactions = this.recentTransactions.filter(t => t.id !== id);
-    alert('Transaction deleted');
+  deleteTransaction(id?: number) {
+    if (!id) return;
+    this.incomeService.deleteIncome(id).subscribe(() => {
+      this.incomes = this.incomes.filter(t => t.id !== id);
+      this.loadIncomes();
+    });
   }
 
 }

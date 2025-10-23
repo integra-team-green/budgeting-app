@@ -1,7 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-// import { IncomeService } from '../../services/income';
 import { Router } from '@angular/router';
 import { InputText } from 'primeng/inputtext';
 import {InputNumberModule} from 'primeng/inputnumber';
@@ -9,6 +8,7 @@ import {DatePickerModule} from 'primeng/datepicker';
 import { Select } from 'primeng/select';
 import { Button } from 'primeng/button';
 import { Textarea } from 'primeng/textarea';
+import {IncomeControllerService} from '../../api';
 
 @Component({
   selector: 'app-add-income',
@@ -36,7 +36,7 @@ export class AddIncomeComponent {
 
   constructor(
     private fb: FormBuilder,
-    // private incomeService: IncomeService,
+    private incomeService: IncomeControllerService,
     private router: Router
   ) {
     this.incomeForm = this.fb.group({
@@ -57,16 +57,16 @@ export class AddIncomeComponent {
 
     const income = this.incomeForm.value;
 
-    // this.incomeService.create(income).subscribe({
-    //   next: () => {
-    //     alert('Income saved successfully!');
-    //     this.router.navigate(['/income']);
-    //   },
-    //   error: (err) => {
-    //     console.error(err);
-    //     alert('Error saving income.');
-    //   }
-    // });
+    this.incomeService.createIncome(income).subscribe({
+      next: () => {
+        alert('Income saved successfully!');
+        this.router.navigate(['/income']);
+      },
+      error: (err) => {
+        console.error(err);
+        alert('Error saving income.');
+      }
+    });
   }
 }
 
