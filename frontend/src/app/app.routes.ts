@@ -5,22 +5,23 @@ import {AuthGuard} from './guards/auth.guard';
 import {RegisterComponent} from './component/register/register.component';
 import { IncomeListComponent } from './pages/income-list/income-list';
 import { AddIncomeComponent } from './pages/add-income/add-income';
-import { IncomeComponent } from './pages/income/income';
+import { IncomeComponent } from './pages/income_overview/income';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  {
-    path: 'dashboard',
-    component: DashboardComponent,
-    canActivate: [AuthGuard],
-    children: [
+  // {
+  //   path: 'dashboard',
+  //   component: DashboardComponent,
+  //   canActivate: [AuthGuard],
+  //   children: [
       { path: '', redirectTo: 'income', pathMatch: 'full' },
       { path: 'income', component: IncomeComponent },
       { path: 'income/list', component: IncomeListComponent },
       { path: 'income/add', component: AddIncomeComponent },
-    ]
-  },
+  //     // { path: '**', redirectTo: '/income' },
+  //   ]
+  // },
   { path: '', redirectTo: '/login', pathMatch: 'full' },
-  { path: '**', redirectTo: '/dashboard/income' },
+  { path: '**', redirectTo: '/income' },
 ];

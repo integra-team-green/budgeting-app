@@ -3,6 +3,9 @@ package cloudflight.integra.backend.controller;
 import cloudflight.integra.backend.controller.problem.IncomeApiErrorResponses;
 import cloudflight.integra.backend.dto.IncomeDTO;
 import cloudflight.integra.backend.service.IncomeService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import java.util.List;
 import java.util.stream.StreamSupport;
 import org.slf4j.Logger;
@@ -38,7 +41,7 @@ public class IncomeController {
         return new ResponseEntity<>(income, HttpStatus.OK);
     }
 
-    @GetMapping
+    @GetMapping()
     public ResponseEntity<List<IncomeDTO>> getAllIncomes() {
         log.debug("Fetching all incomes");
         List<IncomeDTO> incomes = StreamSupport.stream(

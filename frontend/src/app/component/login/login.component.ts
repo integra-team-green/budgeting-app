@@ -50,7 +50,7 @@ export class LoginComponent {
       next: () => {
         this.isLoading = false;
         console.log('Login successful. Token saved in localStorage');
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/income']);
       },
       error: (err) => {
         this.isLoading = false;

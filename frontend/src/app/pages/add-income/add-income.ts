@@ -29,9 +29,9 @@ import {IncomeControllerService} from '../../api';
 export class AddIncomeComponent {
   incomeForm: FormGroup;
   frequencyOptions = [
-    { label: 'One Time', value: 'one time' },
-    { label: 'Monthly', value: 'monthly' },
-    { label: 'Yearly', value: 'yearly' },
+    { label: 'One Time', value: 'ONE_TIME' },
+    { label: 'Monthly', value: 'MONTHLY' },
+    { label: 'Yearly', value: 'YEARLY' },
   ];
 
   constructor(
@@ -63,7 +63,7 @@ export class AddIncomeComponent {
         this.router.navigate(['/income']);
       },
       error: (err) => {
-        console.error(err);
+        console.error(err.message);
         alert('Error saving income.');
       }
     });

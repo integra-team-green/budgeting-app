@@ -55,7 +55,7 @@ export class IncomeComponent implements OnInit {
     this.incomeService.getAllIncomes().subscribe({
       next: (data) => {
         this.incomes = data;
-        this.totalIncome = data.reduce((sum, inc) => sum + (inc.amount ?? 0), 0);
+        this.totalIncome = data.reduce((sum: any, inc: { amount: any; }) => sum + (inc.amount ?? 0), 0);
         const groups: Record<string, number> = {};
         for (const inc of data) {
           const key = inc.source ?? 'Other';
