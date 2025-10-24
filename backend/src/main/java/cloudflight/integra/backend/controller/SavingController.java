@@ -35,7 +35,10 @@ public class SavingController {
     @Operation(summary = "Get saving by ID", description = "Returns a single saving")
     @ApiResponses(
             value = {
-                @ApiResponse(responseCode = "200", description = "Saving found"),
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Saving found",
+                        content = @Content(mediaType = "application/json")),
                 @ApiResponse(responseCode = "404", description = "Saving not found")
             })
     @GetMapping(value = "/{savingId}")
@@ -48,6 +51,10 @@ public class SavingController {
     }
 
     @Operation(summary = "Get all savings", description = "Returns all available savings")
+    @ApiResponse(
+            responseCode = "200",
+            description = "All savings returned",
+            content = @Content(mediaType = "application/json"))
     @GetMapping()
     public ResponseEntity<?> getAllSavings() {
 
@@ -59,7 +66,10 @@ public class SavingController {
     @Operation(summary = "Add a new saving")
     @ApiResponses(
             value = {
-                @ApiResponse(responseCode = "200", description = "Saving added successfully"),
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Saving added successfully",
+                        content = @Content(mediaType = "application/json")),
                 @ApiResponse(responseCode = "400", description = "Invalid input"),
             })
     @PostMapping()
@@ -93,7 +103,10 @@ public class SavingController {
     @Operation(summary = "Update an existing saving by ID")
     @ApiResponses(
             value = {
-                @ApiResponse(responseCode = "200", description = "Saving updated"),
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Saving updated",
+                        content = @Content(mediaType = "application/json")),
                 @ApiResponse(responseCode = "400", description = "ID mismatch"),
                 @ApiResponse(responseCode = "404", description = "Saving not found")
             })

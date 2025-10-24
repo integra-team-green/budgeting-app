@@ -109,7 +109,7 @@ tasks.register('generateAngularClient', GenerateTask) {
 
     outputDir.set("$projectDir/../frontend/src/app/api")
     apiPackage.set("api")
-    modelPackage.set("models")
+    modelPackage.set("model")
     additionalProperties.set([
             ngVersion: "17.0.0",
             npmName  : "@myorg/api-client"
