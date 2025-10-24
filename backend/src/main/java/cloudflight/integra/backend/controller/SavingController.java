@@ -38,7 +38,10 @@ public class SavingController {
                 @ApiResponse(
                         responseCode = "200",
                         description = "Saving found",
-                        content = @Content(mediaType = "application/json")),
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = SavingDTO.class))),
                 @ApiResponse(responseCode = "404", description = "Saving not found")
             })
     @GetMapping(value = "/{savingId}")
@@ -54,7 +57,7 @@ public class SavingController {
     @ApiResponse(
             responseCode = "200",
             description = "All savings returned",
-            content = @Content(mediaType = "application/json"))
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = SavingDTO.class)))
     @GetMapping()
     public ResponseEntity<?> getAllSavings() {
 
@@ -69,7 +72,10 @@ public class SavingController {
                 @ApiResponse(
                         responseCode = "200",
                         description = "Saving added successfully",
-                        content = @Content(mediaType = "application/json")),
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = SavingDTO.class))),
                 @ApiResponse(responseCode = "400", description = "Invalid input"),
             })
     @PostMapping()
@@ -106,7 +112,10 @@ public class SavingController {
                 @ApiResponse(
                         responseCode = "200",
                         description = "Saving updated",
-                        content = @Content(mediaType = "application/json")),
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        schema = @Schema(implementation = SavingDTO.class))),
                 @ApiResponse(responseCode = "400", description = "ID mismatch"),
                 @ApiResponse(responseCode = "404", description = "Saving not found")
             })
