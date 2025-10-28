@@ -4,8 +4,10 @@
     <h1>Money Mind</h1>
   </div>
   <ul class="menu">
-    <li *ngFor="let item of menuItems" [class.active]="item.active" (click)="onSelect(item)">
+    <li *ngFor="let item of menuItems" [class.active]="item.active">
+      <a [routerLink]="item.route" routerLinkActive="active" (click)="onSelect(item)">
       <i [class]="item.icon"></i> {{item.label}}
+      </a>
     </li>
   </ul>
 </div>

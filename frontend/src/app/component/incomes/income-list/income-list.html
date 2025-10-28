@@ -2,10 +2,10 @@
 
   <div class="header">
     <div class="header-left">
-      <p-date-picker [(ngModel)]="filterDate" [showIcon]="true" inputId="buttondisplay" [showOnFocus]="false"></p-date-picker>
+      <p-date-picker [(ngModel)]="filterDate" [showIcon]="true" inputId="buttondisplay" [showOnFocus]="false" (ngModelChange)="filterIncomes()" placeholder="zz.ll.aaaa" dateFormat="dd.mm.yy"></p-date-picker>
       <span class="p-input-icon-left search-input">
       <i class="pi pi-search"></i>
-      <input pInputText type="text" placeholder="Filter by Source" [(ngModel)]="filterSource" />
+      <input pInputText type="text" placeholder="Filter by Source" [(ngModel)]="filterSource" (ngModelChange)="filterIncomes()" />
     </span>
     </div>
     <p-button label="+ Add Income" [style]="{'background-color': '#a78bfa', 'border': 'none'}" [routerLink]="['/income/add']"></p-button>
@@ -23,14 +23,14 @@
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-item>
-      <tr [style.background-color]="'#f3e8ff'">
-        <td>{{ item.date }}</td>
+      <tr [style.background-color]="'#f3e8ff'" [style.color]="'#000000'" >
+        <td>{{ item.date | date:'dd.MM.yyyy' }}</td>
         <td>{{ item.source }}</td>
         <td>${{ item.amount }}</td>
         <td>{{ item.frequency }}</td>
         <td>{{ item.description }}</td>
         <td class="actions">
-          <p-button icon="pi pi-pencil" severity="secondary" class="p-button-rounded p-button-sm mr-2" [style]="{ backgroundColor: '#a78bfa', border: 'none' }"  [routerLink]="['/income', item.id]"></p-button>
+          <p-button icon="pi pi-pencil" severity="secondary" class="p-button-rounded p-button-sm mr-2" [style]="{ backgroundColor: '#a78bfa', border: 'none' }"  [routerLink]="['/income/edit', item.id]"></p-button>
 
           <p-button icon="pi pi-trash" severity="danger" class="p-button-rounded p-button-sm" [style]="{ backgroundColor: '#f472b6', border: 'none' }" (onClick)="deleteIncome(item.id)"></p-button>
           </td>

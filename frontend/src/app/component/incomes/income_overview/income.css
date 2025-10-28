@@ -65,7 +65,7 @@
   }
 
   &.freelance-icon {
-    background: linear-gradient(135deg, #c084fc, #a78bfa);
+    background: linear-gradient(135deg, #ae1201, #af1301);
   }
 
   &.other-icon {
@@ -110,7 +110,6 @@
   padding: 1.5rem;
   margin-bottom: 1rem;
   min-height: 200px;
-
 }
 
 .chart-labels {

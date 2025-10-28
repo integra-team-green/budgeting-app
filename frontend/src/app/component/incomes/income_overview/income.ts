@@ -3,8 +3,9 @@ import {RouterLink} from '@angular/router';
 import { ChartModule } from 'primeng/chart';
 import {ButtonModule} from 'primeng/button';
 import { CardModule } from 'primeng/card';
-import {IncomeControllerService} from '../../api';
-import {IncomeDTO} from '../../api/model/incomeDTO';
+import {IncomeControllerService} from '../../../api';
+import {IncomeDTO} from '../../../api/model/incomeDTO';
+import {CommonModule} from '@angular/common';
 
 @Component({
   selector: 'app-income',
@@ -13,6 +14,7 @@ import {IncomeDTO} from '../../api/model/incomeDTO';
     ChartModule,
     ButtonModule,
     CardModule,
+    CommonModule,
   ],
   templateUrl: './income.html',
   styleUrl: './income.css'
@@ -20,9 +22,11 @@ import {IncomeDTO} from '../../api/model/incomeDTO';
 export class IncomeComponent implements OnInit {
   incomes: IncomeDTO[] = [];
   totalIncome = 0;
-  incomeByCategory: { category: string; amount: number; }[] = [];
+  salaryIncome = 0;
+  otherIncome = 0;
+  freelanceIncome = 0;
   recentTransactions: any[] = [];
-  incomeTips: any[] = [];
+
 
   chartData: any;
   chartOptions: any;
@@ -31,42 +35,29 @@ export class IncomeComponent implements OnInit {
 
   ngOnInit() {
     this.loadIncomes();
-
-    this.incomeTips = [
-      {
-        icon: 'pi pi-chart-line',
-        title: 'Track Regularly',
-        description: 'Review your income sources weekly to identify growth opportunities.'
-      },
-      {
-        icon: 'pi pi-wallet',
-        title: 'Diversify Income',
-        description: 'Explore freelance or side gigs to increase your total income.'
-      },
-      {
-        icon: 'pi pi-calendar',
-        title: 'Plan Ahead',
-        description: 'Set reminders for recurring income and financial goals.'
-      }
-    ];
   }
 
   loadIncomes(): void {
     this.incomeService.getAllIncomes().subscribe({
-      next: (data) => {
+      next: (data:IncomeDTO[]) => {
         this.incomes = data;
-        this.totalIncome = data.reduce((sum: any, inc: { amount: any; }) => sum + (inc.amount ?? 0), 0);
-        const groups: Record<string, number> = {};
-        for (const inc of data) {
-          const key = inc.source ?? 'Other';
-          groups[key] = (groups[key] || 0) + (inc.amount ?? 0);
-        }
+        this.totalIncome = data.reduce(
+          (sum: number, inc: IncomeDTO) => sum + (inc.amount ?? 0),
+          0
+        );
 
+        this.salaryIncome = data
+          .filter(inc => inc.source?.toLowerCase() === 'salary')
+          .reduce((sum, inc) => sum + (inc.amount ?? 0), 0);
 
-        this.incomeByCategory = Object.keys(groups).map((key, index) => ({
-          category: key,
-          amount: groups[key],
-        }));
+        this.freelanceIncome = data
+          .filter(inc => inc.source?.toLowerCase() === 'freelance')
+          .reduce((sum, inc) => sum + (inc.amount ?? 0), 0);
+
+        this.otherIncome = data
+          .filter(inc => inc.source?.toLowerCase() !== 'salary' && inc.source?.toLowerCase() !== 'freelance')
+          .reduce((sum, inc) => sum + (inc.amount ?? 0), 0);
+
 
         this.recentTransactions = [...data]
           .sort((a, b) => new Date(b.date ?? '').getTime() - new Date(a.date ?? '').getTime())
@@ -80,11 +71,12 @@ export class IncomeComponent implements OnInit {
 
   private setupChart(): void {
     this.chartData = {
-      labels: this.incomeByCategory.map(c => c.category),
+      labels: ['Salary', 'Freelance', 'Other'],
       datasets: [
         {
           label: 'Income by Category',
-          data: this.incomeByCategory.map(c => c.amount),
+          data: [this.salaryIncome, this.freelanceIncome, this.otherIncome],
+          backgroundColor: ['#a78bfa', '#af1301', '#ec4899'],
           borderRadius: 6,
         },
       ],
@@ -95,14 +87,14 @@ export class IncomeComponent implements OnInit {
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          display: false,
+          display: true,
         },
       },
       scales: {
         x: {
           ticks: {
-            color: '#6b7280',
-            font: {weight: 500},
+            color: '#000000',
+            font: { weight: 500 },
           },
           grid: {
             color: 'transparent',
@@ -111,7 +103,7 @@ export class IncomeComponent implements OnInit {
         },
         y: {
           ticks: {
-            color: '#6b7280',
+            color: '#000000',
             stepSize: 1000,
           },
           grid: {
@@ -123,11 +115,13 @@ export class IncomeComponent implements OnInit {
     };
   }
   deleteTransaction(id?: number) {
-    if (!id) return;
-    this.incomeService.deleteIncome(id).subscribe(() => {
-      this.incomes = this.incomes.filter(t => t.id !== id);
-      this.loadIncomes();
-    });
+    if (confirm('Are you sure you want to delete this income?')){
+      if (!id) return;
+      this.incomeService.deleteIncome(id).subscribe(() => {
+        this.incomes = this.incomes.filter(t => t.id !== id);
+        this.loadIncomes();
+      });
+  }
   }
 
 }
