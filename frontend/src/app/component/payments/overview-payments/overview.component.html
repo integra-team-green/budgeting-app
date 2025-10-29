@@ -1,0 +1,82 @@
+<div class="app-container">
+  <!-- Sidebar -->
+  <app-sidebar (menuSelect)="onMenuSelect($event)"></app-sidebar>
+
+  <!-- Content -->
+  <div class="content">
+    <div class="page-wrapper">
+      <div class="welcome-add-container">
+        <h2>Payment Overview</h2>
+      </div>
+      <p class="subtitle">Here’s a snapshot of your payments this month</p>
+
+      <!-- Dashboard Cards -->
+      <div class="cards">
+        <p-card class="card total-payments">
+          <i class="pi pi-wallet"></i>
+          <div>
+            <h3>Total Payments</h3>
+            <p>{{ totalPayments }}</p>
+          </div>
+        </p-card>
+
+        <p-card class="card paid-payments">
+          <i class="pi pi-check-circle"></i>
+          <div>
+            <h3>Paid</h3>
+            <p>{{ paidPayments }}</p>
+          </div>
+        </p-card>
+
+        <p-card class="card pending-payments">
+          <i class="pi pi-clock"></i>
+          <div>
+            <h3>Pending</h3>
+            <p>{{ pendingPayments }}</p>
+          </div>
+        </p-card>
+      </div>
+
+
+      <!-- Chart -->
+      <p-card class="chart-card">
+        <h4>Monthly Payments</h4>
+        <p-chart type="bar" [data]="paymentChartData" [options]="chartOptions"></p-chart>
+      </p-card>
+
+      <!-- Bottom Section -->
+      <div class="bottom-section">
+        <!-- Recent Transactions -->
+        <p-card class="long-card recent-activity">
+          <h4>Recent Payment Transactions</h4>
+          <div *ngFor="let tx of transactions; let i = index" class="activity-item">
+            <i class="pi pi-money-bill"></i>
+            <p>{{ tx.name }} <span>{{ tx.paymentDate }}</span></p>
+
+            <div>
+              <button pButton type="button" icon="pi pi-pencil" label="Edit" class="button edit"
+                      (click)="editPayment(i)"></button>
+
+              <button pButton type="button" icon="pi pi-trash" label="Delete" class="button delete"
+                      (click)="confirmDelete(i)"></button>
+            </div>
+          </div>
+
+          <button pButton type="button" label="See All" class="button see-all" (click)="goToAllPayments()"></button>
+        </p-card>
+
+
+        <!-- Tips -->
+        <p-card class="long-card tips">
+          <h4>Payment Tips</h4>
+          <ul>
+            <li *ngFor="let tip of tips">{{tip.title}} <span>{{tip.note}}</span></li>
+          </ul>
+        </p-card>
+      </div>
+    </div>
+    <p-confirmDialog></p-confirmDialog>
+    <p-toast  position="top-left"
+              style="margin-left: 600px; margin-bottom: 140px;"></p-toast>
+  </div>
+</div>

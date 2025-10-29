@@ -65,8 +65,13 @@ public class PaymentServiceImpl implements PaymentService {
                 .findById(id)
                 .orElseThrow(() -> new NotFoundException("Payment not found with id: " + id));
 
-        dbPaymentRepository.delete(payment);
-        return PaymentMapper.getDTO(payment);
+        PaymentDTO responseDTO = PaymentMapper.getDTO(payment);
+        int deletedRows = dbPaymentRepository.deletePaymentByIdUsingQuery(id);
+
+        if (deletedRows == 0) {
+            throw new RuntimeException("Ștergerea Payment-ului a eșuat sau rândul nu a fost găsit.");
+        }
+        return responseDTO;
     }
 
     @Override

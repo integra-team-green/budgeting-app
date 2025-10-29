@@ -4,30 +4,34 @@ import cloudflight.integra.backend.dto.PaymentDTO;
 import cloudflight.integra.backend.entity.Expense;
 import cloudflight.integra.backend.entity.Payment;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class PaymentMapper {
 
-    /** Map Payment to PaymentDTO */
+    /** Entity → DTO */
     public static PaymentDTO getDTO(Payment payment) {
         if (payment == null) return null;
 
+        Long expenseId = null;
+        try {
+            if (payment.getExpense() != null) {
+                expenseId = payment.getExpense().getId();
+            }
+        } catch (Exception e) {
+            expenseId = null;
+        }
+
         return new PaymentDTO(
-                payment.getId(),
-                payment.getExpense() != null ? payment.getExpense().getId() : null,
-                payment.getName(),
-                payment.getAmount(),
-                payment.getStatus(),
-                payment.getPaymentDate());
+                payment.getId(), expenseId, payment.getName(), payment.getStatus(), payment.getPaymentDate());
     }
 
-    /** Map PaymentDTO to Payment without repository */
+    /** DTO → Entity */
     public static Payment getFromDTO(PaymentDTO dto) {
         if (dto == null) return null;
 
         Payment payment = new Payment();
         payment.setId(dto.getId());
         payment.setName(dto.getName());
-        payment.setAmount(dto.getAmount());
         payment.setStatus(dto.getStatus());
         payment.setPaymentDate(dto.getPaymentDate());
 
@@ -42,15 +46,15 @@ public class PaymentMapper {
         return payment;
     }
 
-    /** Map a list of PaymentDTOs into a list of Payments */
-    public static List<Payment> getPaymentsFromDto(List<PaymentDTO> dtos) {
-        if (dtos == null) return List.of();
-        return dtos.stream().map(PaymentMapper::getFromDTO).toList();
-    }
-
-    /** Map a list of Payments into a list of PaymentDTOs */
+    /** List<Entity> → List<DTO> */
     public static List<PaymentDTO> getPaymentDTOsFromPayments(List<Payment> payments) {
         if (payments == null) return List.of();
-        return payments.stream().map(PaymentMapper::getDTO).toList();
+        return payments.stream().map(PaymentMapper::getDTO).collect(Collectors.toList());
+    }
+
+    /** List<DTO> → List<Entity> */
+    public static List<Payment> getPaymentsFromDto(List<PaymentDTO> dtos) {
+        if (dtos == null) return List.of();
+        return dtos.stream().map(PaymentMapper::getFromDTO).collect(Collectors.toList());
     }
 }

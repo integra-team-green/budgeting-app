@@ -99,7 +99,6 @@ public class PaymentRestControllerTest {
         // Creează Payment 1 pentru Expense 1
         payment1 = new PaymentDTO();
         payment1.setName("September Rent");
-        payment1.setAmount(BigDecimal.valueOf(500));
         payment1.setStatus(Payment.StatusEnum.PENDING);
         payment1.setPaymentDate(LocalDate.of(2025, 9, 22));
         payment1.setExpenseId(expense1.getId());
@@ -118,7 +117,6 @@ public class PaymentRestControllerTest {
         // Creează Payment 2 pentru Expense 2
         payment2 = new PaymentDTO();
         payment2.setName("October Utilities");
-        payment2.setAmount(BigDecimal.valueOf(200));
         payment2.setStatus(Payment.StatusEnum.PAID);
         payment2.setPaymentDate(LocalDate.of(2025, 10, 1));
         payment2.setExpenseId(expense2.getId());
@@ -131,7 +129,6 @@ public class PaymentRestControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(payment1.getId()))
                 .andExpect(jsonPath("$.name").value("September Rent"))
-                .andExpect(jsonPath("$.amount").value(500))
                 .andExpect(jsonPath("$.status").value("PENDING"))
                 .andExpect(jsonPath("$.expenseId").value(expense1.getId()));
     }
@@ -149,7 +146,6 @@ public class PaymentRestControllerTest {
 
         PaymentDTO dto = new PaymentDTO();
         dto.setName("Netflix Payment");
-        dto.setAmount(BigDecimal.valueOf(50));
         dto.setPaymentDate(LocalDate.of(2025, 11, 1));
         dto.setStatus(Payment.StatusEnum.PENDING);
         dto.setExpenseId(newExpense.getId());
@@ -170,7 +166,6 @@ public class PaymentRestControllerTest {
         PaymentDTO dto = new PaymentDTO();
         dto.setId(payment1.getId());
         dto.setName("September Rent Updated");
-        dto.setAmount(BigDecimal.valueOf(550));
         dto.setPaymentDate(LocalDate.of(2025, 9, 30));
         dto.setStatus(Payment.StatusEnum.PAID);
         dto.setExpenseId(expense1.getId());
@@ -181,7 +176,6 @@ public class PaymentRestControllerTest {
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("September Rent Updated"))
-                .andExpect(jsonPath("$.amount").value(550))
                 .andExpect(jsonPath("$.status").value("PAID"))
                 .andExpect(jsonPath("$.expenseId").value(expense1.getId()));
     }
@@ -198,7 +192,6 @@ public class PaymentRestControllerTest {
     void testCreatePaymentWithInvalidData() throws Exception {
         PaymentDTO invalidDto = new PaymentDTO();
         invalidDto.setName("");
-        invalidDto.setAmount(null);
         invalidDto.setPaymentDate(null);
         invalidDto.setStatus(null);
         invalidDto.setExpenseId(null);
@@ -215,7 +208,6 @@ public class PaymentRestControllerTest {
         PaymentDTO invalidDto = new PaymentDTO();
         invalidDto.setId(payment1.getId());
         invalidDto.setName("");
-        invalidDto.setAmount(BigDecimal.valueOf(-100));
         invalidDto.setPaymentDate(LocalDate.of(2025, 1, 1));
         invalidDto.setStatus(Payment.StatusEnum.PENDING);
         invalidDto.setExpenseId(expense1.getId());

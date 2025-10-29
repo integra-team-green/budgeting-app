@@ -1,9 +1,9 @@
 package cloudflight.integra.backend.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.PositiveOrZero;
-import java.math.BigDecimal;
 import java.time.LocalDate;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "payment")
@@ -15,6 +15,7 @@ public class Payment {
 
     @OneToOne(optional = false)
     @JoinColumn(name = "expense_id", nullable = false) // Asigură că fiecare Payment trebuie să aibă un Expense
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Expense expense;
 
     @Column(nullable = false)
@@ -24,10 +25,6 @@ public class Payment {
     private StatusEnum status; // pending, paid, failed
 
     private LocalDate paymentDate;
-
-    @PositiveOrZero
-    @Column(nullable = false)
-    private BigDecimal amount;
 
     // Enum pentru status
     public enum StatusEnum {
@@ -63,14 +60,6 @@ public class Payment {
     public void setName(String name) {
 
         this.name = name;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
     }
 
     public Expense getExpense() {

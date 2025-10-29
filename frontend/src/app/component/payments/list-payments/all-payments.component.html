@@ -1,0 +1,57 @@
+<div class="app-container">
+
+  <!-- Sidebar -->
+  <app-sidebar (menuSelect)="onMenuSelect($event)"></app-sidebar>
+
+  <!-- Content -->
+  <div class="content">
+    <div class="page-wrapper">
+
+      <!-- Header + Add Payment -->
+      <div class="payment-header">
+        <div class="payment-controls">
+          <div class="filters">
+            <input type="date" [(ngModel)]="filterDate" placeholder="Filter by Date">
+            <input type="text" [(ngModel)]="filterName" placeholder="Filter by Name">
+            <select [(ngModel)]="filterStatus">
+              <option value="">All Status</option>
+              <option value="pending">PENDING</option>
+              <option value="paid">PAID</option>
+              <option value="failed">FAILED</option>
+            </select>
+          </div>
+
+          <button id="addPaymentBtn" (click)="goToAddPayment()">+ Add Payment</button>
+        </div>
+      </div>
+
+      <!-- Payments Table -->
+      <div class="payment-table">
+        <div class="table-header">
+          <span>No.</span>
+          <span>Name</span>
+          <span>Status</span>
+          <span>Payment Date</span>
+          <span>Actions</span>
+        </div>
+
+        <div *ngFor="let payment of filteredPayments(); let i = index" class="table-row">
+          <span>{{ i + 1 }}</span>
+          <span>{{ payment.name }}</span>
+          <span>{{ payment.status }}</span>
+          <span>{{ payment.paymentDate }}</span>
+          <span>
+            <button type="button" class="button edit" (click)="editPayment(i)"><i class="pi pi-pencil"></i>Edit</button>
+            <button type="button" class="button delete" (click)="confirmDelete(i)">  <i class="pi pi-trash"></i>Delete</button>
+          </span>
+        </div>
+      </div>
+
+    </div>
+    <p-confirmDialog></p-confirmDialog>
+    <p-toast  position="top-left"
+              style="margin-left: 600px; margin-bottom: 140px;"></p-toast>
+  </div>
+
+</div>
+

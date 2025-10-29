@@ -6,7 +6,7 @@ CREATE TABLE payment (
                          name VARCHAR(255) NOT NULL,
                          status VARCHAR(10),
                          payment_date DATE,
-                         amount NUMERIC(19,2) NOT NULL,
+                         amount NUMERIC(19, 2) NOT NULL,
                          CONSTRAINT fk_expense FOREIGN KEY(expense_id) REFERENCES expense(id)
 );
 

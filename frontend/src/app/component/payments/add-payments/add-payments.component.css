@@ -1,0 +1,165 @@
+body, .app-container {
+  margin:0;
+  padding:0;
+  font-family:'Poppins',sans-serif;
+  height:100vh; display:flex;
+  background:#F0E6FA;
+  overflow:hidden; }
+
+
+.content {
+  flex:1;
+  background:#fff;
+  border-top-left-radius:16px;
+  border-bottom-left-radius:16px;
+  box-shadow:-4px 0 10px rgba(0,0,0,0.05);
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+}
+.page-wrapper {
+  width:100%;
+  padding:25px 40px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.welcome h2 {
+  font-size:28px;
+  color:#4B0082;
+  margin:0;
+  position:relative;
+}
+
+.welcome h2::after {
+  content:"";
+  display:block;
+  width:60px;
+  height:4px;
+  background:linear-gradient(to right,#A16EFF,#C080FF);
+  border-radius:2px; margin-top:6px; }
+.payment-subtitle { font-size:14px;
+  color:#6A0DAD; opacity:0.85; margin:10px 0; }
+
+.payment-form {
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  width:100%;
+}
+
+.payment-form label {
+  font-size:13px;
+  color:#4B0082;
+  font-weight:500; }
+
+.payment-form input, .payment-form select {
+  padding:10px;
+  border:1px solid #DCC6E0;
+  border-radius:6px;
+  font-size:14px;
+  outline:none;
+  background:#F9F6FC;
+  color:#4B0082;
+  transition:border 0.3s; }
+
+.payment-form input:focus, .payment-form select:focus {
+  border-color:#6A0DAD; }
+
+.invalid-field {
+  border-color:red; }
+
+.required {
+  color:red; }
+
+.add-more-checkbox {
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-bottom:15px; }
+
+.submit-btn {
+  padding:12px 20px;
+  width:160px; background:linear-gradient(to right,#A16EFF,#6A0DAD);
+  color:white; border:none;
+  border-radius:6px;
+  font-weight:bold;
+  cursor:pointer;
+  transition:background 0.3s; }
+
+.submit-btn:hover {
+  background:linear-gradient(to right,#6A0DAD,#A16EFF);}
+
+.piggy-bank-section {
+  background:#E6CCF2;
+  padding:35px;
+  border-radius:12px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.05);
+  margin-top:20px;
+  text-align:center;}
+
+.piggy-bank-section i {
+  display:inline-block;
+  padding:20px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#A16EFF,#6A0DAD);
+  color:white;
+  font-size:15px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.2);}
+
+.text {
+  margin-top:15px;
+  font-size:16px;
+  color:#4B0082;
+  font-weight:500; }
+
+::ng-deep .p-checkbox.p-checkbox-checked .p-checkbox-box {
+  background-color:#A16EFF !important;
+  border-color:#A16EFF !important;
+}
+::ng-deep .p-checkbox.p-checkbox-checked .p-checkbox-icon {
+  color:white !important;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 60px;
+}
+
+.field-msg {
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  color: #d9534f;
+  visibility: hidden;
+  height: 16px;
+}
+
+.field-msg.show {
+  visibility: visible;
+}
+
+.payment-form input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(17%) sepia(92%) saturate(7200%) hue-rotate(248deg) brightness(91%) contrast(86%);
+  cursor: pointer;
+}
+
+.payment-form input::placeholder {
+  color: #4B0082;
+}
+
+::ng-deep .p-toast .p-toast-message-success .p-toast-detail {
+  color: black !important;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+}
+
+.button{
+  display: flex;
+  gap: 35px;
+  margin-top: 10px;
+}
+
+

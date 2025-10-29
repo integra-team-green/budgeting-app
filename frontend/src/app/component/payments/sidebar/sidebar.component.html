@@ -1,0 +1,11 @@
+<div class="sidebar">
+  <div class="logo">
+    <div class="logo-shape"><i class="pi pi-wallet"></i></div>
+    <h1>Money Mind</h1>
+  </div>
+  <ul class="menu">
+    <li *ngFor="let item of menuItems" [class.active]="item.active" (click)="onSelect(item)">
+      <i [class]="item.icon"></i> {{item.label}}
+    </li>
+  </ul>
+</div>

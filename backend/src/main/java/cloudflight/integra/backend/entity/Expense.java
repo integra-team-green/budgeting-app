@@ -45,7 +45,12 @@ public class Expense {
     @Column(name = "payment_method", nullable = false)
     private PaymentMethod paymentMethod;
 
-    @OneToOne(mappedBy = "expense", cascade = CascadeType.ALL, optional = true, fetch = FetchType.LAZY)
+    @OneToOne(
+            mappedBy = "expense",
+            cascade = CascadeType.ALL,
+            optional = true,
+            fetch = FetchType.LAZY,
+            orphanRemoval = true)
     private Payment payment;
 
     public Expense(

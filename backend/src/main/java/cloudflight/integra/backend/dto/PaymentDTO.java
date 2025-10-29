@@ -1,25 +1,21 @@
 package cloudflight.integra.backend.dto;
 
 import cloudflight.integra.backend.entity.Payment;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class PaymentDTO {
     private Long id;
     private Long expenseId;
     private String name;
-    private BigDecimal amount;
     private Payment.StatusEnum status;
     private LocalDate paymentDate;
 
     public PaymentDTO() {}
 
-    public PaymentDTO(
-            Long id, Long expenseId, String name, BigDecimal amount, Payment.StatusEnum status, LocalDate paymentDate) {
+    public PaymentDTO(Long id, Long expenseId, String name, Payment.StatusEnum status, LocalDate paymentDate) {
         this.id = id;
         this.expenseId = expenseId;
         this.name = name;
-        this.amount = amount;
         this.status = status;
         this.paymentDate = paymentDate;
     }
@@ -38,14 +34,6 @@ public class PaymentDTO {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
     }
 
     public Payment.StatusEnum getStatus() {
